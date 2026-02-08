@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bingo v3.003</title>
+    <title>Bingo v3.004</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cabin+Condensed:wght@400;700&display=swap" rel="stylesheet">
@@ -15,7 +15,6 @@
         }
 
         html {
-            /* Keeps the background grid from jumping when scrollbar hides */
             scrollbar-gutter: stable;
         }
 
@@ -65,6 +64,12 @@
             transform: scale(1.05);
             z-index: 50;
             box-shadow: 0 0 20px 5px rgba(255, 172, 0, 0.4), inset 0 0 10px rgba(0, 0, 0, 0.5);
+        }
+
+        /* NEW: Ghost class to hide the tile without shifting the grid */
+        .tile.ghost {
+            visibility: hidden;
+            pointer-events: none;
         }
 
         /* Blocky corners */
@@ -177,7 +182,7 @@
             margin-bottom: 0.5cqw;
         }
 
-        /* MODAL SYSTEM v3.003 */
+        /* MODAL SYSTEM v3.004 */
         #modal-overlay {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -209,9 +214,7 @@
             flex-direction: column;
             container-type: inline-size;
             
-            /* Enhanced Animation Settings */
             opacity: 0;
-            /* Start centered on itself but scaled down */
             transform: translate(-50%, -50%) scale(0);
             transform-origin: center center;
             transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
@@ -221,7 +224,6 @@
 
         .modal-content.active {
             opacity: 1;
-            /* Move to screen center */
             top: 50% !important;
             left: 50% !important;
             transform: translate(-50%, -50%) scale(1);
@@ -293,7 +295,7 @@
 </head>
 <body>
 
-    <h1>Bingo v3.003</h1>
+    <h1>Bingo v3.004</h1>
     <div class="grid-container" id="grid"></div>
 
     <div id="modal-overlay" onclick="closeModal()">
@@ -322,6 +324,7 @@
 
     <script>
         const sheetUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRFOGe_j8BL0X5Cwvy3LNmsrWG82IAXlWpump0Sw6PKWLz-1gxbisdbPuTmJ_CmjLA_q-Q6y9jTfFwq/pub?gid=1593254680&single=true&output=csv';
+        let currentActiveTile = null;
 
         async function fetchData() {
             try {
@@ -378,6 +381,10 @@
             const tile = event.currentTarget;
             const rect = tile.getBoundingClientRect();
 
+            // Track the tile and hide it
+            currentActiveTile = tile;
+            tile.classList.add('ghost');
+
             document.getElementById('modal-header').innerHTML = `${data.id} <span style="color:#ffac00">|</span> ${data.title}`;
             document.getElementById('modal-image').src = data.img;
             document.getElementById('modal-bar').style.width = data.percent + '%';
@@ -385,7 +392,6 @@
             document.getElementById('modal-list').innerHTML = data.checklistHtml;
             document.getElementById('modal-desc').innerText = data.description;
             
-            // MATH UPDATE: Start the modal's center at the tile's center
             const spawnX = rect.left + (rect.width / 2);
             const spawnY = rect.top + (rect.height / 2);
 
@@ -405,11 +411,18 @@
         function closeModal() {
             const overlay = document.getElementById('modal-overlay');
             const box = document.getElementById('modal-box');
+            
             overlay.classList.remove('active');
             box.classList.remove('active');
+            
             setTimeout(() => {
                 overlay.style.display = 'none';
                 document.body.style.overflow = 'auto'; 
+                // Restore the tile when the modal finishes its animation
+                if (currentActiveTile) {
+                    currentActiveTile.classList.remove('ghost');
+                    currentActiveTile = null;
+                }
             }, 500);
         }
 
