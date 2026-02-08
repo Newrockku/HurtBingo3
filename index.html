@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bingo v3.1</title>
+    <title>Bingo v3</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cabin+Condensed:wght@400;700&display=swap" rel="stylesheet">
@@ -53,7 +53,7 @@
             container-type: inline-size;
         }
 
-        /* Restored blocky corners as requested */
+        /* Restored blocky corners */
         .corner {
             position: absolute;
             width: 6cqw;
@@ -67,8 +67,7 @@
         .bottom-left  { bottom: -0.5cqw; left: -0.5cqw; border-right: none; border-top: none; }
         .bottom-right { bottom: -0.5cqw; right: -0.5cqw; border-left: none; border-top: none; }
 
-        /* Unified Width */
-        .header-box, .progress-container, .checklist-box {
+        .header-box, .img-container, .progress-container, .checklist-box {
             width: 100%;
             margin-left: auto;
             margin-right: auto;
@@ -80,7 +79,7 @@
             padding: 2% 4%; 
             text-align: center;
             font-weight: bold;
-            font-size: 10cqw; /* Larger font to fill the width */
+            font-size: 10cqw;
             margin-bottom: 2%;
             display: flex;
             justify-content: center;
@@ -93,12 +92,19 @@
         .header-text { color: #ffac00; } 
         .divider { color: #ffac00; margin: 0 1.5%; } 
 
-        .tile img {
+        /* NEW: Image container locks the height so lower boxes don't rise */
+        .img-container {
             height: 42%; 
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 2%;
+        }
+
+        .img-container img {
+            max-height: 100%; 
             max-width: 90%;
             object-fit: contain;
-            margin: auto;
-            display: block;
             filter: drop-shadow(2px 3px 4px black);
         }
 
@@ -219,7 +225,9 @@
                             </div>
                         </div>
                         
-                        <img src="${finalImgSrc}" alt="${title}" onerror="this.style.display='none'">
+                        <div class="img-container">
+                            <img src="${finalImgSrc}" alt="${title}" onerror="this.style.visibility='hidden'">
+                        </div>
                         
                         <div class="progress-container">
                             <div class="progress-bg">
