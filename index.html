@@ -9,7 +9,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Cabin+Condensed:wght@400;700&display=swap" rel="stylesheet">
     
     <style>
-        /* Global Reset to prevent pixel bleed */
+        /* Global Reset */
         * {
             box-sizing: border-box;
         }
@@ -53,7 +53,7 @@
             container-type: inline-size;
         }
 
-        /* Restored blocky corners */
+        /* Blocky corners */
         .corner {
             position: absolute;
             width: 6cqw;
@@ -69,30 +69,43 @@
 
         .header-box, .img-container, .progress-container, .checklist-box {
             width: 100%;
-            margin-left: auto;
-            margin-right: auto;
         }
 
+        /* UPDATED: Header Box to force text to fill the width */
         .header-box {
             background: #342e25;
             border: 1px solid #000;
-            padding: 2% 4%; 
-            text-align: center;
-            font-weight: bold;
-            font-size: 10cqw;
+            padding: 1% 4%; 
             margin-bottom: 2%;
+            min-height: 18%; /* Keeps height consistent */
             display: flex;
-            justify-content: center;
             align-items: center;
-            white-space: normal; 
-            line-height: 0.9;
             overflow: hidden;
         }
 
-        .header-text { color: #ffac00; } 
-        .divider { color: #ffac00; margin: 0 1.5%; } 
+        .header-content {
+            display: flex;
+            justify-content: space-between; /* Pushes number to left and title to right */
+            align-items: center;
+            width: 100%;
+            font-weight: bold;
+            font-size: 11cqw; /* Larger font */
+            line-height: 0.9;
+            letter-spacing: -0.2cqw; /* Tightens it up to fit more characters */
+        }
 
-        /* NEW: Image container locks the height so lower boxes don't rise */
+        .header-text { 
+            color: #ffac00;
+            white-space: nowrap; /* Prevents awkward single-word wrapping */
+        } 
+
+        .divider { 
+            color: #ffac00; 
+            margin: 0 1.5%; 
+            font-size: 9cqw;
+        } 
+
+        /* Image container locks the height */
         .img-container {
             height: 42%; 
             display: flex;
@@ -111,7 +124,6 @@
         .progress-container {
             margin-bottom: 2%;
             height: 4cqw;
-            display: block;
         }
 
         .progress-bg {
@@ -218,10 +230,10 @@
                         <div class="corner bottom-right"></div>
                         
                         <div class="header-box">
-                            <div>
+                            <div class="header-content">
                                 <span class="header-text">${index + 1}</span>
                                 <span class="divider">|</span>
-                                <span class="header-text">${title}</span>
+                                <span class="header-text" style="flex-grow: 1; text-align: right;">${title}</span>
                             </div>
                         </div>
                         
