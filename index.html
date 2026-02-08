@@ -332,7 +332,8 @@
 
         async function fetchData() {
             try {
-                const response = await fetch(sheetUrl);
+                // Fetching with a timestamp prevents the browser from using a cached version of the data
+                const response = await fetch(`${sheetUrl}&cachebust=${new Date().getTime()}`);
                 const data = await response.text();
                 const rows = data.split('\n').slice(1); 
 
@@ -423,7 +424,11 @@
             document.body.style.overflow = 'auto'; 
         }
 
+        // Initial Load
         fetchData();
+
+        // Automatically update the information every 30 seconds
+        setInterval(fetchData, 30000);
     </script>
 </body>
 </html>
