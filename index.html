@@ -53,11 +53,9 @@
             overflow: hidden; 
             container-type: inline-size;
             cursor: pointer;
-            /* Transition added for the glow effect */
-            transition: box-shadow 0.3s ease, border-color 0.3s ease;
+            transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
         }
 
-        /* CHANGED: Hover effect to a Background Glow */
         .tile:hover {
             transform: scale(1.05);
             z-index: 50;
@@ -181,17 +179,23 @@
             margin-bottom: 0.5cqw;
         }
 
-        /* MODAL SYSTEM */
+        /* MODAL SYSTEM - ANIMATION UPDATES */
         #modal-overlay {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.4);
+            background: rgba(0, 0, 0, 0);
             display: none;
             justify-content: center;
             align-items: center;
             z-index: 1000;
-            backdrop-filter: blur(5px);
+            backdrop-filter: blur(0px);
             padding: 20px;
+            transition: background 0.4s ease, backdrop-filter 0.4s ease;
+        }
+
+        #modal-overlay.active {
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(5px);
         }
 
         .modal-content {
@@ -201,11 +205,25 @@
             max-width: 450px;
             max-height: 95vh;
             padding: 35px;
-            position: relative;
+            position: absolute; /* Changed to absolute for origin positioning */
             box-shadow: 0 0 40px rgba(255, 172, 0, 0.4);
             display: flex;
             flex-direction: column;
             container-type: inline-size;
+            
+            /* Animation properties */
+            opacity: 0;
+            pointer-events: none;
+            transform: scale(0.1);
+            transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+        }
+
+        .modal-content.active {
+            opacity: 1;
+            pointer-events: auto;
+            transform: scale(1) translate(-50%, -50%);
+            top: 50% !important;
+            left: 50% !important;
         }
 
         .modal-header {
@@ -215,17 +233,12 @@
             font-weight: bold;
             border-bottom: 2px solid #342e25;
             padding-bottom: 10px;
-            text-shadow: 
-                -1px -1px 0 #000,  
-                 1px -1px 0 #000,
-                -1px  1px 0 #000,
-                 1px  1px 0 #000;
+            text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
         }
 
         .modal-img { height: 150px; margin-bottom: 15px; display: flex; justify-content: center; flex-shrink: 0;}
         .modal-img img { max-height: 100%; filter: drop-shadow(4px 4px 6px black); }
         
-        /* UPDATED: Added text outline (shadow method) */
         .modal-label { 
             font-size: 0.85rem; 
             text-transform: uppercase; 
@@ -234,11 +247,7 @@
             display: block; 
             font-weight: bold;
             letter-spacing: 1px;
-            text-shadow: 
-                -1px -1px 0 #000,  
-                 1px -1px 0 #000,
-                -1px  1px 0 #000,
-                 1px  1px 0 #000;
+            text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
         }
 
         .modal-progress { height: 10px; margin-bottom: 15px; flex-shrink: 0; }
@@ -250,15 +259,13 @@
             line-height: 1.2;
             height: auto; 
             min-height: 40px; 
-            max-height: 250px; 
+            max-height: 200px; 
             overflow-y: auto; 
             margin-bottom: 15px; 
         }
 
         .modal-checklist .check-item { font-size: 0.9rem; margin-bottom: 4px; }
         .modal-checklist .check-item:last-child { margin-bottom: 0; }
-        .modal-checklist .check-mark { width: 16px; height: 16px; }
-        .modal-checklist .check-mark::after { width: 4px; height: 8px; border-width: 0 2px 2px 0; }
 
         .modal-description {
             font-size: 0.9rem;
@@ -269,7 +276,6 @@
             border: 1px solid #000;
             overflow-y: auto;
             flex-grow: 1;
-            margin-bottom: 15px;
         }
 
         .close-btn {
@@ -298,7 +304,7 @@
     <div class="grid-container" id="grid"></div>
 
     <div id="modal-overlay" onclick="closeModal()">
-        <div class="modal-content" onclick="event.stopPropagation()">
+        <div class="modal-content" id="modal-box" onclick="event.stopPropagation()">
             <div class="corner top-left"></div>
             <div class="corner top-right"></div>
             <div class="corner bottom-left"></div>
@@ -332,7 +338,6 @@
 
         async function fetchData() {
             try {
-                // Fetching with a timestamp prevents the browser from using a cached version of the data
                 const response = await fetch(`${sheetUrl}&cachebust=${new Date().getTime()}`);
                 const data = await response.text();
                 const rows = data.split('\n').slice(1); 
@@ -368,7 +373,7 @@
                     const tile = document.createElement('div');
                     tile.className = 'tile';
                     
-                    tile.onclick = () => openModal({
+                    tile.onclick = (e) => openModal(e, {
                         id: index + 1,
                         title,
                         img: finalImgSrc,
@@ -407,7 +412,13 @@
             }
         }
 
-        function openModal(data) {
+        function openModal(event, data) {
+            const overlay = document.getElementById('modal-overlay');
+            const box = document.getElementById('modal-box');
+            const tile = event.currentTarget;
+            const rect = tile.getBoundingClientRect();
+
+            // 1. Set data
             document.getElementById('modal-header').innerHTML = `${data.id} <span style="color:#ffac00">|</span> ${data.title}`;
             document.getElementById('modal-image').src = data.img;
             document.getElementById('modal-bar').style.width = data.percent + '%';
@@ -415,20 +426,38 @@
             document.getElementById('modal-list').innerHTML = data.checklistHtml;
             document.getElementById('modal-desc').innerText = data.description;
             
-            document.getElementById('modal-overlay').style.display = 'flex';
+            // 2. Position the modal box at the tile's location
+            box.style.top = rect.top + (rect.height / 2) + 'px';
+            box.style.left = rect.left + (rect.width / 2) + 'px';
+            box.style.transform = 'scale(0.1) translate(0, 0)'; 
+
+            // 3. Show and animate
+            overlay.style.display = 'flex';
+            
+            // Small timeout to allow the initial position to register
+            setTimeout(() => {
+                overlay.classList.add('active');
+                box.classList.add('active');
+            }, 10);
+
             document.body.style.overflow = 'hidden'; 
         }
 
         function closeModal() {
-            document.getElementById('modal-overlay').style.display = 'none';
-            document.body.style.overflow = 'auto'; 
+            const overlay = document.getElementById('modal-overlay');
+            const box = document.getElementById('modal-box');
+            
+            overlay.classList.remove('active');
+            box.classList.remove('active');
+            
+            setTimeout(() => {
+                overlay.style.display = 'none';
+                document.body.style.overflow = 'auto'; 
+            }, 400); // Matches transition duration
         }
 
-        // Initial Load
         fetchData();
-
-        // Automatically update the information every 15 seconds
-        setInterval(fetchData, 15000);
+        setInterval(fetchData, 30000);
     </script>
 </body>
 </html>
