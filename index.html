@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bingo v3.4</title>
+    <title>Bingo v3.5</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cabin+Condensed:wght@400;700&display=swap" rel="stylesheet">
@@ -40,6 +40,7 @@
             max-width: 1600px;
         }
 
+        /* Tile Styles */
         .tile {
             background-color: #494034; 
             border: 2px solid #6d604e;
@@ -52,15 +53,16 @@
             overflow: hidden; 
             container-type: inline-size;
             cursor: pointer;
-            transition: transform 0.1s ease;
+            transition: transform 0.1s ease, border-color 0.2s ease;
         }
 
         .tile:hover {
             transform: scale(1.02);
             border-color: #ffac00;
+            z-index: 50;
         }
 
-        /* Blocky corners preserved */
+        /* Blocky corners */
         .corner {
             position: absolute;
             width: 6cqw;
@@ -74,6 +76,7 @@
         .bottom-left  { bottom: -0.5cqw; left: -0.5cqw; border-right: none; border-top: none; }
         .bottom-right { bottom: -0.5cqw; right: -0.5cqw; border-left: none; border-top: none; }
 
+        /* Component Styles */
         .header-box {
             background: #342e25;
             border: 1px solid #000;
@@ -97,13 +100,7 @@
             display: inline-block;
         }
 
-        .header-text { color: #ffac00; } 
-
-        .divider { 
-            color: #ffac00; 
-            margin: 0 1cqw;
-            opacity: 1;
-        } 
+        .divider { margin: 0 1cqw; } 
 
         .img-container {
             height: 40%; 
@@ -136,10 +133,7 @@
             overflow: hidden;
         }
 
-        .progress-fill {
-            height: 100%;
-            transition: width 0.5s ease;
-        }
+        .progress-fill { height: 100%; transition: width 0.5s ease; }
 
         .checklist-box {
             background: #342e25; 
@@ -148,7 +142,6 @@
             flex-grow: 1; 
             width: 100%;
             overflow-y: auto;
-            text-align: left;
             min-height: 0;
         }
 
@@ -162,9 +155,7 @@
         }
 
         .check-mark {
-            width: 4.5cqw;
-            height: 4.5cqw;
-            background-color: transparent; 
+            width: 4.5cqw; height: 4.5cqw;
             border: 1px solid #4caf50;
             margin-right: 3%;
             flex-shrink: 0;
@@ -176,84 +167,107 @@
 
         .check-mark::after {
             content: '';
-            width: 1.2cqw;
-            height: 2.5cqw;
+            width: 1.2cqw; height: 2.5cqw;
             border: solid #4caf50;
             border-width: 0 0.8cqw 0.8cqw 0;
             transform: rotate(45deg);
             margin-bottom: 0.5cqw;
         }
 
-        /* MODAL STYLES */
+        /* MODAL SYSTEM */
         #modal-overlay {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.85);
+            background: rgba(0, 0, 0, 0.9);
             display: none;
             justify-content: center;
             align-items: center;
             z-index: 1000;
-            backdrop-filter: blur(5px);
+            backdrop-filter: blur(8px);
+            padding: 20px;
         }
 
         .modal-content {
             background-color: #494034;
             border: 3px solid #6d604e;
-            width: 90%;
-            max-width: 500px;
-            padding: 30px;
+            width: 100%;
+            max-width: 450px;
+            max-height: 90vh;
+            padding: 25px;
             position: relative;
-            box-shadow: 0 0 30px rgba(0,0,0,0.7);
-            text-align: center;
+            box-shadow: 0 0 40px rgba(0,0,0,0.8);
+            display: flex;
+            flex-direction: column;
+            /* Using Container Queries for modal too so it scales like the tile */
+            container-type: inline-size;
         }
 
-        .modal-title {
-            font-size: 2rem;
-            margin-bottom: 15px;
-            color: #ffac00;
-            border-bottom: 2px solid #342e25;
-            padding-bottom: 10px;
-        }
+        /* We reuse the tile styles inside the modal but at static/larger sizes */
+        .modal-header { font-size: 1.8rem; margin-bottom: 15px; text-align: center; font-weight: bold; border-bottom: 2px solid #342e25; padding-bottom: 10px; }
+        .modal-img { height: 150px; margin-bottom: 15px; display: flex; justify-content: center; }
+        .modal-img img { max-height: 100%; filter: drop-shadow(4px 4px 6px black); }
+        
+        .modal-progress { height: 20px; margin-bottom: 15px; }
+        .modal-checklist { background: #342e25; border: 1px solid #000; padding: 15px; max-height: 150px; overflow-y: auto; margin-bottom: 15px; }
+        .modal-checklist .check-item { font-size: 1.1rem; }
+        .modal-checklist .check-mark { width: 16px; height: 16px; }
+        .modal-checklist .check-mark::after { width: 4px; height: 8px; border-width: 0 2px 2px 0; }
 
+        .modal-desc-label { font-size: 0.9rem; text-transform: uppercase; color: #858476; margin-bottom: 5px; display: block; }
         .modal-description {
-            font-size: 1.2rem;
+            font-size: 1.1rem;
             color: #e0d7c6;
-            line-height: 1.5;
-            background: #342e25;
+            line-height: 1.4;
+            background: #2a251e;
             padding: 15px;
             border: 1px solid #000;
-            text-align: left;
+            overflow-y: auto;
         }
 
         .close-btn {
             position: absolute;
-            top: 10px;
-            right: 15px;
-            font-size: 1.5rem;
+            top: 5px; right: 12px;
+            font-size: 2rem;
             cursor: pointer;
             color: #858476;
+            z-index: 1001;
         }
-
         .close-btn:hover { color: #ffac00; }
 
-        @media (max-width: 1000px) {
-            .grid-container { grid-template-columns: repeat(5, 1fr); }
-        }
-        @media (max-width: 600px) {
-            .grid-container { grid-template-columns: repeat(3, 1fr); }
-        }
+        /* Scrollbar styling */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-thumb { background: #6d604e; }
+        ::-webkit-scrollbar-track { background: #342e25; }
+
+        @media (max-width: 1000px) { .grid-container { grid-template-columns: repeat(5, 1fr); } }
+        @media (max-width: 600px) { .grid-container { grid-template-columns: repeat(3, 1fr); } }
     </style>
 </head>
 <body>
 
-    <h1>Bingo v3.4</h1>
+    <h1>Bingo v3.5</h1>
     
     <div class="grid-container" id="grid"></div>
 
     <div id="modal-overlay" onclick="closeModal()">
         <div class="modal-content" onclick="event.stopPropagation()">
             <span class="close-btn" onclick="closeModal()">&times;</span>
-            <div id="modal-title" class="modal-title"></div>
+            
+            <div id="modal-header" class="modal-header"></div>
+            
+            <div class="modal-img">
+                <img id="modal-image" src="" alt="">
+            </div>
+            
+            <div class="modal-progress">
+                <div class="progress-bg">
+                    <div id="modal-bar" class="progress-fill"></div>
+                </div>
+            </div>
+            
+            <div id="modal-list" class="modal-checklist"></div>
+            
+            <span class="modal-desc-label">Description</span>
             <div id="modal-desc" class="modal-description"></div>
         </div>
     </div>
@@ -279,23 +293,16 @@
                     const current = parseInt(cols[2]) || 0;
                     const goal = parseInt(cols[3]) || 1;
                     const itemList = cols[4] ? cols[4].replace(/"/g, "").trim().split(',') : [];
-                    // Capture description from Column 6 (index 5)
                     const description = cols[5] ? cols[5].replace(/"/g, "").trim() : "No description provided.";
 
                     const percent = Math.min((current / goal) * 100, 100);
-                    
                     let barColor = '#d32f2f'; 
                     if (percent === 100) barColor = '#00ff00';
                     else if (percent > 0) barColor = '#ffa500';
 
                     const finalImgSrc = (imgName.includes('http')) ? imgName : `./images/${imgName}`;
 
-                    const tile = document.createElement('div');
-                    tile.className = 'tile';
-                    
-                    // Attach click event for modal
-                    tile.onclick = () => openModal(title, description);
-                    
+                    // Build the checklist HTML
                     let checklistHtml = '';
                     itemList.forEach(item => {
                         if(item.trim() !== "") {
@@ -303,12 +310,25 @@
                         }
                     });
 
+                    const tile = document.createElement('div');
+                    tile.className = 'tile';
+                    
+                    // Pass all data to the openModal function
+                    tile.onclick = () => openModal({
+                        id: index + 1,
+                        title,
+                        img: finalImgSrc,
+                        percent,
+                        barColor,
+                        checklistHtml,
+                        description
+                    });
+
                     tile.innerHTML = `
                         <div class="corner top-left"></div>
                         <div class="corner top-right"></div>
                         <div class="corner bottom-left"></div>
                         <div class="corner bottom-right"></div>
-                        
                         <div class="header-box">
                             <div class="header-content">
                                 <span class="header-text">${index + 1}</span>
@@ -316,20 +336,15 @@
                                 <span class="header-text">${title}</span>
                             </div>
                         </div>
-                        
                         <div class="img-container">
                             <img src="${finalImgSrc}" alt="${title}" onerror="this.style.visibility='hidden'">
                         </div>
-                        
                         <div class="progress-container">
                             <div class="progress-bg">
                                 <div class="progress-fill" style="width: ${percent}%; background: ${barColor}"></div>
                             </div>
                         </div>
-                        
-                        <div class="checklist-box">
-                            ${checklistHtml}
-                        </div>
+                        <div class="checklist-box">${checklistHtml}</div>
                     `;
                     grid.appendChild(tile);
                 });
@@ -338,14 +353,21 @@
             }
         }
 
-        function openModal(title, desc) {
-            document.getElementById('modal-title').innerText = title;
-            document.getElementById('modal-desc').innerText = desc;
+        function openModal(data) {
+            document.getElementById('modal-header').innerHTML = `${data.id} <span style="color:#858476">|</span> ${data.title}`;
+            document.getElementById('modal-image').src = data.img;
+            document.getElementById('modal-bar').style.width = data.percent + '%';
+            document.getElementById('modal-bar').style.background = data.barColor;
+            document.getElementById('modal-list').innerHTML = data.checklistHtml;
+            document.getElementById('modal-desc').innerText = data.description;
+            
             document.getElementById('modal-overlay').style.display = 'flex';
+            document.body.style.overflow = 'hidden'; // Prevent background scrolling
         }
 
         function closeModal() {
             document.getElementById('modal-overlay').style.display = 'none';
+            document.body.style.overflow = 'auto'; // Restore scrolling
         }
 
         fetchData();
