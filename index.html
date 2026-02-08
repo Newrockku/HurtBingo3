@@ -53,7 +53,7 @@
             overflow: hidden; 
             container-type: inline-size;
             cursor: pointer;
-            transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
 
         .tile:hover {
@@ -62,7 +62,7 @@
             box-shadow: 0 0 20px 5px rgba(255, 172, 0, 0.4), inset 0 0 10px rgba(0, 0, 0, 0.5);
         }
 
-        /* Blocky corners with 1px black outline */
+        /* Blocky corners */
         .corner {
             position: absolute;
             width: 6cqw;
@@ -70,18 +70,13 @@
             border: 3cqw solid #858476; 
             pointer-events: none;
             z-index: 10;
-            filter: 
-                drop-shadow(1px 0 0 #000) 
-                drop-shadow(-1px 0 0 #000) 
-                drop-shadow(0 1px 0 #000) 
-                drop-shadow(0 -1px 0 #000);
+            filter: drop-shadow(1px 0 0 #000) drop-shadow(-1px 0 0 #000) drop-shadow(0 1px 0 #000) drop-shadow(0 -1px 0 #000);
         }
         .top-left     { top: -0.5cqw; left: -0.5cqw; border-right: none; border-bottom: none; }
         .top-right    { top: -0.5cqw; right: -0.5cqw; border-left: none; border-bottom: none; }
         .bottom-left  { bottom: -0.5cqw; left: -0.5cqw; border-right: none; border-top: none; }
         .bottom-right { bottom: -0.5cqw; right: -0.5cqw; border-left: none; border-top: none; }
 
-        /* Component Styles */
         .header-box {
             background: #342e25;
             border: 1px solid #000;
@@ -127,7 +122,6 @@
             margin-bottom: 2%;
             height: 4cqw;
             width: 100%;
-            flex-shrink: 0;
         }
 
         .progress-bg {
@@ -161,7 +155,6 @@
 
         .check-mark {
             width: 4.5cqw; height: 4.5cqw;
-            border: 0px solid #4caf50;
             margin-right: 3%;
             flex-shrink: 0;
             position: relative;
@@ -179,7 +172,7 @@
             margin-bottom: 0.5cqw;
         }
 
-        /* MODAL SYSTEM - ANIMATION UPDATES */
+        /* MODAL SYSTEM v3.001 */
         #modal-overlay {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -189,41 +182,44 @@
             align-items: center;
             z-index: 1000;
             backdrop-filter: blur(0px);
-            padding: 20px;
             transition: background 0.4s ease, backdrop-filter 0.4s ease;
         }
 
         #modal-overlay.active {
-            background: rgba(0, 0, 0, 0.6);
+            background: rgba(0, 0, 0, 0.7);
             backdrop-filter: blur(5px);
         }
 
         .modal-content {
             background-color: #494034;
             border: 3px solid #6d604e;
-            width: 100%;
+            width: 90vw;
             max-width: 450px;
-            max-height: 95vh;
-            padding: 35px;
-            position: absolute; /* Changed to absolute for origin positioning */
+            height: auto;
+            max-height: 90vh;
+            padding: 30px;
+            position: fixed;
             box-shadow: 0 0 40px rgba(255, 172, 0, 0.4);
             display: flex;
             flex-direction: column;
             container-type: inline-size;
             
-            /* Animation properties */
+            /* Initial State */
             opacity: 0;
+            transform: translate(0, 0) scale(0);
+            transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
             pointer-events: none;
-            transform: scale(0.1);
-            transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+            z-index: 1001;
+            transform-origin: center center;
         }
 
         .modal-content.active {
             opacity: 1;
-            pointer-events: auto;
-            transform: scale(1) translate(-50%, -50%);
+            /* Center the modal exactly */
             top: 50% !important;
             left: 50% !important;
+            transform: translate(-50%, -50%) scale(1);
+            pointer-events: auto;
         }
 
         .modal-header {
@@ -246,31 +242,24 @@
             margin-bottom: 5px; 
             display: block; 
             font-weight: bold;
-            letter-spacing: 1px;
             text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
         }
 
-        .modal-progress { height: 10px; margin-bottom: 15px; flex-shrink: 0; }
+        .modal-progress { height: 10px; margin-bottom: 15px; }
         
         .modal-checklist { 
             background: #342e25; 
             border: 1px solid #000; 
             padding: 10px;
-            line-height: 1.2;
             height: auto; 
-            min-height: 40px; 
             max-height: 200px; 
             overflow-y: auto; 
             margin-bottom: 15px; 
         }
 
-        .modal-checklist .check-item { font-size: 0.9rem; margin-bottom: 4px; }
-        .modal-checklist .check-item:last-child { margin-bottom: 0; }
-
         .modal-description {
             font-size: 0.9rem;
             color: #ffac00;
-            line-height: 1.4;
             background: #342e25;
             padding: 10px;
             border: 1px solid #000;
@@ -280,15 +269,14 @@
 
         .close-btn {
             position: absolute;
-            top: 6px; right: 12px;
-            font-size: 3rem;
+            top: 10px; right: 15px;
+            font-size: 2.5rem;
             cursor: pointer;
             color: #858476;
-            z-index: 1001;
+            line-height: 1;
         }
         .close-btn:hover { color: #ffac00; }
 
-        /* Scrollbar styling */
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-thumb { background: #6d604e; }
         ::-webkit-scrollbar-track { background: #342e25; }
@@ -300,7 +288,6 @@
 <body>
 
     <h1>Bingo v3.001</h1>
-    
     <div class="grid-container" id="grid"></div>
 
     <div id="modal-overlay" onclick="closeModal()">
@@ -311,18 +298,12 @@
             <div class="corner bottom-right"></div>
 
             <span class="close-btn" onclick="closeModal()">&times;</span>
-            
             <div id="modal-header" class="modal-header"></div>
-            
-            <div class="modal-img">
-                <img id="modal-image" src="" alt="">
-            </div>
+            <div class="modal-img"><img id="modal-image" src="" alt=""></div>
             
             <span class="modal-label">Progress</span>
             <div class="modal-progress">
-                <div class="progress-bg">
-                    <div id="modal-bar" class="progress-fill"></div>
-                </div>
+                <div class="progress-bg"><div id="modal-bar" class="progress-fill"></div></div>
             </div>
             
             <span class="modal-label">Collected Items</span>
@@ -341,7 +322,6 @@
                 const response = await fetch(`${sheetUrl}&cachebust=${new Date().getTime()}`);
                 const data = await response.text();
                 const rows = data.split('\n').slice(1); 
-
                 const grid = document.getElementById('grid');
                 grid.innerHTML = '';
 
@@ -357,10 +337,7 @@
                     const description = cols[5] ? cols[5].replace(/"/g, "").trim() : "No description provided.";
 
                     const percent = Math.min((current / goal) * 100, 100);
-                    let barColor = '#d32f2f'; 
-                    if (percent === 100) barColor = '#00ff00';
-                    else if (percent > 0) barColor = '#ffa500';
-
+                    let barColor = percent === 100 ? '#00ff00' : (percent > 0 ? '#ffa500' : '#d32f2f');
                     const finalImgSrc = (imgName.includes('http')) ? imgName : `./images/${imgName}`;
 
                     let checklistHtml = '';
@@ -372,44 +349,21 @@
 
                     const tile = document.createElement('div');
                     tile.className = 'tile';
-                    
                     tile.onclick = (e) => openModal(e, {
-                        id: index + 1,
-                        title,
-                        img: finalImgSrc,
-                        percent,
-                        barColor,
-                        checklistHtml,
-                        description
+                        id: index + 1, title, img: finalImgSrc, percent, barColor, checklistHtml, description
                     });
 
                     tile.innerHTML = `
-                        <div class="corner top-left"></div>
-                        <div class="corner top-right"></div>
-                        <div class="corner bottom-left"></div>
-                        <div class="corner bottom-right"></div>
-                        <div class="header-box">
-                            <div class="header-content">
-                                <span class="header-text">${index + 1}</span>
-                                <span class="divider">|</span>
-                                <span class="header-text">${title}</span>
-                            </div>
-                        </div>
-                        <div class="img-container">
-                            <img src="${finalImgSrc}" alt="${title}" onerror="this.style.visibility='hidden'">
-                        </div>
-                        <div class="progress-container">
-                            <div class="progress-bg">
-                                <div class="progress-fill" style="width: ${percent}%; background: ${barColor}"></div>
-                            </div>
-                        </div>
+                        <div class="corner top-left"></div><div class="corner top-right"></div>
+                        <div class="corner bottom-left"></div><div class="corner bottom-right"></div>
+                        <div class="header-box"><div class="header-content">${index + 1} <span class="divider">|</span> ${title}</div></div>
+                        <div class="img-container"><img src="${finalImgSrc}" onerror="this.style.visibility='hidden'"></div>
+                        <div class="progress-container"><div class="progress-bg"><div class="progress-fill" style="width: ${percent}%; background: ${barColor}"></div></div></div>
                         <div class="checklist-box">${checklistHtml}</div>
                     `;
                     grid.appendChild(tile);
                 });
-            } catch (error) {
-                console.error("Error:", error);
-            }
+            } catch (error) { console.error("Error:", error); }
         }
 
         function openModal(event, data) {
@@ -418,7 +372,7 @@
             const tile = event.currentTarget;
             const rect = tile.getBoundingClientRect();
 
-            // 1. Set data
+            // Populate data
             document.getElementById('modal-header').innerHTML = `${data.id} <span style="color:#ffac00">|</span> ${data.title}`;
             document.getElementById('modal-image').src = data.img;
             document.getElementById('modal-bar').style.width = data.percent + '%';
@@ -426,15 +380,13 @@
             document.getElementById('modal-list').innerHTML = data.checklistHtml;
             document.getElementById('modal-desc').innerText = data.description;
             
-            // 2. Position the modal box at the tile's location
-            box.style.top = rect.top + (rect.height / 2) + 'px';
-            box.style.left = rect.left + (rect.width / 2) + 'px';
-            box.style.transform = 'scale(0.1) translate(0, 0)'; 
+            // Set spawn point to tile location
+            box.style.top = (rect.top + rect.height/2) + 'px';
+            box.style.left = (rect.left + rect.width/2) + 'px';
 
-            // 3. Show and animate
             overlay.style.display = 'flex';
             
-            // Small timeout to allow the initial position to register
+            // Trigger animation
             setTimeout(() => {
                 overlay.classList.add('active');
                 box.classList.add('active');
@@ -446,14 +398,12 @@
         function closeModal() {
             const overlay = document.getElementById('modal-overlay');
             const box = document.getElementById('modal-box');
-            
             overlay.classList.remove('active');
             box.classList.remove('active');
-            
             setTimeout(() => {
                 overlay.style.display = 'none';
                 document.body.style.overflow = 'auto'; 
-            }, 400); // Matches transition duration
+            }, 500);
         }
 
         fetchData();
