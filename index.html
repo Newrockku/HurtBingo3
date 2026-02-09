@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bingo v3.047</title>
+    <title>Bingo v3.048</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cabin+Condensed:wght@400;700&display=swap" rel="stylesheet">
@@ -43,6 +43,7 @@
             align-items: center;
             box-shadow: 0 4px 15px rgba(0,0,0,0.5);
             gap: 15px;
+            z-index: 10;
         }
 
         .dashboard-main { 
@@ -75,7 +76,6 @@
             font-weight: bold;
         }
 
-        /* Team Selector Styling */
         #team-selector {
             background: #221e18;
             color: #ffac00;
@@ -117,9 +117,10 @@
             padding: 0 10px 60px 10px;
             width: 100%;
             max-width: 1600px;
+            position: relative;
+            z-index: 5;
         }
 
-        /* Responsive Breakpoints */
         @media (max-width: 1200px) { .grid-container { grid-template-columns: repeat(5, 1fr); } }
         @media (max-width: 800px) { .grid-container { grid-template-columns: repeat(4, 1fr); } }
         @media (max-width: 600px) { 
@@ -235,26 +236,17 @@
 
         .tile.completed .checklist-box { background: #162a16; }
 
-        /* Scrollbars */
-        ::-webkit-scrollbar { width: 8px; }
-        ::-webkit-scrollbar-thumb { background: #6d604e; }
-        ::-webkit-scrollbar-track { background: #221e18; }
-        .tile.completed .checklist-box::-webkit-scrollbar-thumb,
-        .modal-content.completed .modal-checklist::-webkit-scrollbar-thumb,
-        .modal-content.completed .modal-description::-webkit-scrollbar-thumb { background: #4caf50; }
-
-        .tile .check-item {
-            font-size: 6.5cqw; 
-            color: #ffee00;
+        /* Standard Checkmark logic for Tile and Modal */
+        .check-item {
             display: flex;
             align-items: center;
             margin-bottom: 4px;
         }
-        .tile.completed .check-item { color: #4caf50; }
 
-        .tile .check-mark {
-            width: 4.5cqw; height: 4.5cqw;
-            margin-right: 3%;
+        .check-mark {
+            width: 1.2em;
+            height: 1.2em;
+            margin-right: 6px;
             flex-shrink: 0;
             position: relative;
             display: flex;
@@ -262,13 +254,18 @@
             align-items: center;
         }
 
-        .tile .check-mark::after {
+        /* The actual checkmark drawing */
+        .check-mark::after {
             content: '';
-            width: 1.2cqw; height: 2.5cqw;
+            width: 0.3em;
+            height: 0.6em;
             border: solid #4caf50;
-            border-width: 0 0.8cqw 0.8cqw 0;
+            border-width: 0 0.2em 0.2em 0;
             transform: rotate(45deg);
         }
+
+        .tile .check-item { font-size: 6.5cqw; color: #ffee00; }
+        .tile.completed .check-item { color: #4caf50; }
 
         /* MODAL SYSTEM */
         #modal-overlay {
@@ -331,6 +328,8 @@
         .modal-content.completed .modal-label { color: #4caf50; }
 
         .modal-progress { height: 12px; margin-bottom: 12px; }
+        .modal-content.completed .modal-progress,
+        .modal-content.completed .progress-label { display: none; }
         
         .modal-checklist { 
             background: #342e25; 
@@ -353,7 +352,6 @@
 
         .modal-content.completed .modal-checklist,
         .modal-content.completed .modal-description { background: #162a16; color: #4caf50; }
-        .modal-content.completed .modal-checklist .check-item { color: #4caf50; }
 
         .close-btn {
             position: absolute;
@@ -365,16 +363,17 @@
         }
         .close-btn:hover { color: #ffac00; }
 
-        /* --- VERSION FOOTER --- */
+        /* --- BACKGROUND WATERMARK FOOTER --- */
         .version-footer {
             position: fixed;
             bottom: 10px;
             right: 15px;
             font-size: 0.65rem;
-            color: #6d604e;
+            color: #4a4134; /* Darker to blend in */
             text-align: right;
             pointer-events: none;
-            z-index: 999;
+            z-index: 1; /* Behind grid */
+            opacity: 0.6;
         }
     </style>
 </head>
@@ -386,7 +385,7 @@
             <div class="team-row">
                 <p id="team-name">Select Team</p>
                 <select id="team-selector" onchange="changeTeam(this.value)">
-                    </select>
+                </select>
             </div>
         </div>
         <div class="stats-container">
@@ -404,7 +403,7 @@
     <div class="grid-container" id="grid"></div>
 
     <footer class="version-footer">
-        <span>Build: v3.047</span>
+        <span>Build: v3.048</span><br>
         <span id="last-sync">Last Sync: Never</span>
     </footer>
 
@@ -425,8 +424,6 @@
     </div>
 
     <script>
-        // --- TEAM CONFIGURATION ---
-        // Add your teams and their spreadsheet CSV URLs here.
         const TEAM_MAP = {
             "Warriors": {
                 name: "The Spreadsheet Warriors",
@@ -439,31 +436,20 @@
                 url: "PASTE_SECOND_TEAM_CSV_URL_HERE",
                 codeword: "PALADIN_PRIDE",
                 points: 800
-            },
-            "Rogues": {
-                name: "Shadow Rogues",
-                url: "PASTE_THIRD_TEAM_CSV_URL_HERE",
-                codeword: "STEALTH_WIN",
-                points: 2100
             }
         };
 
-        let currentTeamKey = "Warriors"; // Default
+        let currentTeamKey = "Warriors";
         let currentActiveTile = null;
         let lastSeenHash = null;
         let previousVersionHash = null;
         let codewordSecret = "";
 
-        // Initialization Logic
         function init() {
-            // 1. Check URL for team parameter
             const params = new URLSearchParams(window.location.search);
             const teamParam = params.get('team');
-            if (teamParam && TEAM_MAP[teamParam]) {
-                currentTeamKey = teamParam;
-            }
+            if (teamParam && TEAM_MAP[teamParam]) currentTeamKey = teamParam;
 
-            // 2. Populate Dropdown
             const selector = document.getElementById('team-selector');
             Object.keys(TEAM_MAP).forEach(key => {
                 const opt = document.createElement('option');
@@ -478,7 +464,6 @@
         }
 
         function changeTeam(newKey) {
-            // Update URL and reload to ensure a fresh state for the new team
             const url = new URL(window.location);
             url.searchParams.set('team', newKey);
             window.location.href = url.href;
@@ -516,8 +501,6 @@
             document.getElementById('team-name').innerText = teamData.name;
             document.getElementById('total-points').innerText = teamData.points.toLocaleString();
             codewordSecret = teamData.codeword;
-            
-            // Reset hidden state when changing teams
             const el = document.getElementById('codeword-display');
             el.classList.add('codeword-hidden');
             el.innerText = "?????";
@@ -526,21 +509,16 @@
         async function fetchData() {
             try {
                 const teamData = TEAM_MAP[currentTeamKey];
-                // Handle empty URLs for placeholder teams
                 if (teamData.url.startsWith("PASTE")) {
                     document.getElementById('grid').innerHTML = '<p style="grid-column: 1/-1; text-align: center; margin-top: 50px;">This team sheet has not been linked yet.</p>';
                     return;
                 }
 
-                const response = await fetch(`${teamData.url}&cachebust=${new Date().getTime()}`, {
-                    cache: "no-store",
-                    headers: { 'Cache-Control': 'no-cache', 'Pragma': 'no-cache' }
-                });
+                const response = await fetch(`${teamData.url}&cachebust=${new Date().getTime()}`);
                 const rawData = await response.text();
                 const currentHash = hashString(rawData);
 
                 if (currentHash === lastSeenHash || currentHash === previousVersionHash) return;
-
                 previousVersionHash = lastSeenHash;
                 lastSeenHash = currentHash;
 
@@ -634,9 +612,7 @@
             }, 500);
         }
 
-        // Run Init
         init();
-
         setInterval(() => {
             fetchData();
             fetchGlobalData();
