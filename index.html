@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bingo v3.025</title>
+    <title>Bingo v3.026</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cabin+Condensed:wght@400;700&display=swap" rel="stylesheet">
@@ -173,7 +173,7 @@
             transform: rotate(45deg);
         }
 
-        /* MODAL SYSTEM v3.025 */
+        /* MODAL SYSTEM v3.026 */
         #modal-overlay {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -306,7 +306,6 @@
         }
         .close-btn:hover { color: #ffac00; }
 
-        /* SCROLLBAR: v3.025 Squared and Narrowed */
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-thumb { background: #6d604e; border-radius: 0; }
         ::-webkit-scrollbar-track { background: #221e18; }
@@ -317,7 +316,7 @@
 </head>
 <body>
 
-    <h1>Bingo v3.025</h1>
+    <h1>Bingo v3.026</h1>
     <div class="grid-container" id="grid"></div>
 
     <div id="modal-overlay" onclick="closeModal()">
@@ -404,7 +403,9 @@
             currentActiveTile = tile;
             tile.classList.add('ghost');
 
-            document.getElementById('modal-header').innerHTML = `${data.id} <span style="color:#6d604e; text-shadow:none;">|</span> ${data.title}`;
+            // FIXED: Removed the inline style from the "|" so it inherits the modal-header text-shadow and color
+            document.getElementById('modal-header').innerHTML = `${data.id} | ${data.title}`;
+            
             document.getElementById('modal-image').src = data.img;
             document.getElementById('modal-bar').style.width = data.percent + '%';
             document.getElementById('modal-bar').style.background = data.barColor;
