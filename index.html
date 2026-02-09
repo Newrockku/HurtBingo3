@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bingo v3.036</title>
+    <title>Bingo v3.038</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cabin+Condensed:wght@400;700&display=swap" rel="stylesheet">
@@ -149,33 +149,26 @@
 
         .tile.completed .checklist-box { background: #162a16; }
 
+        /* Custom Scrollbar */
         .checklist-box::-webkit-scrollbar,
         .modal-checklist::-webkit-scrollbar,
-        .modal-description::-webkit-scrollbar { 
-            width: 6px; 
-        }
+        .modal-description::-webkit-scrollbar { width: 6px; }
         
         .checklist-box::-webkit-scrollbar-thumb,
         .modal-checklist::-webkit-scrollbar-thumb,
-        .modal-description::-webkit-scrollbar-thumb { 
-            background: #6d604e; 
-        }
+        .modal-description::-webkit-scrollbar-thumb { background: #6d604e; }
+        
         .checklist-box::-webkit-scrollbar-track,
         .modal-checklist::-webkit-scrollbar-track,
-        .modal-description::-webkit-scrollbar-track { 
-            background: #221e18; 
-        }
+        .modal-description::-webkit-scrollbar-track { background: #221e18; }
 
         .tile.completed .checklist-box::-webkit-scrollbar-thumb,
         .modal-content.completed .modal-checklist::-webkit-scrollbar-thumb,
-        .modal-content.completed .modal-description::-webkit-scrollbar-thumb { 
-            background: #4caf50; 
-        }
+        .modal-content.completed .modal-description::-webkit-scrollbar-thumb { background: #4caf50; }
+        
         .tile.completed .checklist-box::-webkit-scrollbar-track,
         .modal-content.completed .modal-checklist::-webkit-scrollbar-track,
-        .modal-content.completed .modal-description::-webkit-scrollbar-track { 
-            background: #0d1a0d; 
-        }
+        .modal-content.completed .modal-description::-webkit-scrollbar-track { background: #0d1a0d; }
 
         .tile .check-item {
             font-size: 6.5cqw; 
@@ -257,12 +250,7 @@
             text-align: center;
             font-weight: bold;
             color: #ffac00;
-            text-shadow: 
-                -1px -1px 0 #000,  
-                 1px -1px 0 #000,
-                -1px  1px 0 #000,
-                 1px  1px 0 #000,
-                 2px  2px 4px rgba(0,0,0,0.8);
+            text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000, 2px 2px 4px rgba(0,0,0,0.8);
             flex-shrink: 0;
         }
         .modal-content.completed .modal-header { color: #4caf50; }
@@ -364,7 +352,7 @@
 </head>
 <body>
 
-    <h1>Bingo v3.036</h1>
+    <h1>Bingo v3.038</h1>
     <div class="grid-container" id="grid"></div>
 
     <div id="modal-overlay" onclick="closeModal()">
@@ -389,23 +377,47 @@
     <script>
         const sheetUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRFOGe_j8BL0X5Cwvy3LNmsrWG82IAXlWpump0Sw6PKWLz-1gxbisdbPuTmJ_CmjLA_q-Q6y9jTfFwq/pub?gid=1593254680&single=true&output=csv';
         let currentActiveTile = null;
+        
+        // Anti-Flicker Memory: Stores the hashes of the last two unique versions of the data
+        let lastSeenHash = null;
+        let previousVersionHash = null;
+
+        // Simple string hashing function
+        function hashString(str) {
+            let hash = 0;
+            for (let i = 0; i < str.length; i++) {
+                hash = ((hash << 5) - hash) + str.charCodeAt(i);
+                hash |= 0; 
+            }
+            return hash;
+        }
 
         async function fetchData() {
             try {
-                // Modified fetch with Cache-Control headers to force fresh data
                 const response = await fetch(`${sheetUrl}&cachebust=${new Date().getTime()}`, {
                     cache: "no-store",
-                    headers: {
-                        'Cache-Control': 'no-cache',
-                        'Pragma': 'no-cache'
-                    }
+                    headers: { 'Cache-Control': 'no-cache', 'Pragma': 'no-cache' }
                 });
                 
-                const data = await response.text();
-                const rows = data.split('\n').slice(1); 
+                const rawData = await response.text();
+                const currentHash = hashString(rawData);
+
+                // 1. DUPLICATE CHECK: If the data is exactly what we currently have, do nothing.
+                if (currentHash === lastSeenHash) return;
+
+                // 2. FLICKER CHECK: If this version is the same as the PREVIOUS version (ignoring the current one),
+                // it means the CDN is flickering back to old data. Reject it.
+                if (currentHash === previousVersionHash) {
+                    console.log("CDN Flicker detected (serving old version). Skipping update.");
+                    return;
+                }
+
+                // 3. SUCCESS: Update memory and render
+                previousVersionHash = lastSeenHash;
+                lastSeenHash = currentHash;
+
+                const rows = rawData.split('\n').slice(1); 
                 const grid = document.getElementById('grid');
-                
-                // Track if we need to update the UI
                 grid.innerHTML = '';
 
                 rows.forEach((row, index) => {
@@ -453,15 +465,11 @@
             const box = document.getElementById('modal-box');
             const tile = event.currentTarget;
             const rect = tile.getBoundingClientRect();
-
             currentActiveTile = tile;
             tile.classList.add('ghost');
 
-            if (data.isCompleted) {
-                box.classList.add('completed');
-            } else {
-                box.classList.remove('completed');
-            }
+            if (data.isCompleted) box.classList.add('completed');
+            else box.classList.remove('completed');
 
             document.getElementById('modal-header').innerHTML = `${data.id} | ${data.title}`;
             document.getElementById('modal-image').src = data.img;
@@ -474,7 +482,6 @@
             const spawnY = rect.top + (rect.height / 2);
             box.style.top = spawnY + 'px';
             box.style.left = spawnX + 'px';
-
             overlay.style.display = 'flex';
             setTimeout(() => {
                 overlay.classList.add('active');
@@ -497,7 +504,7 @@
         }
 
         fetchData();
-        setInterval(fetchData, 5000);
+        setInterval(fetchData, 30000);
     </script>
 </body>
 </html>
