@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bingo v3.060</title>
+    <title>Bingo v3.061</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cabin+Condensed:wght@400;700&display=swap" rel="stylesheet">
@@ -90,7 +90,7 @@
             padding-bottom: 60px;
         }
 
-        /* --- Updated Point Badges --- */
+        /* --- Grid Point Badge (Bottom Right) --- */
         .point-badge {
             position: absolute;
             bottom: 5px;
@@ -106,19 +106,24 @@
         }
         .tile.completed .point-badge { border-color: #4caf50; color: #4caf50; }
 
-        .modal-points-overlay {
-            position: absolute;
-            top: 25px;
-            right: 25px;
-            font-size: 1rem;
+        /* --- Modal Layout Tweaks --- */
+        .modal-section-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-bottom: 2px;
+        }
+
+        .modal-points-inline {
+            font-size: 0.85rem;
             background: #221e18;
-            border: 2px solid #ffac00;
-            padding: 2px 8px;
+            border: 1px solid #ffac00;
+            padding: 1px 6px;
             border-radius: 4px;
             font-weight: bold;
-            z-index: 10;
+            color: #ffac00;
         }
-        .modal-content.completed .modal-points-overlay { border-color: #4caf50; color: #4caf50; }
+        .modal-content.completed .modal-points-inline { border-color: #4caf50; color: #4caf50; }
 
         /* --- RESPONSIVE LOGIC --- */
         @media (max-width: 1400px) {
@@ -214,22 +219,27 @@
     <main class="grid-container" id="grid"></main>
 
     <footer class="version-footer">
-        <span>Build: v3.060</span><br>
+        <span>Build: v3.061</span><br>
         <span id="last-sync">Last Sync: Never</span>
     </footer>
 
     <div id="modal-overlay" onclick="closeModal()">
         <div class="modal-content" id="modal-box" onclick="event.stopPropagation()">
             <span class="close-btn" onclick="closeModal()">&times;</span>
-            <div id="modal-points" class="modal-points-overlay">0 PTS</div>
 
             <div id="standard-modal-view">
                 <div id="modal-header" class="modal-header"></div>
                 <div class="modal-img"><img id="modal-image" src="" alt=""></div>
+                
                 <div class="modal-label progress-label">Progress</div>
                 <div class="modal-progress"><div class="progress-bg"><div id="modal-bar" class="progress-fill"></div></div></div>
-                <div class="modal-label">Collected Items</div>
+                
+                <div class="modal-section-row">
+                    <div class="modal-label">Collected Items</div>
+                    <div id="modal-points" class="modal-points-inline">0 PTS</div>
+                </div>
                 <div id="modal-list" class="modal-checklist"></div>
+                
                 <div class="modal-label">Description</div>
                 <div id="modal-desc" class="modal-description"></div>
             </div>
@@ -393,9 +403,6 @@
             document.getElementById('modal-list').innerHTML = data.checklistHtml;
             document.getElementById('modal-desc').innerText = data.description;
             
-            // Show points in modal mode
-            document.getElementById('modal-points').style.display = 'block';
-
             box.style.top = (rect.top + rect.height / 2) + 'px';
             box.style.left = (rect.left + rect.width / 2) + 'px';
             overlay.style.display = 'flex';
@@ -415,9 +422,6 @@
             box.classList.add('map-mode');
             box.classList.remove('completed');
             
-            // Hide points in map mode
-            document.getElementById('modal-points').style.display = 'none';
-
             largeGrid.innerHTML = '';
             for(let i=1; i<=49; i++) {
                 const cell = document.createElement('div');
