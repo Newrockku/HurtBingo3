@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bingo v3.054</title>
+    <title>Bingo v3.055</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cabin+Condensed:wght@400;700&display=swap" rel="stylesheet">
@@ -45,10 +45,6 @@
             border: 2px solid #1e3a1e;
         }
 
-        .tile.completed .checklist-box::-webkit-scrollbar-thumb:hover {
-            background: #2d5a2d;
-        }
-
         /* --- Specific Scrollbar for Modals --- */
         .modal-content.completed .modal-checklist::-webkit-scrollbar-track,
         .modal-content.completed .modal-description::-webkit-scrollbar-track {
@@ -71,7 +67,6 @@
             flex-direction: column;
             align-items: center;
             min-height: 100vh;
-            position: relative;
         }
 
         /* --- Aligned Header Dashboard --- */
@@ -81,12 +76,11 @@
             background: #494034;
             border: 2px solid #6d604e;
             padding: 10px 20px;
-            margin-bottom: 15px;
+            margin-bottom: 20px;
             display: flex;
             justify-content: space-between;
             align-items: center;
             box-shadow: 0 4px 15px rgba(0,0,0,0.5);
-            gap: 15px;
             z-index: 10;
         }
 
@@ -94,7 +88,6 @@
             display: flex; 
             flex-direction: column; 
             justify-content: center;
-            flex: 1;
         }
         
         #event-title {
@@ -114,41 +107,10 @@
             font-weight: bold;
         }
 
-        /* --- Minimap Styling --- */
-        .minimap-container {
-            display: grid;
-            grid-template-columns: repeat(7, 12px);
-            grid-template-rows: repeat(7, 12px);
-            gap: 2px;
-            background: #221e18;
-            padding: 4px;
-            border: 1px solid #6d604e;
-        }
-
-        .mini-tile {
-            width: 12px;
-            height: 12px;
-            background: #342e25;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 7px;
-            color: rgba(255,255,255,0.4);
-            font-weight: bold;
-            border-radius: 1px;
-        }
-
-        .mini-tile.complete {
-            background: #4caf50;
-            color: white;
-        }
-
         .stats-container {
             display: flex;
             gap: 25px;
             align-items: center;
-            flex: 1;
-            justify-content: flex-end;
         }
 
         .stat-item { 
@@ -162,7 +124,6 @@
             font-size: 0.65rem; 
             text-transform: uppercase; 
             color: #858476; 
-            display: block; 
             margin-bottom: 1px; 
         }
 
@@ -183,31 +144,94 @@
         }
         .codeword-hidden { color: #221e18; text-shadow: none; }
 
+        /* --- Main Content Layout --- */
+        .main-layout {
+            display: flex;
+            width: 100%;
+            max-width: 1580px;
+            gap: 20px;
+            position: relative;
+        }
+
         /* --- Responsive Grid --- */
         .grid-container {
             display: grid;
             grid-template-columns: repeat(7, 1fr); 
             gap: 10px;
-            padding: 0 0 60px 0; 
-            width: 100%;
-            max-width: 1580px; 
-            position: relative;
+            padding-bottom: 60px;
+            flex-grow: 1;
             z-index: 5;
         }
 
-        @media (max-width: 1200px) { .grid-container { grid-template-columns: repeat(5, 1fr); } }
-        @media (max-width: 800px) { .grid-container { grid-template-columns: repeat(4, 1fr); } }
-        @media (max-width: 600px) { 
-            .grid-container { grid-template-columns: repeat(3, 1fr); padding-bottom: 60px; } 
-            .dashboard { padding: 12px 10px; gap: 10px; flex-wrap: wrap; justify-content: center; }
-            .dashboard-main { flex: 1 1 100%; align-items: center; text-align: center; }
-            .minimap-container { order: 2; }
-            .stats-container { order: 3; flex: 1 1 100%; justify-content: space-around; margin-top: 5px; }
-            #event-title { font-size: 1.3rem; }
-            #team-name { font-size: 1rem; }
-            .stat-value { font-size: 1.1rem; }
+        /* --- External Minimap HUD --- */
+        .minimap-wrapper {
+            position: sticky;
+            top: 20px;
+            height: fit-content;
+            background: #494034;
+            border: 2px solid #6d604e;
+            padding: 8px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
         }
 
+        .minimap-container {
+            display: grid;
+            grid-template-columns: repeat(7, 12px);
+            grid-template-rows: repeat(7, 12px);
+            gap: 2px;
+            background: #221e18;
+            padding: 4px;
+            border: 1px solid #000;
+        }
+
+        .mini-tile {
+            width: 12px;
+            height: 12px;
+            background: #342e25;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 7px;
+            color: rgba(255,255,255,0.3);
+            font-weight: bold;
+            border-radius: 1px;
+        }
+
+        .mini-tile.complete {
+            background: #4caf50;
+            color: white;
+            box-shadow: 0 0 5px rgba(76, 175, 80, 0.5);
+        }
+
+        /* --- Responsive Queries --- */
+        @media (max-width: 1400px) {
+            .grid-container { grid-template-columns: repeat(5, 1fr); }
+        }
+        
+        @media (max-width: 1000px) {
+            .grid-container { grid-template-columns: repeat(4, 1fr); }
+        }
+
+        @media (max-width: 800px) {
+            .main-layout { flex-direction: column; align-items: center; }
+            .grid-container { grid-template-columns: repeat(3, 1fr); width: 100%; }
+            .minimap-wrapper { 
+                position: fixed; 
+                bottom: 20px; 
+                top: auto; 
+                right: 20px; 
+                z-index: 100;
+                opacity: 0.9;
+            }
+        }
+
+        @media (max-width: 500px) {
+            .grid-container { grid-template-columns: repeat(2, 1fr); }
+            .dashboard { flex-direction: column; gap: 10px; text-align: center; }
+            .stats-container { width: 100%; justify-content: space-around; }
+        }
+
+        /* --- Tile Styles --- */
         .tile {
             background-color: #494034; 
             border: 2px solid #6d604e;
@@ -458,9 +482,6 @@
             <p id="team-name">Loading Team...</p>
         </div>
 
-        <div class="minimap-container" id="minimap">
-            </div>
-
         <div class="stats-container">
             <div class="stat-item">
                 <span class="stat-label">Codeword</span>
@@ -473,10 +494,17 @@
         </div>
     </header>
 
-    <div class="grid-container" id="grid"></div>
+    <main class="main-layout">
+        <div class="grid-container" id="grid"></div>
+        
+        <aside class="minimap-wrapper">
+            <div class="minimap-container" id="minimap">
+                </div>
+        </aside>
+    </main>
 
     <footer class="version-footer">
-        <span>Build: v3.054</span><br>
+        <span>Build: v3.055</span><br>
         <span id="last-sync">Last Sync: Never</span>
     </footer>
 
