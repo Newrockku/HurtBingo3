@@ -25,7 +25,7 @@
             --text-completed: #4caf50;
         }
 
-        /* --- Themes --- */
+        /* --- Themes (Preserved) --- */
         [data-theme="spring"] { --bg-body: #2d3a2d; --bg-tile: #4a5d4a; --bg-well: #2d3a2d; --bg-completed: #5d4a5d; --bg-completed-well: #3a2d3a; --border-main: #88b088; --border-completed: #d896ff; --accent: #a2ffb3; --text-main: #a2ffb3; --text-bright: #ffffff; --text-dim: #b5c9b5; --text-completed: #d896ff; }
         [data-theme="summer"] { --bg-body: #1a3a4a; --bg-tile: #2c5d72; --bg-well: #1a3a4a; --bg-completed: #725d2c; --bg-completed-well: #4a3a1a; --border-main: #5ea3cc; --border-completed: #ffcc33; --accent: #33f0ff; --text-main: #33f0ff; --text-bright: #ffffff; --text-dim: #92b7ca; --text-completed: #ffcc33; }
         [data-theme="autumn"] { --bg-body: #3a1f1a; --bg-tile: #5d322c; --bg-well: #3a1f1a; --bg-completed: #2c4a5d; --bg-completed-well: #1a2d3a; --border-main: #a35d4d; --border-completed: #5ea3cc; --accent: #ff7e33; --text-main: #ff7e33; --text-bright: #ffd1b3; --text-dim: #ca9a92; --text-completed: #5ea3cc; }
@@ -33,69 +33,68 @@
         [data-theme="cyberpunk"] { --bg-body: #0d0221; --bg-tile: #261447; --bg-well: #0d0221; --bg-completed: #ff0055; --bg-completed-well: #80002a; --border-main: #fb3640; --border-completed: #00f5d4; --accent: #fee440; --text-main: #ff0055; --text-bright: #ffffff; --text-dim: #9d8189; --text-completed: #00f5d4; }
         [data-theme="midnight"] { --bg-body: #000000; --bg-tile: #121212; --bg-well: #080808; --bg-completed: #222222; --bg-completed-well: #111111; --border-main: #333333; --border-completed: #ffffff; --accent: #ffffff; --text-main: #eeeeee; --text-bright: #ffffff; --text-dim: #555555; --text-completed: #ffffff; }
 
-        /* Global Reset */
         * { box-sizing: border-box; }
         body { background-color: var(--bg-body); color: var(--text-main); font-family: 'Cabin Condensed', sans-serif; margin: 0; padding: 10px; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
 
         /* --- Dashboard --- */
-        .dashboard { width: 100%; max-width: 1580px; background: var(--bg-tile); border: 2px solid var(--border-main); padding: 12px 15px; margin-bottom: 20px; display: grid; grid-template-columns: 1fr auto auto; align-items: center; gap: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
+        .dashboard { width: 100%; max-width: 1580px; background: var(--bg-tile); border: 2px solid var(--border-main); padding: 12px 15px; margin-bottom: 20px; display: grid; grid-template-columns: 1fr auto auto; align-items: center; gap: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.5); z-index: 100; }
         #event-title { font-size: 1.5rem; margin: 0; text-transform: uppercase; text-shadow: 2px 2px 4px black; }
         #team-name { font-size: 1rem; color: #ffffff; margin: 2px 0 0 0; font-weight: bold; }
         .stats-container { display: flex; gap: 15px; align-items: center; }
-        .stat-value { font-size: 1.2rem; font-weight: bold; }
-        .codeword-hidden { color: var(--bg-well); }
+        .stat-value { font-size: 1.2rem; font-weight: bold; color: var(--text-main); }
+        .codeword-hidden { color: var(--bg-well); text-shadow: none; }
 
-        /* --- Mini-Map Fix --- */
-        .minimap-wrapper { background: var(--bg-well); padding: 4px; border: 2px solid var(--border-main); cursor: pointer; }
-        .minimap-container { display: grid; grid-template-columns: repeat(7, 8px); grid-template-rows: repeat(7, 8px); gap: 2px; }
-        .mini-tile { width: 8px; height: 8px; background: var(--bg-body); font-size: 5px; color: rgba(255,255,255,0.1); display: flex; justify-content: center; align-items: center; }
+        /* --- Mini-Map (Restored) --- */
+        .minimap-wrapper { background: var(--bg-well); padding: 4px; border: 2px solid var(--border-main); cursor: pointer; transition: transform 0.2s; }
+        .minimap-wrapper:hover { transform: scale(1.05); border-color: var(--accent); }
+        .minimap-container { display: grid; grid-template-columns: repeat(7, 8px); grid-template-rows: repeat(7, 8px); gap: 2px; pointer-events: none; }
+        .mini-tile { width: 8px; height: 8px; background: var(--bg-body); display: flex; justify-content: center; align-items: center; font-size: 5px; color: rgba(255,255,255,0.1); border-radius: 1px; }
         .mini-tile.complete { background: var(--bg-completed); color: var(--text-completed); }
 
-        /* --- Grid --- */
-        .grid-container { display: grid; grid-template-columns: repeat(7, 1fr); gap: 10px; width: 100%; max-width: 1580px; }
-        .tile { background-color: var(--bg-tile); border: 2px solid var(--border-main); position: relative; aspect-ratio: 1 / 1; padding: 5%; cursor: pointer; transition: 0.3s; container-type: inline-size; overflow: hidden; }
+        /* --- Grid (Restored) --- */
+        .grid-container { display: grid; grid-template-columns: repeat(7, 1fr); gap: 10px; width: 100%; max-width: 1580px; padding-bottom: 80px; }
+        .tile { background-color: var(--bg-tile); border: 2px solid var(--border-main); position: relative; aspect-ratio: 1 / 1; display: flex; flex-direction: column; padding: 5%; box-shadow: inset 0 0 10px rgba(0,0,0,0.5); overflow: hidden; container-type: inline-size; cursor: pointer; transition: all 0.3s ease; }
         .tile.completed { background-color: var(--bg-completed); border-color: var(--border-completed); }
-        .tile:hover { transform: scale(1.05); z-index: 50; box-shadow: 0 0 25px 2px var(--accent); }
+        .tile:hover { transform: scale(1.05); z-index: 50; box-shadow: 0 0 25px 2px var(--accent), inset 0 0 10px rgba(0, 0, 0, 0.5); }
         .tile.ghost { opacity: 0; pointer-events: none; }
 
-        .header-content { font-weight: bold; font-size: 8cqw; text-align: center; color: var(--text-main); }
+        .header-box { padding: 2% 0; margin-bottom: 2%; min-height: 18%; display: flex; justify-content: center; align-items: center; text-align: center; }
+        .header-content { font-weight: bold; font-size: 8cqw; color: var(--text-main); text-shadow: 1px 1px 2px black; }
         .tile.completed .header-content { color: var(--text-completed); }
-        .img-container { height: 40%; display: flex; justify-content: center; align-items: center; margin: 5% 0; }
-        .img-container img { max-height: 100%; filter: drop-shadow(2px 3px 4px black); }
-        
-        .progress-bg { background: var(--bg-well); height: 6px; border: 1px solid #000; width: 100%; margin-bottom: 5%; }
-        .progress-fill { height: 100%; background: var(--accent); }
-        
-        .checklist-box { background: var(--bg-well); border: 1px solid #000; padding: 3%; height: 30%; overflow-y: auto; font-size: 6cqw; color: var(--text-bright); }
+
+        .img-container { height: 40%; display: flex; justify-content: center; align-items: center; margin-bottom: 2%; }
+        .img-container img { max-height: 100%; max-width: 95%; filter: drop-shadow(2px 3px 4px black); }
+
+        .progress-container { margin-bottom: 2%; height: 2cqw; min-height: 5px; width: 100%; }
+        .progress-bg { background: var(--bg-well); height: 100%; border: 1px solid #000; overflow: hidden; }
+        .progress-fill { height: 100%; background-color: var(--accent); transition: width 0.5s ease; }
+
+        .checklist-box { background: var(--bg-well); border: 1px solid #000; padding: 3%; flex-grow: 1; overflow-y: auto; font-size: 6cqw; color: var(--text-bright); }
         .tile.completed .checklist-box { background: var(--bg-completed-well); color: var(--text-completed); }
-        .point-badge { position: absolute; bottom: 5px; right: 5px; background: var(--bg-well); border: 1px solid var(--accent); padding: 1px 5px; font-size: 10px; color: var(--text-main); }
+
+        .point-badge { position: absolute; bottom: 5px; right: 5px; background: var(--bg-well); border: 1px solid var(--accent); padding: 1px 5px; font-size: 10px; font-weight: bold; color: var(--text-main); }
         .tile.completed .point-badge { border-color: var(--border-completed); color: var(--text-completed); background: var(--bg-completed-well); }
 
-        /* --- Modals --- */
+        /* --- Modals (Fixed) --- */
         #modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.7); display: none; justify-content: center; align-items: center; z-index: 2000; backdrop-filter: blur(5px); }
-        .modal-content { background-color: var(--bg-tile); border: 3px solid var(--border-main); width: 90vw; max-width: 450px; padding: 25px; position: relative; box-shadow: 0 0 50px rgba(0, 0, 0, 0.8); display: flex; flex-direction: column; }
+        .modal-content { background-color: var(--bg-tile); border: 3px solid var(--border-main); width: 90vw; max-width: 450px; padding: 25px; position: relative; display: flex; flex-direction: column; box-shadow: 0 0 50px rgba(0,0,0,0.8); }
         .modal-content.completed { background-color: var(--bg-completed); border-color: var(--border-completed); }
         
-        .close-btn { position: absolute; top: 10px; right: 15px; font-size: 1.5rem; cursor: pointer; color: #888; transition: 0.2s; }
+        .close-btn { position: absolute; top: 10px; right: 15px; font-size: 1.5rem; cursor: pointer; color: #888; transition: 0.2s; font-family: sans-serif; font-weight: bold; }
         .close-btn:hover { color: #fff; }
 
-        .modal-header { font-size: 1.8rem; text-align: center; font-weight: bold; margin-bottom: 15px; color: var(--text-main); }
+        .modal-header { font-size: 1.8rem; text-align: center; font-weight: bold; margin-bottom: 15px; color: var(--text-main); text-shadow: 2px 2px 4px rgba(0,0,0,0.8); }
         .modal-content.completed .modal-header { color: var(--text-completed); }
         
         .modal-label { font-size: 0.75rem; text-transform: uppercase; font-weight: bold; color: var(--text-main); margin-bottom: 4px; }
         .modal-content.completed .modal-label { color: var(--text-completed); }
         
-        .modal-checklist, .modal-description { background: var(--bg-well); border: 1px solid #000; padding: 10px; margin-bottom: 15px; color: var(--text-bright); }
+        .modal-checklist, .modal-description { background: var(--bg-well); border: 1px solid #000; padding: 10px; margin-bottom: 15px; color: var(--text-bright); overflow-y: auto; }
         .modal-content.completed .modal-checklist, .modal-content.completed .modal-description { background: var(--bg-completed-well); color: var(--text-completed); }
 
-        /* Large Map Grid */
-        .large-map-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; margin-top: 15px; }
-        .large-map-tile { aspect-ratio: 1; background: var(--bg-well); display: flex; justify-content: center; align-items: center; cursor: pointer; border: 1px solid var(--border-main); }
-        .large-map-tile.complete { background: var(--bg-completed); color: var(--text-completed); }
+        .version-footer { position: fixed; bottom: 10px; left: 25px; font-size: 0.65rem; color: var(--text-dim); }
 
-        .version-footer { position: fixed; bottom: 10px; left: 15px; font-size: 0.7rem; color: var(--text-dim); }
-
-        @media (max-width: 800px) { .grid-container { grid-template-columns: repeat(3, 1fr); } }
+        @media (max-width: 600px) { .grid-container { grid-template-columns: repeat(3, 1fr); } }
     </style>
 </head>
 
@@ -107,10 +106,10 @@
             <p id="team-name">Loading Team...</p>
         </div>
         <div class="stats-container">
-            <div class="stat-item"><span class="stat-value codeword-hidden" id="codeword-display" onclick="toggleCodeword()">?????</span></div>
-            <div class="stat-item"><span class="stat-value" id="total-points">0</span></div>
+            <div class="stat-item"><span id="codeword-display" class="stat-value codeword-hidden" onclick="toggleCodeword()">?????</span></div>
+            <div class="stat-item"><span id="total-points" class="stat-value">0</span></div>
         </div>
-        <div class="tools-container" style="display:flex; gap:10px; align-items:center;">
+        <div class="tools-container" style="display:flex; gap:15px; align-items:center;">
             <div class="settings-trigger" onclick="openSettingsModal()" style="cursor:pointer; font-size: 1.2rem;">⚙️</div>
             <aside class="minimap-wrapper" onclick="openMapModal()">
                 <div class="minimap-container" id="minimap"></div>
@@ -126,57 +125,54 @@
             
             <div id="standard-modal-view">
                 <div id="modal-header" class="modal-header"></div>
-                <div style="height: 100px; margin-bottom: 15px; display: flex; justify-content: center;">
-                    <img id="modal-image" src="" alt="" style="max-height: 100%; filter: drop-shadow(2px 2px 4px black);">
+                <div style="height: 120px; margin-bottom: 12px; display: flex; justify-content: center;">
+                    <img id="modal-image" src="" alt="" style="max-height: 100%; filter: drop-shadow(4px 4px 6px black);">
                 </div>
                 <div id="modal-progress-section">
                     <div class="modal-label">Progress</div>
-                    <div class="progress-bg"><div id="modal-bar" class="progress-fill"></div></div>
+                    <div class="progress-container"><div class="progress-bg"><div id="modal-bar" class="progress-fill"></div></div></div>
                 </div>
                 <div class="modal-label">Collected Items</div>
-                <div id="modal-list" class="modal-checklist" style="max-height: 120px; overflow-y: auto;"></div>
+                <div id="modal-list" class="modal-checklist" style="max-height: 130px;"></div>
                 <div class="modal-label">Description</div>
-                <div id="modal-desc" class="modal-description"></div>
+                <div id="modal-desc" class="modal-description" style="max-height: 80px;"></div>
             </div>
 
             <div id="map-modal-view" style="display: none;">
                 <div class="modal-header">OVERVIEW</div>
-                <div class="large-map-grid" id="large-map-grid"></div>
+                <div id="large-map-grid" style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px;"></div>
             </div>
 
             <div id="settings-modal-view" style="display: none;">
                 <div class="modal-header">SETTINGS</div>
                 <div class="modal-label">Theme Selection</div>
-                <select id="theme-dropdown" onchange="changeTheme(this.value)" style="width:100%; padding: 10px; background: var(--bg-well); color: var(--text-main); border: 1px solid var(--border-main);">
+                <select id="theme-dropdown" onchange="changeTheme(this.value)" style="width: 100%; padding: 8px; background: var(--bg-well); color: var(--text-main); border: 1px solid var(--border-main);">
                     <option value="osrs">OSRS Classic</option>
                     <option value="midnight">Midnight OLED</option>
-                    <option value="cyberpunk">Cyberpunk</option>
                     <option value="spring">Spring</option>
                     <option value="summer">Summer</option>
                     <option value="autumn">Autumn</option>
                     <option value="winter">Winter</option>
+                    <option value="cyberpunk">Cyberpunk</option>
                 </select>
             </div>
         </div>
     </div>
 
-    <footer class="version-footer">Build: v3.076</footer>
+    <footer class="version-footer">Build: v3.077</footer>
 
     <script>
         const TEAM_MAP = {
             "Warriors": { name: "The Spreadsheet Warriors", url: "https://docs.google.com/spreadsheets/d/e/2PACX-1vRFOGe_j8BL0X5Cwvy3LNmsrWG82IAXlWpump0Sw6PKWLz-1gxbisdbPuTmJ_CmjLA_q-Q6y9jTfFwq/pub?gid=1593254680&single=true&output=csv", codeword: "BINGO_BLITZ", points: 1250 }
         };
 
-        let currentActiveTile = null;
+        let currentActiveElement = null;
         let tileDataCache = [];
         let completionState = [];
 
         function init() {
             const savedTheme = localStorage.getItem('bingo-theme');
-            if (savedTheme) {
-                changeTheme(savedTheme);
-                document.getElementById('theme-dropdown').value = savedTheme;
-            }
+            if (savedTheme) changeTheme(savedTheme);
 
             const minimap = document.getElementById('minimap');
             for(let i=1; i<=49; i++) {
@@ -214,7 +210,8 @@
                     const goal = parseInt(cols[3]) || 1;
                     const items = cols[4] ? cols[4].replace(/"/g, "").trim().split(',') : [];
                     const desc = cols[5] ? cols[5].replace(/"/g, "").trim() : "";
-                    
+                    const pts = cols[6] ? cols[6].replace(/"/g, "").trim() : "0";
+
                     const percent = Math.min((current / goal) * 100, 100);
                     const isDone = percent === 100;
                     completionState[index] = isDone;
@@ -222,30 +219,32 @@
                     const miniTile = document.getElementById(`mini-${index + 1}`);
                     if (miniTile) isDone ? miniTile.classList.add('complete') : miniTile.classList.remove('complete');
 
-                    const pkg = { id: index + 1, title, img, percent, items, desc, isDone };
+                    let checklistHtml = items.map(i => `<div style="margin-bottom:2px;">• ${i.trim()}</div>`).join('');
+
+                    const pkg = { id: index + 1, title, img, percent, checklistHtml, desc, isDone, pts };
                     tileDataCache.push(pkg);
                     
                     const tile = document.createElement('div');
                     tile.className = `tile ${isDone ? 'completed' : ''}`;
                     tile.onclick = (e) => openModal(pkg, e.currentTarget);
                     tile.innerHTML = `
-                        <div class="header-content">${index + 1} | ${title}</div>
+                        <div class="header-box"><div class="header-content">${index + 1} | ${title}</div></div>
                         <div class="img-container"><img src="${img}" onerror="this.style.visibility='hidden'"></div>
-                        ${!isDone ? `<div class="progress-bg"><div class="progress-fill" style="width:${percent}%"></div></div>` : ''}
-                        <div class="checklist-box">${items.join('<br>')}</div>
-                        <div class="point-badge">${isDone ? 'DONE' : 'IN PROGRESS'}</div>
+                        ${!isDone ? `<div class="progress-container"><div class="progress-bg"><div class="progress-fill" style="width: ${percent}%"></div></div></div>` : ''}
+                        <div class="checklist-box">${checklistHtml}</div>
+                        <div class="point-badge">${pts} PTS</div>
                     `;
                     grid.appendChild(tile);
                 });
                 document.getElementById('team-name').innerText = TEAM_MAP["Warriors"].name;
-                document.getElementById('total-points').innerText = TEAM_MAP["Warriors"].points;
+                document.getElementById('total-points').innerText = TEAM_MAP["Warriors"].points.toLocaleString();
             } catch (e) { console.error(e); }
         }
 
         function openModal(data, trigger) {
             const box = document.getElementById('modal-box');
-            if (currentActiveTile) currentActiveTile.classList.remove('ghost');
-            currentActiveTile = trigger;
+            if (currentActiveElement) currentActiveElement.classList.remove('ghost');
+            currentActiveElement = trigger;
             if (trigger) trigger.classList.add('ghost');
 
             box.className = 'modal-content' + (data.isDone ? ' completed' : '');
@@ -255,7 +254,7 @@
 
             document.getElementById('modal-header').innerText = `${data.id} | ${data.title}`;
             document.getElementById('modal-image').src = data.img;
-            document.getElementById('modal-list').innerHTML = data.items.join('<br>');
+            document.getElementById('modal-list').innerHTML = data.checklistHtml;
             document.getElementById('modal-desc').innerText = data.desc;
             
             const prog = document.getElementById('modal-progress-section');
@@ -274,13 +273,14 @@
             
             const grid = document.getElementById('large-map-grid');
             grid.innerHTML = '';
-            for(let i=1; i<=49; i++) {
+            tileDataCache.forEach((data, i) => {
                 const cell = document.createElement('div');
-                cell.className = `large-map-tile ${completionState[i-1] ? 'complete' : ''}`;
-                cell.innerText = i;
-                cell.onclick = () => openModal(tileDataCache[i-1]);
+                cell.style.cssText = "aspect-ratio:1; background:var(--bg-well); border:1px solid var(--border-main); display:flex; justify-content:center; align-items:center; cursor:pointer;";
+                if (data.isDone) cell.style.background = "var(--bg-completed)";
+                cell.innerText = i + 1;
+                cell.onclick = () => openModal(data);
                 grid.appendChild(cell);
-            }
+            });
             document.getElementById('modal-overlay').style.display = 'flex';
         }
 
@@ -295,7 +295,7 @@
         function closeModal() {
             document.getElementById('modal-overlay').style.display = 'none';
             document.body.style.overflow = 'auto';
-            if (currentActiveTile) currentActiveTile.classList.remove('ghost');
+            if (currentActiveElement) currentActiveElement.classList.remove('ghost');
         }
 
         function toggleCodeword() {
