@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bingo v3.071</title>
+    <title>Bingo v3.070</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cabin+Condensed:wght@400;700&display=swap" rel="stylesheet">
@@ -47,11 +47,7 @@
         * { box-sizing: border-box; }
         html { scrollbar-gutter: stable; overflow-y: scroll; }
 
-        /* --- Custom Scrollbar (Cross-Browser) --- */
-        html {
-            scrollbar-width: thin;
-            scrollbar-color: var(--bg-tile) var(--bg-well);
-        }
+        /* --- Custom Scrollbar --- */
         ::-webkit-scrollbar { width: 8px; }
         ::-webkit-scrollbar-track { background: var(--bg-well); }
         ::-webkit-scrollbar-thumb { background: var(--bg-tile); border: 2px solid var(--bg-well); }
@@ -206,7 +202,7 @@
 
 <body>
 
-    <header class="dashboard">
+    <header class="dashboard" role="banner">
         <div class="dashboard-main">
             <h1 id="event-title">Bingo 2026 | v3.070</h1>
             <p id="team-name">Loading Team...</p>
@@ -215,6 +211,7 @@
         <div class="stats-container">
             <div class="stat-item theme-selector">
                 <span class="stat-label">Theme</span>
+                <label for="theme-dropdown" class="sr-only" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);">Select Theme</label>
                 <select id="theme-dropdown" onchange="changeTheme(this.value)">
                     <optgroup label="Classic">
                         <option value="osrs">OSRS (Original)</option>
@@ -241,30 +238,30 @@
             </div>
             <div class="stat-item">
                 <span class="stat-label">Codeword</span>
-                <span id="codeword-display" class="stat-value codeword-hidden" onclick="toggleCodeword()">?????</span>
+                <span id="codeword-display" class="stat-value codeword-hidden" role="button" tabindex="0" aria-label="Toggle codeword visibility" onclick="toggleCodeword()" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();toggleCodeword();}">?????</span>
             </div>
             <div class="stat-item">
                 <span class="stat-label">Points</span>
-                <span id="total-points" class="stat-value">0</span>
+                <span id="total-points" class="stat-value" aria-live="polite">0</span>
             </div>
         </div>
 
-        <aside class="minimap-wrapper" id="mini-map-trigger" onclick="openMapModal(event)">
-            <div class="minimap-container" id="minimap"></div>
+        <aside class="minimap-wrapper" id="mini-map-trigger" role="button" tabindex="0" aria-label="Open overview map" onclick="openMapModal(event)" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openMapModal(event);}">
+            <div class="minimap-container" id="minimap" aria-hidden="true"></div>
         </aside>
     </header>
 
-    <main class="grid-container" id="grid"></main>
+    <main class="grid-container" id="grid" role="grid" aria-label="Bingo board"></main>
 
     <footer class="version-footer">
         <span>Build: v3.070</span><br>
-        <span id="last-sync-text">Last Sync: Never</span>
-        <span class="sync-btn" onclick="fetchData(true)">[Sync Now]</span>
+        <span id="last-sync-text" aria-live="polite">Last Sync: Never</span>
+        <span class="sync-btn" role="button" tabindex="0" onclick="fetchData(true)" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();fetchData(true);}">[Sync Now]</span>
     </footer>
 
-    <div id="modal-overlay" onclick="closeModal()">
+    <div id="modal-overlay" role="dialog" aria-modal="true" aria-label="Tile details" onclick="closeModal()">
         <div class="modal-content" id="modal-box" onclick="event.stopPropagation()">
-            <span class="close-btn" onclick="closeModal()">&times;</span>
+            <span class="close-btn" role="button" tabindex="0" aria-label="Close dialog" onclick="closeModal()" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();closeModal();}">&times;</span>
             
             <div id="standard-modal-view">
                 <div id="modal-header" class="modal-header"></div>
@@ -293,10 +290,19 @@
     </div>
 
     <script>
-        // Encapsulate logic to prevent global namespace pollution
+        /* ============================================
+           CONSTANTS & STATE
+           ============================================ */
         const TEAM_MAP = {
-            "Warriors": { name: "The Spreadsheet Warriors", url: "https://docs.google.com/spreadsheets/d/e/2PACX-1vRFOGe_j8BL0X5Cwvy3LNmsrWG82IAXlWpump0Sw6PKWLz-1gxbisdbPuTmJ_CmjLA_q-Q6y9jTfFwq/pub?gid=1593254680&single=true&output=csv", codeword: "BINGO_BLITZ", points: 1250 }
+            "Warriors": {
+                name: "The Spreadsheet Warriors",
+                url: "https://docs.google.com/spreadsheets/d/e/2PACX-1vRFOGe_j8BL0X5Cwvy3LNmsrWG82IAXlWpump0Sw6PKWLz-1gxbisdbPuTmJ_CmjLA_q-Q6y9jTfFwq/pub?gid=1593254680&single=true&output=csv",
+                codeword: "BINGO_BLITZ",
+                points: 1250
+            }
         };
+
+        const MAX_TILES = 49;
 
         let currentTeamKey = "Warriors";
         let currentActiveElement = null;
@@ -304,133 +310,287 @@
         let codewordSecret = "";
         let completionState = [];
         let tileDataCache = [];
+        let fetchController = null;
+        let syncIntervalId = null;
 
-        function init() {
-            const minimap = document.getElementById('minimap');
-            const frag = document.createDocumentFragment();
-            for(let i=1; i<=49; i++) {
-                const dot = document.createElement('div');
-                dot.className = 'mini-tile';
-                dot.id = `mini-${i}`;
-                dot.textContent = i;
-                frag.appendChild(dot);
-                completionState.push(false);
+        /* ============================================
+           UTILITY FUNCTIONS
+           ============================================ */
+
+        /**
+         * Escapes a string for safe insertion into HTML.
+         */
+        function escapeHTML(str) {
+            const div = document.createElement('div');
+            div.appendChild(document.createTextNode(str));
+            return div.innerHTML;
+        }
+
+        /**
+         * Generates a simple 32-bit integer hash from a string.
+         */
+        function simpleHash(str) {
+            let hash = 0;
+            for (let i = 0; i < str.length; i++) {
+                const ch = str.charCodeAt(i);
+                hash = ((hash << 5) - hash) + ch;
+                hash |= 0;
             }
-            minimap.appendChild(frag);
-            fetchGlobalData();
-            fetchData();
+            return hash;
         }
 
-        function changeTheme(theme) {
-            document.documentElement.setAttribute('data-theme', theme);
+        /**
+         * Properly parses a single CSV row, handling quoted fields,
+         * escaped double-quotes, and commas within quoted values.
+         */
+        function parseCSVRow(row) {
+            const cols = [];
+            let current = '';
+            let inQuotes = false;
+            for (let i = 0; i < row.length; i++) {
+                const ch = row[i];
+                if (inQuotes) {
+                    if (ch === '"' && row[i + 1] === '"') {
+                        current += '"';
+                        i++;
+                    } else if (ch === '"') {
+                        inQuotes = false;
+                    } else {
+                        current += ch;
+                    }
+                } else {
+                    if (ch === '"') {
+                        inQuotes = true;
+                    } else if (ch === ',') {
+                        cols.push(current.trim());
+                        current = '';
+                    } else {
+                        current += ch;
+                    }
+                }
+            }
+            cols.push(current.trim());
+            return cols;
         }
 
+        /**
+         * Returns a CSS color for a progress percentage (0–100).
+         */
         function getProgressColor(percent) {
             if (percent >= 100) return 'var(--text-completed)';
             const hue = (percent * 120) / 100;
             return `hsl(${hue}, 70%, 45%)`;
         }
-        
-        // Prevent XSS from CSV data
-        function escapeHtml(text) {
-            if (!text) return text;
-            return text
-                .replace(/&/g, "&amp;")
-                .replace(/</g, "&lt;")
-                .replace(/>/g, "&gt;")
-                .replace(/"/g, "&quot;")
-                .replace(/'/g, "&#039;");
+
+        /**
+         * Handles broken images gracefully.
+         */
+        function handleImgError(img) {
+            img.style.visibility = 'hidden';
+            img.removeAttribute('src');
         }
 
-        async function fetchGlobalData() {
+        /* ============================================
+           THEME MANAGEMENT
+           ============================================ */
+
+        function changeTheme(theme) {
+            document.documentElement.setAttribute('data-theme', theme);
+            try {
+                localStorage.setItem('bingo-theme', theme);
+            } catch (e) { /* storage full or disabled — silently ignore */ }
+        }
+
+        function restoreTheme() {
+            try {
+                const saved = localStorage.getItem('bingo-theme');
+                if (saved) {
+                    document.documentElement.setAttribute('data-theme', saved);
+                    const dropdown = document.getElementById('theme-dropdown');
+                    if (dropdown) dropdown.value = saved;
+                }
+            } catch (e) { /* localStorage unavailable */ }
+        }
+
+        /* ============================================
+           DATA FETCHING
+           ============================================ */
+
+        function fetchGlobalData() {
             const teamData = TEAM_MAP[currentTeamKey];
-            document.getElementById('team-name').textContent = teamData.name;
-            document.getElementById('total-points').textContent = teamData.points.toLocaleString();
+            if (!teamData) return;
+            document.getElementById('team-name').innerText = teamData.name;
+            document.getElementById('total-points').innerText = teamData.points.toLocaleString();
             codewordSecret = teamData.codeword;
         }
 
         async function fetchData(isManual = false) {
+            // Abort any in-flight request
+            if (fetchController) {
+                fetchController.abort();
+            }
+            fetchController = new AbortController();
+
             try {
-                const response = await fetch(`${TEAM_MAP[currentTeamKey].url}&t=${Date.now()}`, {
-                    method: 'GET',
-                    headers: { 'pragma': 'no-cache', 'cache-control': 'no-cache' }
-                });
-                
+                const teamData = TEAM_MAP[currentTeamKey];
+                if (!teamData) return;
+
+                const response = await fetch(
+                    `${teamData.url}&t=${Date.now()}`,
+                    {
+                        method: 'GET',
+                        headers: { 'pragma': 'no-cache', 'cache-control': 'no-cache' },
+                        signal: fetchController.signal
+                    }
+                );
+
                 const rawData = await response.text();
-                if (!isManual && lastSeenHash === rawData.length) return; 
-                
-                lastSeenHash = rawData.length;
+
+                // Check if data actually changed
+                const dataHash = simpleHash(rawData);
+                if (!isManual && lastSeenHash === dataHash) return;
+                lastSeenHash = dataHash;
+
+                // Update sync timestamp
                 const syncText = document.getElementById('last-sync-text');
-                syncText.textContent = `Last Sync: ${new Date().toLocaleTimeString()}`;
+                syncText.innerText = `Last Sync: ${new Date().toLocaleTimeString()}`;
                 syncText.classList.remove('sync-flash');
-                void syncText.offsetWidth; // Trigger reflow
+                void syncText.offsetWidth; // force reflow to restart animation
                 syncText.classList.add('sync-flash');
-                
+
+                // Parse rows
                 const rows = rawData.split('\n').slice(1);
                 const grid = document.getElementById('grid');
-                grid.innerHTML = ''; // Clear current grid
+                grid.innerHTML = '';
                 tileDataCache = [];
-                
-                // Use DocumentFragment for batched DOM insertion (Performance)
-                const docFrag = document.createDocumentFragment();
-                
+
+                const fragment = document.createDocumentFragment();
+
                 rows.forEach((row, index) => {
-                    // Safe regex split for CSV
-                    const cols = row.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
+                    if (index >= MAX_TILES) return;
+                    const rawRow = row.trim();
+                    if (!rawRow) return;
+
+                    const cols = parseCSVRow(rawRow);
                     if (cols.length < 4) return;
-                    
-                    const title = cols[0].replace(/"/g, "").trim();
-                    const imgName = cols[1].replace(/"/g, "").trim();
-                    const current = parseInt(cols[2]) || 0;
-                    const goal = parseInt(cols[3]) || 1;
-                    const itemList = cols[4] ? cols[4].replace(/"/g, "").trim().split(',') : [];
-                    const description = cols[5] ? cols[5].replace(/"/g, "").trim() : "";
-                    const pts = cols[6] ? cols[6].replace(/"/g, "").trim() : "0"; 
-                    
+
+                    const title = cols[0] || `Tile ${index + 1}`;
+                    const imgName = cols[1] || '';
+                    const current = Math.max(0, parseInt(cols[2]) || 0);
+                    const goal = Math.max(1, parseInt(cols[3]) || 1);
+                    const itemList = cols[4] ? cols[4].split(',').filter(s => s.trim()) : [];
+                    const description = cols[5] || '';
+                    const pts = cols[6] || '0';
+
                     const percent = Math.min((current / goal) * 100, 100);
                     const isCompleted = percent === 100;
                     const barColor = getProgressColor(percent);
                     const finalImgSrc = (imgName.includes('http')) ? imgName : `./images/${imgName}`;
-                    
+
+                    // Update completion state & minimap
                     completionState[index] = isCompleted;
                     const miniTile = document.getElementById(`mini-${index + 1}`);
-                    if (miniTile) isCompleted ? miniTile.classList.add('complete') : miniTile.classList.remove('complete');
+                    if (miniTile) {
+                        if (isCompleted) {
+                            miniTile.classList.add('complete');
+                        } else {
+                            miniTile.classList.remove('complete');
+                        }
+                    }
 
+                    // Build safe checklist HTML
                     let checklistHtml = '';
-                    itemList.forEach(item => { 
-                        if(item.trim()) checklistHtml += `<div class="check-item"><span class="check-mark"></span> ${escapeHtml(item.trim())}</div>`; 
+                    itemList.forEach(item => {
+                        const trimmed = item.trim();
+                        if (trimmed) {
+                            checklistHtml += `<div class="check-item"><span class="check-mark"></span> ${escapeHTML(trimmed)}</div>`;
+                        }
                     });
 
-                    const pkg = { id: index + 1, title, img: finalImgSrc, percent, barColor, checklistHtml, description, isCompleted, points: pts };
+                    // Cache tile data
+                    const pkg = {
+                        id: index + 1,
+                        title: title,
+                        img: finalImgSrc,
+                        percent: percent,
+                        barColor: barColor,
+                        checklistHtml: checklistHtml,
+                        description: description,
+                        isCompleted: isCompleted,
+                        points: pts
+                    };
                     tileDataCache.push(pkg);
-                    
+
+                    // Build tile element
                     const tile = document.createElement('div');
-                    tile.className = `tile ${isCompleted ? 'completed' : ''}`;
+                    tile.className = `tile${isCompleted ? ' completed' : ''}`;
+                    tile.setAttribute('role', 'button');
+                    tile.setAttribute('tabindex', '0');
+                    tile.setAttribute('aria-label',
+                        `Tile ${index + 1}: ${title} - ${isCompleted ? 'Complete' : Math.round(percent) + '% complete'}`
+                    );
+
                     tile.onclick = (e) => openModal(e, pkg);
-                    
-                    // Securely constructed HTML
+                    tile.onkeydown = (e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                            e.preventDefault();
+                            openModal(e, pkg);
+                        }
+                    };
+
+                    const safeTitle = escapeHTML(title);
+                    const safePts = escapeHTML(pts);
+                    const safeImgSrc = escapeHTML(finalImgSrc);
+
                     tile.innerHTML = `
-                        <div class="header-box"><div class="header-content">${index + 1} | ${escapeHtml(title)}</div></div>
-                        <div class="img-container"><img src="${finalImgSrc}" alt="${escapeHtml(title)}" onerror="this.style.visibility='hidden'"></div>
+                        <div class="header-box"><div class="header-content">${index + 1} | ${safeTitle}</div></div>
+                        <div class="img-container"><img src="${safeImgSrc}" alt="${safeTitle}" onerror="handleImgError(this)"></div>
                         <div class="progress-container"><div class="progress-bg"><div class="progress-fill" style="width: ${percent}%; background-color: ${barColor}"></div></div></div>
                         <div class="checklist-box">${checklistHtml}</div>
-                        <div class="point-badge">${escapeHtml(pts)} PTS</div>
+                        <div class="point-badge">${safePts} PTS</div>
                     `;
-                    docFrag.appendChild(tile);
+
+                    fragment.appendChild(tile);
                 });
-                grid.appendChild(docFrag);
-            } catch (e) { console.error("Sync Error:", e); }
+
+                // Single DOM append — one reflow instead of 49
+                grid.appendChild(fragment);
+
+            } catch (e) {
+                if (e.name === 'AbortError') return; // silently ignore aborted fetches
+                console.error("Sync Error:", e);
+            } finally {
+                fetchController = null;
+            }
         }
+
+        /* ============================================
+           MODAL MANAGEMENT
+           ============================================ */
 
         function openModal(e, data) {
             const overlay = document.getElementById('modal-overlay');
             const box = document.getElementById('modal-box');
-            if (currentActiveElement) currentActiveElement.classList.remove('ghost');
-            currentActiveElement = e.currentTarget;
-            currentActiveElement.classList.add('ghost');
-            
+
+            // Clean up any previous ghost state
+            if (currentActiveElement && currentActiveElement.isConnected) {
+                currentActiveElement.classList.remove('ghost');
+            }
+
+            const trigger = e.currentTarget;
+
+            // Only ghost actual tile elements, not large-map cells
+            if (trigger && trigger.classList.contains('tile')) {
+                currentActiveElement = trigger;
+                currentActiveElement.classList.add('ghost');
+            } else {
+                currentActiveElement = null;
+            }
+
+            // Reset modal mode
             box.classList.remove('map-mode');
-            
+
+            // Completion state
             if (data.isCompleted) {
                 box.classList.add('completed');
                 document.getElementById('modal-progress-section').style.display = 'none';
@@ -439,93 +599,194 @@
                 document.getElementById('modal-progress-section').style.display = 'block';
             }
 
+            // Show standard view
             document.getElementById('standard-modal-view').style.display = 'block';
             document.getElementById('map-modal-view').style.display = 'none';
 
-            document.getElementById('modal-header').textContent = `${data.id} | ${data.title}`;
-            document.getElementById('modal-image').src = data.img;
-            document.getElementById('modal-points').textContent = `${data.points} PTS`;
+            // Populate content (using innerText for plain text, innerHTML only for pre-sanitized checklist)
+            document.getElementById('modal-header').innerText = `${data.id} | ${data.title}`;
+
+            const modalImg = document.getElementById('modal-image');
+            modalImg.style.visibility = 'visible';
+            modalImg.onerror = () => handleImgError(modalImg);
+            modalImg.src = data.img;
+            modalImg.alt = data.title;
+
+            document.getElementById('modal-points').innerText = `${data.points} PTS`;
             document.getElementById('modal-bar').style.width = data.percent + '%';
             document.getElementById('modal-bar').style.backgroundColor = data.barColor;
-            document.getElementById('modal-list').innerHTML = data.checklistHtml; // Contains safe HTML
-            document.getElementById('modal-desc').textContent = data.description;
-            
-            const rect = currentActiveElement.getBoundingClientRect();
-            box.style.top = (rect.top + rect.height/2) + 'px';
-            box.style.left = (rect.left + rect.width/2) + 'px';
+            document.getElementById('modal-list').innerHTML = data.checklistHtml;
+            document.getElementById('modal-desc').innerText = data.description;
+
+            // Update aria label
+            box.setAttribute('aria-label', `Details for tile ${data.id}: ${data.title}`);
+
+            // Animate from trigger position
+            const rect = (trigger && trigger.getBoundingClientRect)
+                ? trigger.getBoundingClientRect()
+                : { top: window.innerHeight / 2, left: window.innerWidth / 2, height: 0, width: 0 };
+
+            box.style.top = (rect.top + rect.height / 2) + 'px';
+            box.style.left = (rect.left + rect.width / 2) + 'px';
+
             overlay.style.display = 'flex';
-            
-            // Force reflow for animation
-            requestAnimationFrame(() => {
-                overlay.classList.add('active'); 
+            setTimeout(() => {
+                overlay.classList.add('active');
                 box.classList.add('active');
-            });
+                // Focus the close button for keyboard accessibility
+                const closeBtn = box.querySelector('.close-btn');
+                if (closeBtn) closeBtn.focus();
+            }, 10);
+
             document.body.style.overflow = 'hidden';
         }
 
         function openMapModal(e) {
             const overlay = document.getElementById('modal-overlay');
             const box = document.getElementById('modal-box');
+
+            // Clean up previous ghost
+            if (currentActiveElement && currentActiveElement.isConnected) {
+                currentActiveElement.classList.remove('ghost');
+            }
+
             currentActiveElement = document.getElementById('mini-map-trigger');
-            currentActiveElement.classList.add('ghost');
-            
+            if (currentActiveElement) {
+                currentActiveElement.classList.add('ghost');
+            }
+
             box.classList.add('map-mode');
             box.classList.remove('completed');
             document.getElementById('standard-modal-view').style.display = 'none';
             document.getElementById('map-modal-view').style.display = 'flex';
-            
+
+            // Build large map grid
             const largeGrid = document.getElementById('large-map-grid');
             largeGrid.innerHTML = '';
-            
-            const docFrag = document.createDocumentFragment();
-            for(let i=1; i<=49; i++) {
-                const cell = document.createElement('div');
-                cell.className = `large-map-tile ${completionState[i-1] ? 'complete' : ''}`;
-                cell.textContent = i;
-                cell.onclick = (ev) => { 
-                    ev.stopPropagation(); 
-                    const pkg = tileDataCache[i-1]; 
-                    if(pkg) openModal({currentTarget: cell}, pkg); 
-                };
-                docFrag.appendChild(cell);
-            }
-            largeGrid.appendChild(docFrag);
 
-            const rect = currentActiveElement.getBoundingClientRect();
-            box.style.top = (rect.top + rect.height/2) + 'px';
-            box.style.left = (rect.left + rect.width/2) + 'px';
+            const mapFragment = document.createDocumentFragment();
+            for (let i = 1; i <= MAX_TILES; i++) {
+                const cell = document.createElement('div');
+                cell.className = `large-map-tile${completionState[i - 1] ? ' complete' : ''}`;
+                cell.innerText = i;
+                cell.setAttribute('role', 'button');
+                cell.setAttribute('tabindex', '0');
+                cell.setAttribute('aria-label', `Tile ${i}${completionState[i - 1] ? ' - Complete' : ''}`);
+
+                const tileIndex = i; // capture for closure
+                cell.onclick = (ev) => {
+                    ev.stopPropagation();
+                    const pkg = tileDataCache[tileIndex - 1];
+                    if (pkg) openModal({ currentTarget: cell }, pkg);
+                };
+                cell.onkeydown = (ev) => {
+                    if (ev.key === 'Enter' || ev.key === ' ') {
+                        ev.preventDefault();
+                        ev.stopPropagation();
+                        const pkg = tileDataCache[tileIndex - 1];
+                        if (pkg) openModal({ currentTarget: cell }, pkg);
+                    }
+                };
+
+                mapFragment.appendChild(cell);
+            }
+            largeGrid.appendChild(mapFragment);
+
+            // Animate from minimap position
+            const rect = currentActiveElement
+                ? currentActiveElement.getBoundingClientRect()
+                : { top: window.innerHeight / 2, left: window.innerWidth / 2, height: 0, width: 0 };
+
+            box.style.top = (rect.top + rect.height / 2) + 'px';
+            box.style.left = (rect.left + rect.width / 2) + 'px';
+
+            box.setAttribute('aria-label', 'Bingo board overview map');
+
             overlay.style.display = 'flex';
-            
-            requestAnimationFrame(() => {
-                overlay.classList.add('active'); 
+            setTimeout(() => {
+                overlay.classList.add('active');
                 box.classList.add('active');
-            });
+                const closeBtn = box.querySelector('.close-btn');
+                if (closeBtn) closeBtn.focus();
+            }, 10);
+
             document.body.style.overflow = 'hidden';
         }
 
         function closeModal() {
-            document.getElementById('modal-overlay').classList.remove('active');
-            document.getElementById('modal-box').classList.remove('active');
-            if (currentActiveElement) currentActiveElement.classList.remove('ghost');
-            setTimeout(() => { document.getElementById('modal-overlay').style.display = 'none'; document.body.style.overflow = 'auto'; }, 500);
+            const overlay = document.getElementById('modal-overlay');
+            const box = document.getElementById('modal-box');
+
+            overlay.classList.remove('active');
+            box.classList.remove('active');
+
+            if (currentActiveElement && currentActiveElement.isConnected) {
+                currentActiveElement.classList.remove('ghost');
+            }
+
+            setTimeout(() => {
+                overlay.style.display = 'none';
+                document.body.style.overflow = 'auto';
+            }, 500);
         }
+
+        /* ============================================
+           CODEWORD TOGGLE
+           ============================================ */
 
         function toggleCodeword() {
             const el = document.getElementById('codeword-display');
             el.classList.toggle('codeword-hidden');
-            el.textContent = el.classList.contains('codeword-hidden') ? "?????" : codewordSecret;
+            if (el.classList.contains('codeword-hidden')) {
+                el.innerText = "????";
+                el.setAttribute('aria-label', 'Codeword hidden. Click to reveal.');
+            } else {
+                el.innerText = codewordSecret;
+                el.setAttribute('aria-label', 'Codeword: ' + codewordSecret + '. Click to hide.');
+            }
         }
-        
-        // Expose necessary functions to global scope for HTML inline handlers
-        window.changeTheme = changeTheme;
-        window.fetchData = fetchData;
-        window.toggleCodeword = toggleCodeword;
-        window.openMapModal = openMapModal;
-        window.closeModal = closeModal;
 
-        // Initialize
-        document.addEventListener('DOMContentLoaded', init);
-        setInterval(() => fetchData(), 30000);
+        /* ============================================
+           KEYBOARD SHORTCUTS
+           ============================================ */
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                closeModal();
+            }
+        });
+
+        /* ============================================
+           INITIALIZATION
+           ============================================ */
+
+        function init() {
+            // Restore persisted theme
+            restoreTheme();
+
+            // Build minimap
+            const minimap = document.getElementById('minimap');
+            const minimapFragment = document.createDocumentFragment();
+            for (let i = 1; i <= MAX_TILES; i++) {
+                const dot = document.createElement('div');
+                dot.className = 'mini-tile';
+                dot.id = `mini-${i}`;
+                dot.innerText = i;
+                minimapFragment.appendChild(dot);
+                completionState.push(false);
+            }
+            minimap.appendChild(minimapFragment);
+
+            // Load data
+            fetchGlobalData();
+            fetchData();
+
+            // Auto-sync every 30 seconds
+            if (syncIntervalId) clearInterval(syncIntervalId);
+            syncIntervalId = setInterval(() => fetchData(), 30000);
+        }
+
+        init();
     </script>
 </body>
 </html>
