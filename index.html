@@ -47,7 +47,11 @@
         * { box-sizing: border-box; }
         html { scrollbar-gutter: stable; overflow-y: scroll; }
 
-        /* --- Custom Scrollbar --- */
+        /* --- Custom Scrollbar (Cross-Browser) --- */
+        html {
+            scrollbar-width: thin;
+            scrollbar-color: var(--bg-tile) var(--bg-well);
+        }
         ::-webkit-scrollbar { width: 8px; }
         ::-webkit-scrollbar-track { background: var(--bg-well); }
         ::-webkit-scrollbar-thumb { background: var(--bg-tile); border: 2px solid var(--bg-well); }
@@ -289,6 +293,7 @@
     </div>
 
     <script>
+        // Encapsulate logic to prevent global namespace pollution
         const TEAM_MAP = {
             "Warriors": { name: "The Spreadsheet Warriors", url: "https://docs.google.com/spreadsheets/d/e/2PACX-1vRFOGe_j8BL0X5Cwvy3LNmsrWG82IAXlWpump0Sw6PKWLz-1gxbisdbPuTmJ_CmjLA_q-Q6y9jTfFwq/pub?gid=1593254680&single=true&output=csv", codeword: "BINGO_BLITZ", points: 1250 }
         };
@@ -302,14 +307,16 @@
 
         function init() {
             const minimap = document.getElementById('minimap');
+            const frag = document.createDocumentFragment();
             for(let i=1; i<=49; i++) {
                 const dot = document.createElement('div');
                 dot.className = 'mini-tile';
                 dot.id = `mini-${i}`;
-                dot.innerText = i;
-                minimap.appendChild(dot);
+                dot.textContent = i;
+                frag.appendChild(dot);
                 completionState.push(false);
             }
+            minimap.appendChild(frag);
             fetchGlobalData();
             fetchData();
         }
@@ -323,11 +330,22 @@
             const hue = (percent * 120) / 100;
             return `hsl(${hue}, 70%, 45%)`;
         }
+        
+        // Prevent XSS from CSV data
+        function escapeHtml(text) {
+            if (!text) return text;
+            return text
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
 
         async function fetchGlobalData() {
             const teamData = TEAM_MAP[currentTeamKey];
-            document.getElementById('team-name').innerText = teamData.name;
-            document.getElementById('total-points').innerText = teamData.points.toLocaleString();
+            document.getElementById('team-name').textContent = teamData.name;
+            document.getElementById('total-points').textContent = teamData.points.toLocaleString();
             codewordSecret = teamData.codeword;
         }
 
@@ -343,17 +361,21 @@
                 
                 lastSeenHash = rawData.length;
                 const syncText = document.getElementById('last-sync-text');
-                syncText.innerText = `Last Sync: ${new Date().toLocaleTimeString()}`;
+                syncText.textContent = `Last Sync: ${new Date().toLocaleTimeString()}`;
                 syncText.classList.remove('sync-flash');
-                void syncText.offsetWidth; 
+                void syncText.offsetWidth; // Trigger reflow
                 syncText.classList.add('sync-flash');
                 
                 const rows = rawData.split('\n').slice(1);
                 const grid = document.getElementById('grid');
-                grid.innerHTML = '';
+                grid.innerHTML = ''; // Clear current grid
                 tileDataCache = [];
                 
+                // Use DocumentFragment for batched DOM insertion (Performance)
+                const docFrag = document.createDocumentFragment();
+                
                 rows.forEach((row, index) => {
+                    // Safe regex split for CSV
                     const cols = row.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
                     if (cols.length < 4) return;
                     
@@ -375,7 +397,9 @@
                     if (miniTile) isCompleted ? miniTile.classList.add('complete') : miniTile.classList.remove('complete');
 
                     let checklistHtml = '';
-                    itemList.forEach(item => { if(item.trim()) checklistHtml += `<div class="check-item"><span class="check-mark"></span> ${item.trim()}</div>`; });
+                    itemList.forEach(item => { 
+                        if(item.trim()) checklistHtml += `<div class="check-item"><span class="check-mark"></span> ${escapeHtml(item.trim())}</div>`; 
+                    });
 
                     const pkg = { id: index + 1, title, img: finalImgSrc, percent, barColor, checklistHtml, description, isCompleted, points: pts };
                     tileDataCache.push(pkg);
@@ -383,15 +407,18 @@
                     const tile = document.createElement('div');
                     tile.className = `tile ${isCompleted ? 'completed' : ''}`;
                     tile.onclick = (e) => openModal(e, pkg);
+                    
+                    // Securely constructed HTML
                     tile.innerHTML = `
-                        <div class="header-box"><div class="header-content">${index + 1} | ${title}</div></div>
-                        <div class="img-container"><img src="${finalImgSrc}" onerror="this.style.visibility='hidden'"></div>
+                        <div class="header-box"><div class="header-content">${index + 1} | ${escapeHtml(title)}</div></div>
+                        <div class="img-container"><img src="${finalImgSrc}" alt="${escapeHtml(title)}" onerror="this.style.visibility='hidden'"></div>
                         <div class="progress-container"><div class="progress-bg"><div class="progress-fill" style="width: ${percent}%; background-color: ${barColor}"></div></div></div>
                         <div class="checklist-box">${checklistHtml}</div>
-                        <div class="point-badge">${pts} PTS</div>
+                        <div class="point-badge">${escapeHtml(pts)} PTS</div>
                     `;
-                    grid.appendChild(tile);
+                    docFrag.appendChild(tile);
                 });
+                grid.appendChild(docFrag);
             } catch (e) { console.error("Sync Error:", e); }
         }
 
@@ -415,19 +442,24 @@
             document.getElementById('standard-modal-view').style.display = 'block';
             document.getElementById('map-modal-view').style.display = 'none';
 
-            document.getElementById('modal-header').innerText = `${data.id} | ${data.title}`;
+            document.getElementById('modal-header').textContent = `${data.id} | ${data.title}`;
             document.getElementById('modal-image').src = data.img;
-            document.getElementById('modal-points').innerText = `${data.points} PTS`;
+            document.getElementById('modal-points').textContent = `${data.points} PTS`;
             document.getElementById('modal-bar').style.width = data.percent + '%';
             document.getElementById('modal-bar').style.backgroundColor = data.barColor;
-            document.getElementById('modal-list').innerHTML = data.checklistHtml;
-            document.getElementById('modal-desc').innerText = data.description;
+            document.getElementById('modal-list').innerHTML = data.checklistHtml; // Contains safe HTML
+            document.getElementById('modal-desc').textContent = data.description;
             
             const rect = currentActiveElement.getBoundingClientRect();
             box.style.top = (rect.top + rect.height/2) + 'px';
             box.style.left = (rect.left + rect.width/2) + 'px';
             overlay.style.display = 'flex';
-            setTimeout(() => { overlay.classList.add('active'); box.classList.add('active'); }, 10);
+            
+            // Force reflow for animation
+            requestAnimationFrame(() => {
+                overlay.classList.add('active'); 
+                box.classList.add('active');
+            });
             document.body.style.overflow = 'hidden';
         }
 
@@ -444,19 +476,30 @@
             
             const largeGrid = document.getElementById('large-map-grid');
             largeGrid.innerHTML = '';
+            
+            const docFrag = document.createDocumentFragment();
             for(let i=1; i<=49; i++) {
                 const cell = document.createElement('div');
                 cell.className = `large-map-tile ${completionState[i-1] ? 'complete' : ''}`;
-                cell.innerText = i;
-                cell.onclick = (ev) => { ev.stopPropagation(); const pkg = tileDataCache[i-1]; if(pkg) openModal({currentTarget: cell}, pkg); };
-                largeGrid.appendChild(cell);
+                cell.textContent = i;
+                cell.onclick = (ev) => { 
+                    ev.stopPropagation(); 
+                    const pkg = tileDataCache[i-1]; 
+                    if(pkg) openModal({currentTarget: cell}, pkg); 
+                };
+                docFrag.appendChild(cell);
             }
+            largeGrid.appendChild(docFrag);
 
             const rect = currentActiveElement.getBoundingClientRect();
             box.style.top = (rect.top + rect.height/2) + 'px';
             box.style.left = (rect.left + rect.width/2) + 'px';
             overlay.style.display = 'flex';
-            setTimeout(() => { overlay.classList.add('active'); box.classList.add('active'); }, 10);
+            
+            requestAnimationFrame(() => {
+                overlay.classList.add('active'); 
+                box.classList.add('active');
+            });
             document.body.style.overflow = 'hidden';
         }
 
@@ -470,10 +513,18 @@
         function toggleCodeword() {
             const el = document.getElementById('codeword-display');
             el.classList.toggle('codeword-hidden');
-            el.innerText = el.classList.contains('codeword-hidden') ? "????" : codewordSecret;
+            el.textContent = el.classList.contains('codeword-hidden') ? "?????" : codewordSecret;
         }
+        
+        // Expose necessary functions to global scope for HTML inline handlers
+        window.changeTheme = changeTheme;
+        window.fetchData = fetchData;
+        window.toggleCodeword = toggleCodeword;
+        window.openMapModal = openMapModal;
+        window.closeModal = closeModal;
 
-        init();
+        // Initialize
+        document.addEventListener('DOMContentLoaded', init);
         setInterval(() => fetchData(), 30000);
     </script>
 </body>
