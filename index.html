@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bingo 2026</title>
+    <title>Bingo v3.071</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cabin+Condensed:wght@400;700&display=swap" rel="stylesheet">
@@ -61,7 +61,7 @@
             display: flex; flex-direction: column; align-items: center; min-height: 100vh;
         }
 
-        /* --- Dashboard --- */
+        /* --- Redesigned Dashboard --- */
         .dashboard {
             width: 100%; max-width: 1580px; 
             background: var(--bg-tile); border: 2px solid var(--border-main);
@@ -88,6 +88,12 @@
         }
         .settings-trigger:hover { color: var(--accent); transform: rotate(45deg); }
 
+        /* --- Settings Panel --- */
+        .settings-content select { 
+            background: var(--bg-well); color: var(--text-main); border: 1px solid var(--border-main); 
+            padding: 8px; font-family: 'Cabin Condensed'; cursor: pointer; font-size: 1.1rem; border-radius: 4px; width: 100%;
+        }
+
         /* --- Mini-Map --- */
         .minimap-wrapper {
             background: var(--bg-well); padding: 4px; border: 2px solid var(--border-main);
@@ -101,7 +107,7 @@
         /* --- Grid --- */
         .grid-container {
             display: grid; grid-template-columns: repeat(7, 1fr); gap: 10px;
-            width: 100%; max-width: 1580px; padding-bottom: 80px;
+            width: 100%; max-width: 1580px; padding-bottom: 60px;
         }
 
         /* --- Tile Styles --- */
@@ -112,6 +118,7 @@
             container-type: inline-size; cursor: pointer; transition: all 0.3s ease, opacity 0.4s ease; 
         }
         .tile.completed { background-color: var(--bg-completed); border-color: var(--border-completed); }
+        
         .tile:hover { transform: scale(1.05); z-index: 50; box-shadow: 0 0 25px 2px var(--accent), inset 0 0 10px rgba(0, 0, 0, 0.5); }
         .tile.completed:hover { box-shadow: 0 0 25px 2px var(--border-completed), inset 0 0 10px rgba(0, 0, 0, 0.5); }
         .tile.ghost { opacity: 0; pointer-events: none; }
@@ -157,26 +164,36 @@
         .modal-label { font-size: 0.7rem; text-transform: uppercase; font-weight: bold; margin-bottom: 2px; color: var(--text-main); }
         .modal-checklist, .modal-description { background: var(--bg-well); border: 1px solid #000; padding: 8px; overflow-y: auto; color: var(--text-bright); }
 
-        /* --- Background Sync Footer --- */
-        .version-footer { 
-            position: fixed; bottom: 10px; left: 25px; font-size: 0.65rem; 
-            color: var(--border-main); z-index: -1; opacity: 0.6; pointer-events: auto; 
-        }
+        /* --- Large Map --- */
+        .large-map-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; background: var(--bg-body); padding: 10px; border: 2px solid var(--border-main); width: 100%; aspect-ratio: 1/1; }
+        .large-map-tile { background: var(--bg-well); display: flex; justify-content: center; align-items: center; font-size: 1.2rem; font-weight: bold; color: rgba(255,255,255,0.2); border: 1px solid var(--bg-tile); cursor: pointer; transition: 0.2s; }
+        .large-map-tile.complete { background: var(--bg-completed); color: var(--text-completed); border-color: var(--border-completed); }
+
+        .close-btn { position: absolute; top: 5px; right: 12px; font-size: 2rem; cursor: pointer; color: var(--text-dim); z-index: 100; }
+        .close-btn:hover { color: var(--accent); }
+        
+        .version-footer { position: fixed; bottom: 10px; left: 25px; font-size: 0.65rem; color: var(--border-main); z-index: 500; }
         .sync-btn { cursor: pointer; color: var(--text-dim); text-decoration: underline; margin-left: 5px; }
         .sync-btn:hover { color: var(--accent); }
         .sync-flash { animation: flash-sync 1s ease-out; }
         @keyframes flash-sync { 0% { color: var(--accent); } 100% { color: var(--border-main); } }
         
-        /* --- Mobile Overrides --- */
+        /* --- Mobile Specific Overrides --- */
         @media (max-width: 600px) {
-            .dashboard { grid-template-columns: 1fr auto; grid-template-areas: "main main" "stats tools"; }
+            .dashboard {
+                grid-template-columns: 1fr auto;
+                grid-template-areas: "main main" "stats tools";
+            }
             .dashboard-main { grid-area: main; border-bottom: 1px solid var(--border-main); padding-bottom: 8px; }
             .stats-container { grid-area: stats; justify-content: flex-start; }
             .tools-container { grid-area: tools; display: flex; align-items: center; gap: 15px; }
+
             .grid-container { grid-template-columns: repeat(3, 1fr); }
+            
             #event-title { font-size: 1.2rem; }
             #team-name { font-size: 0.85rem; }
             .stat-value { font-size: 1rem; }
+            
             .minimap-wrapper { position: fixed; bottom: 20px; right: 20px; z-index: 1000; box-shadow: 0 4px 15px rgba(0,0,0,0.7); }
         }
 
@@ -190,7 +207,7 @@
 
     <header class="dashboard">
         <div class="dashboard-main">
-            <h1 id="event-title">Bingo 2026</h1>
+            <h1 id="event-title">Bingo 2026 | v3.071</h1>
             <p id="team-name">Loading Team...</p>
         </div>
 
@@ -216,8 +233,8 @@
     <main class="grid-container" id="grid"></main>
 
     <footer class="version-footer">
-        <span>Build: v3.073</span><br>
-        <span id="last-sync-text">Updated just now</span>
+        <span>Build: v3.071</span><br>
+        <span id="last-sync-text">Last Sync: Never</span>
         <span class="sync-btn" onclick="fetchData(true)">[Sync Now]</span>
     </footer>
 
@@ -252,7 +269,7 @@
                 <div class="modal-header">SETTINGS</div>
                 <div class="modal-label">Choose Theme</div>
                 <div class="settings-content">
-                    <select id="theme-dropdown" onchange="changeTheme(this.value)" style="width: 100%; padding: 8px; background: var(--bg-well); color: var(--text-main); border: 1px solid var(--border-main); font-family: inherit;">
+                    <select id="theme-dropdown" onchange="changeTheme(this.value)">
                         <optgroup label="Classic">
                             <option value="osrs">OSRS (Original)</option>
                             <option value="midnight">Midnight OLED</option>
@@ -276,6 +293,9 @@
                         </optgroup>
                     </select>
                 </div>
+                <div style="margin-top: 20px; font-size: 0.8rem; color: var(--text-dim); text-align: center;">
+                    Bingo 2026 Engine v3.071
+                </div>
             </div>
         </div>
     </div>
@@ -288,7 +308,6 @@
         let currentTeamKey = "Warriors";
         let currentActiveElement = null;
         let lastSeenHash = null;
-        let lastSyncTime = null;
         let codewordSecret = "";
         let completionState = [];
         let tileDataCache = [];
@@ -305,18 +324,6 @@
             }
             fetchGlobalData();
             fetchData();
-            
-            // Start the relative time counter
-            setInterval(updateRelativeTime, 30000);
-        }
-
-        function updateRelativeTime() {
-            if (!lastSyncTime) return;
-            const diff = Math.floor((Date.now() - lastSyncTime) / 1000);
-            const el = document.getElementById('last-sync-text');
-            
-            if (diff < 60) el.innerText = "Updated just now";
-            else el.innerText = `Updated ${Math.floor(diff / 60)}m ago`;
         }
 
         function changeTheme(theme) {
@@ -338,12 +345,10 @@
                 });
                 const rawData = await response.text();
                 if (!isManual && lastSeenHash === rawData.length) return; 
-                
                 lastSeenHash = rawData.length;
-                lastSyncTime = Date.now();
                 
                 const syncText = document.getElementById('last-sync-text');
-                updateRelativeTime();
+                syncText.innerText = `Last Sync: ${new Date().toLocaleTimeString()}`;
                 syncText.classList.remove('sync-flash');
                 void syncText.offsetWidth; 
                 syncText.classList.add('sync-flash');
@@ -395,6 +400,7 @@
         }
 
         function openModal(e, data) {
+            const overlay = document.getElementById('modal-overlay');
             const box = document.getElementById('modal-box');
             if (currentActiveElement) currentActiveElement.classList.remove('ghost');
             currentActiveElement = e.currentTarget;
