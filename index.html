@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bingo v3.070</title>
+    <title>Bingo v3.080</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cabin+Condensed:wght@400;700&display=swap" rel="stylesheet">
@@ -67,14 +67,15 @@
             background: var(--bg-tile); border: 2px solid var(--border-main);
             padding: 10px 20px; margin-bottom: 20px;
             display: flex; justify-content: space-between; align-items: center;
+            flex-wrap: wrap; gap: 8px;
             box-shadow: 0 4px 15px rgba(0,0,0,0.5); z-index: 100;
         }
 
-        .dashboard-main { display: flex; flex-direction: column; flex: 1; }
-        #event-title { font-size: 1.6rem; margin: 0; text-transform: uppercase; letter-spacing: 1px; text-shadow: 2px 2px 4px black; }
-        #team-name { font-size: 1.1rem; color: #ffffff; margin: 2px 0 0 0; text-shadow: 1px 1px 2px black; font-weight: bold; }
+        .dashboard-main { display: flex; flex-direction: column; flex: 1; min-width: 0; }
+        #event-title { font-size: 1.6rem; margin: 0; text-transform: uppercase; letter-spacing: 1px; text-shadow: 2px 2px 4px black; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        #team-name { font-size: 1.1rem; color: #ffffff; margin: 2px 0 0 0; text-shadow: 1px 1px 2px black; font-weight: bold; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-        .stats-container { display: flex; gap: 20px; align-items: center; margin: 0 20px; }
+        .stats-container { display: flex; gap: 15px; align-items: center; flex-shrink: 0; flex-wrap: wrap; }
         .stat-item { text-align: center; }
         .stat-label { font-size: 0.65rem; text-transform: uppercase; color: var(--text-dim); display: block; }
         .stat-value { font-size: 1.3rem; font-weight: bold; color: var(--text-main); }
@@ -82,10 +83,16 @@
         #codeword-display { cursor: pointer; background: var(--bg-well); padding: 2px 10px; border-radius: 4px; min-width: 90px; text-align: center; display: inline-block; }
         .codeword-hidden { color: var(--bg-well); text-shadow: none; }
 
-        .theme-selector select { 
-            background: var(--bg-well); color: var(--text-main); border: 1px solid var(--border-main); 
-            padding: 2px 5px; font-family: 'Cabin Condensed'; cursor: pointer; font-size: 1.1rem; border-radius: 4px;
+        /* --- Settings Gear Button --- */
+        .settings-btn {
+            background: none; border: 2px solid var(--border-main); color: var(--text-dim);
+            width: 38px; height: 38px; border-radius: 4px; cursor: pointer;
+            display: flex; justify-content: center; align-items: center;
+            transition: all 0.2s ease; flex-shrink: 0; font-size: 1.3rem; padding: 0;
         }
+        .settings-btn:hover { border-color: var(--accent); color: var(--accent); background: var(--bg-well); }
+        .settings-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+        .settings-btn svg { width: 20px; height: 20px; fill: currentColor; }
 
         /* --- Mini-Map --- */
         .minimap-wrapper {
@@ -182,21 +189,79 @@
 
         .close-btn { position: absolute; top: 5px; right: 12px; font-size: 2rem; cursor: pointer; color: var(--text-dim); z-index: 100; }
         .close-btn:hover { color: var(--accent); }
+
+        /* --- Settings Modal --- */
+        .settings-section { margin-bottom: 18px; }
+        .settings-section-title {
+            font-size: 0.75rem; text-transform: uppercase; font-weight: bold;
+            color: var(--text-dim); letter-spacing: 1px; margin-bottom: 8px;
+            padding-bottom: 4px; border-bottom: 1px solid var(--border-main);
+        }
+        .settings-row {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 8px 0;
+        }
+        .settings-row-label { font-size: 1rem; color: var(--text-bright); }
+        .settings-row-hint { font-size: 0.7rem; color: var(--text-dim); margin-top: 2px; }
+        .settings-select {
+            background: var(--bg-well); color: var(--text-main); border: 1px solid var(--border-main);
+            padding: 5px 10px; font-family: 'Cabin Condensed'; cursor: pointer;
+            font-size: 1rem; border-radius: 4px; min-width: 140px;
+        }
+        .settings-select:focus { border-color: var(--accent); outline: none; }
+        .settings-version {
+            text-align: center; font-size: 0.7rem; color: var(--text-dim);
+            margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border-main);
+        }
         
         .version-footer { position: fixed; bottom: 10px; left: 25px; font-size: 0.65rem; color: var(--border-main); z-index: 500; }
         .sync-btn { cursor: pointer; color: var(--text-dim); text-decoration: underline; margin-left: 5px; }
         .sync-btn:hover { color: var(--accent); }
         .sync-flash { animation: flash-sync 1s ease-out; }
         @keyframes flash-sync { 0% { color: var(--accent); } 100% { color: var(--border-main); } }
-        
+
+        /* --- Mobile Dashboard Responsive --- */
         @media (max-width: 1400px) {
             .grid-container { grid-template-columns: repeat(5, 1fr); }
-            .minimap-wrapper { position: fixed; bottom: 20px; right: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.7); background: var(--bg-well); border: 2px solid var(--border-main); z-index: 1000; }
-            .minimap-container { grid-template-columns: repeat(7, 12px); grid-template-rows: repeat(7, 12px); }
-            .mini-tile { width: 12px; height: 12px; font-size: 7px; }
+            .minimap-wrapper.in-dashboard { display: none; }
+            .minimap-wrapper.floating {
+                display: block; position: fixed; bottom: 20px; right: 20px;
+                box-shadow: 0 4px 15px rgba(0,0,0,0.7); background: var(--bg-well);
+                border: 2px solid var(--border-main); z-index: 1000;
+            }
+            .minimap-wrapper.floating .minimap-container { grid-template-columns: repeat(7, 12px); grid-template-rows: repeat(7, 12px); }
+            .minimap-wrapper.floating .mini-tile { width: 12px; height: 12px; font-size: 7px; }
+        }
+        @media (min-width: 1401px) {
+            .minimap-wrapper.floating { display: none; }
         }
         @media (max-width: 1000px) { .grid-container { grid-template-columns: repeat(4, 1fr); } }
-        @media (max-width: 600px) { .grid-container { grid-template-columns: repeat(3, 1fr); } }
+
+        @media (max-width: 768px) {
+            body { padding: 8px; }
+            .dashboard { padding: 8px 12px; gap: 6px; }
+            .dashboard-main { flex-basis: calc(100% - 50px); }
+            #event-title { font-size: 1.2rem; }
+            #team-name { font-size: 0.9rem; }
+            .stats-container { 
+                order: 3; flex-basis: 100%; justify-content: center;
+                gap: 12px; padding-top: 6px;
+                border-top: 1px solid var(--border-main);
+            }
+            .stat-value { font-size: 1.1rem; }
+            #codeword-display { min-width: 70px; padding: 2px 8px; }
+            .settings-btn { order: 2; }
+        }
+
+        @media (max-width: 600px) {
+            .grid-container { grid-template-columns: repeat(3, 1fr); }
+            .dashboard { padding: 6px 10px; }
+            #event-title { font-size: 1rem; }
+            #team-name { font-size: 0.8rem; }
+            .stats-container { gap: 10px; }
+            .stat-label { font-size: 0.6rem; }
+            .stat-value { font-size: 1rem; }
+        }
     </style>
 </head>
 
@@ -204,38 +269,15 @@
 
     <header class="dashboard" role="banner">
         <div class="dashboard-main">
-            <h1 id="event-title">Bingo 2026 | v3.070</h1>
+            <h1 id="event-title">Bingo 2026 | v3.080</h1>
             <p id="team-name">Loading Team...</p>
         </div>
 
+        <button class="settings-btn" id="settings-trigger" aria-label="Open settings" onclick="openSettingsModal(event)" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openSettingsModal(event);}">
+            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58a.49.49 0 00.12-.61l-1.92-3.32a.49.49 0 00-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54a.484.484 0 00-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96a.49.49 0 00-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.07.62-.07.94s.02.64.07.94l-2.03 1.58a.49.49 0 00-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6A3.6 3.6 0 1115.6 12 3.611 3.611 0 0112 15.6z"/></svg>
+        </button>
+
         <div class="stats-container">
-            <div class="stat-item theme-selector">
-                <span class="stat-label">Theme</span>
-                <label for="theme-dropdown" class="sr-only" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);">Select Theme</label>
-                <select id="theme-dropdown" onchange="changeTheme(this.value)">
-                    <optgroup label="Classic">
-                        <option value="osrs">OSRS (Original)</option>
-                        <option value="midnight">Midnight OLED</option>
-                    </optgroup>
-                    <optgroup label="Seasons">
-                        <option value="spring">Spring</option>
-                        <option value="summer">Summer</option>
-                        <option value="autumn">Autumn</option>
-                        <option value="winter">Winter</option>
-                    </optgroup>
-                    <optgroup label="Aesthetic">
-                        <option value="abyssal">Abyssal</option>
-                        <option value="volcanic">Volcanic</option>
-                        <option value="cyberpunk">Cyberpunk</option>
-                        <option value="bloodlust">Bloodlust</option>
-                        <option value="royal">Royal</option>
-                        <option value="emerald">Emerald</option>
-                        <option value="solar">Solar</option>
-                        <option value="vaporwave">Vaporwave</option>
-                        <option value="tox">Toxic</option>
-                    </optgroup>
-                </select>
-            </div>
             <div class="stat-item">
                 <span class="stat-label">Codeword</span>
                 <span id="codeword-display" class="stat-value codeword-hidden" role="button" tabindex="0" aria-label="Toggle codeword visibility" onclick="toggleCodeword()" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();toggleCodeword();}">?????</span>
@@ -246,15 +288,20 @@
             </div>
         </div>
 
-        <aside class="minimap-wrapper" id="mini-map-trigger" role="button" tabindex="0" aria-label="Open overview map" onclick="openMapModal(event)" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openMapModal(event);}">
+        <aside class="minimap-wrapper in-dashboard" id="mini-map-trigger" role="button" tabindex="0" aria-label="Open overview map" onclick="openMapModal(event)" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openMapModal(event);}">
             <div class="minimap-container" id="minimap" aria-hidden="true"></div>
         </aside>
     </header>
 
+    <!-- Floating minimap for smaller screens -->
+    <aside class="minimap-wrapper floating" id="mini-map-floating" role="button" tabindex="0" aria-label="Open overview map" onclick="openMapModal(event)" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openMapModal(event);}">
+        <div class="minimap-container" id="minimap-floating" aria-hidden="true"></div>
+    </aside>
+
     <main class="grid-container" id="grid" role="grid" aria-label="Bingo board"></main>
 
     <footer class="version-footer">
-        <span>Build: v3.070</span><br>
+        <span>Build: v3.080</span><br>
         <span id="last-sync-text" aria-live="polite">Last Sync: Never</span>
         <span class="sync-btn" role="button" tabindex="0" onclick="fetchData(true)" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();fetchData(true);}">[Sync Now]</span>
     </footer>
@@ -263,6 +310,7 @@
         <div class="modal-content" id="modal-box" onclick="event.stopPropagation()">
             <span class="close-btn" role="button" tabindex="0" aria-label="Close dialog" onclick="closeModal()" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();closeModal();}">&times;</span>
             
+            <!-- Standard Tile View -->
             <div id="standard-modal-view">
                 <div id="modal-header" class="modal-header"></div>
                 <div class="modal-img"><img id="modal-image" src="" alt=""></div>
@@ -282,9 +330,68 @@
                 <div id="modal-desc" class="modal-description" style="max-height: 80px;"></div>
             </div>
 
+            <!-- Map Overview View -->
             <div id="map-modal-view" style="display: none; flex-direction: column; align-items: center;">
                 <div class="modal-header">OVERVIEW</div>
                 <div class="large-map-grid" id="large-map-grid"></div>
+            </div>
+
+            <!-- Settings View -->
+            <div id="settings-modal-view" style="display: none; flex-direction: column;">
+                <div class="modal-header">SETTINGS</div>
+
+                <div class="settings-section">
+                    <div class="settings-section-title">Appearance</div>
+                    <div class="settings-row">
+                        <div>
+                            <div class="settings-row-label">Theme</div>
+                            <div class="settings-row-hint">Choose a visual style</div>
+                        </div>
+                        <label for="settings-theme-dropdown" class="sr-only" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);">Select Theme</label>
+                        <select id="settings-theme-dropdown" class="settings-select" onchange="changeTheme(this.value)">
+                            <optgroup label="Classic">
+                                <option value="osrs">OSRS (Original)</option>
+                                <option value="midnight">Midnight OLED</option>
+                            </optgroup>
+                            <optgroup label="Seasons">
+                                <option value="spring">Spring</option>
+                                <option value="summer">Summer</option>
+                                <option value="autumn">Autumn</option>
+                                <option value="winter">Winter</option>
+                            </optgroup>
+                            <optgroup label="Aesthetic">
+                                <option value="abyssal">Abyssal</option>
+                                <option value="volcanic">Volcanic</option>
+                                <option value="cyberpunk">Cyberpunk</option>
+                                <option value="bloodlust">Bloodlust</option>
+                                <option value="royal">Royal</option>
+                                <option value="emerald">Emerald</option>
+                                <option value="solar">Solar</option>
+                                <option value="vaporwave">Vaporwave</option>
+                                <option value="tox">Toxic</option>
+                            </optgroup>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="settings-section">
+                    <div class="settings-section-title">Data</div>
+                    <div class="settings-row">
+                        <div>
+                            <div class="settings-row-label">Sync Interval</div>
+                            <div class="settings-row-hint">How often to refresh data</div>
+                        </div>
+                        <select id="settings-sync-interval" class="settings-select" onchange="changeSyncInterval(this.value)">
+                            <option value="15000">15 seconds</option>
+                            <option value="30000" selected>30 seconds</option>
+                            <option value="60000">1 minute</option>
+                            <option value="120000">2 minutes</option>
+                            <option value="300000">5 minutes</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="settings-version">Bingo Board &middot; v3.080</div>
             </div>
         </div>
     </div>
@@ -293,6 +400,8 @@
         /* ============================================
            CONSTANTS & STATE
            ============================================ */
+        const APP_VERSION = '3.080';
+
         const TEAM_MAP = {
             "Warriors": {
                 name: "The Spreadsheet Warriors",
@@ -303,6 +412,10 @@
         };
 
         const MAX_TILES = 49;
+        const STORAGE_KEYS = {
+            theme: 'bingo-theme',
+            syncInterval: 'bingo-sync-interval'
+        };
 
         let currentTeamKey = "Warriors";
         let currentActiveElement = null;
@@ -312,23 +425,18 @@
         let tileDataCache = [];
         let fetchController = null;
         let syncIntervalId = null;
+        let currentSyncInterval = 30000;
 
         /* ============================================
            UTILITY FUNCTIONS
            ============================================ */
 
-        /**
-         * Escapes a string for safe insertion into HTML.
-         */
         function escapeHTML(str) {
             const div = document.createElement('div');
             div.appendChild(document.createTextNode(str));
             return div.innerHTML;
         }
 
-        /**
-         * Generates a simple 32-bit integer hash from a string.
-         */
         function simpleHash(str) {
             let hash = 0;
             for (let i = 0; i < str.length; i++) {
@@ -339,10 +447,6 @@
             return hash;
         }
 
-        /**
-         * Properly parses a single CSV row, handling quoted fields,
-         * escaped double-quotes, and commas within quoted values.
-         */
         function parseCSVRow(row) {
             const cols = [];
             let current = '';
@@ -373,21 +477,23 @@
             return cols;
         }
 
-        /**
-         * Returns a CSS color for a progress percentage (0–100).
-         */
         function getProgressColor(percent) {
             if (percent >= 100) return 'var(--text-completed)';
             const hue = (percent * 120) / 100;
             return `hsl(${hue}, 70%, 45%)`;
         }
 
-        /**
-         * Handles broken images gracefully.
-         */
         function handleImgError(img) {
             img.style.visibility = 'hidden';
             img.removeAttribute('src');
+        }
+
+        function storageSave(key, value) {
+            try { localStorage.setItem(key, value); } catch (e) { /* silent */ }
+        }
+
+        function storageLoad(key, fallback) {
+            try { return localStorage.getItem(key) || fallback; } catch (e) { return fallback; }
         }
 
         /* ============================================
@@ -396,20 +502,73 @@
 
         function changeTheme(theme) {
             document.documentElement.setAttribute('data-theme', theme);
-            try {
-                localStorage.setItem('bingo-theme', theme);
-            } catch (e) { /* storage full or disabled — silently ignore */ }
+            storageSave(STORAGE_KEYS.theme, theme);
+
+            // Keep both dropdowns in sync
+            const settingsDropdown = document.getElementById('settings-theme-dropdown');
+            if (settingsDropdown) settingsDropdown.value = theme;
         }
 
         function restoreTheme() {
-            try {
-                const saved = localStorage.getItem('bingo-theme');
-                if (saved) {
-                    document.documentElement.setAttribute('data-theme', saved);
-                    const dropdown = document.getElementById('theme-dropdown');
-                    if (dropdown) dropdown.value = saved;
+            const saved = storageLoad(STORAGE_KEYS.theme, null);
+            if (saved) {
+                document.documentElement.setAttribute('data-theme', saved);
+                const settingsDropdown = document.getElementById('settings-theme-dropdown');
+                if (settingsDropdown) settingsDropdown.value = saved;
+            }
+        }
+
+        /* ============================================
+           SYNC INTERVAL MANAGEMENT
+           ============================================ */
+
+        function changeSyncInterval(ms) {
+            currentSyncInterval = parseInt(ms) || 30000;
+            storageSave(STORAGE_KEYS.syncInterval, currentSyncInterval);
+            restartSyncInterval();
+        }
+
+        function restartSyncInterval() {
+            if (syncIntervalId) clearInterval(syncIntervalId);
+            syncIntervalId = setInterval(() => fetchData(), currentSyncInterval);
+        }
+
+        function restoreSyncInterval() {
+            const saved = parseInt(storageLoad(STORAGE_KEYS.syncInterval, '30000'));
+            if (saved && !isNaN(saved)) {
+                currentSyncInterval = saved;
+                const dropdown = document.getElementById('settings-sync-interval');
+                if (dropdown) dropdown.value = String(saved);
+            }
+        }
+
+        /* ============================================
+           MINIMAP MANAGEMENT
+           ============================================ */
+
+        function buildMinimap(containerId) {
+            const container = document.getElementById(containerId);
+            if (!container) return;
+            const fragment = document.createDocumentFragment();
+            for (let i = 1; i <= MAX_TILES; i++) {
+                const dot = document.createElement('div');
+                dot.className = 'mini-tile';
+                dot.dataset.index = i;
+                dot.innerText = i;
+                fragment.appendChild(dot);
+            }
+            container.appendChild(fragment);
+        }
+
+        function updateMinimaps(index, isCompleted) {
+            // Update all minimap instances
+            document.querySelectorAll(`.mini-tile[data-index="${index + 1}"]`).forEach(tile => {
+                if (isCompleted) {
+                    tile.classList.add('complete');
+                } else {
+                    tile.classList.remove('complete');
                 }
-            } catch (e) { /* localStorage unavailable */ }
+            });
         }
 
         /* ============================================
@@ -425,7 +584,6 @@
         }
 
         async function fetchData(isManual = false) {
-            // Abort any in-flight request
             if (fetchController) {
                 fetchController.abort();
             }
@@ -445,20 +603,16 @@
                 );
 
                 const rawData = await response.text();
-
-                // Check if data actually changed
                 const dataHash = simpleHash(rawData);
                 if (!isManual && lastSeenHash === dataHash) return;
                 lastSeenHash = dataHash;
 
-                // Update sync timestamp
                 const syncText = document.getElementById('last-sync-text');
                 syncText.innerText = `Last Sync: ${new Date().toLocaleTimeString()}`;
                 syncText.classList.remove('sync-flash');
-                void syncText.offsetWidth; // force reflow to restart animation
+                void syncText.offsetWidth;
                 syncText.classList.add('sync-flash');
 
-                // Parse rows
                 const rows = rawData.split('\n').slice(1);
                 const grid = document.getElementById('grid');
                 grid.innerHTML = '';
@@ -487,18 +641,9 @@
                     const barColor = getProgressColor(percent);
                     const finalImgSrc = (imgName.includes('http')) ? imgName : `./images/${imgName}`;
 
-                    // Update completion state & minimap
                     completionState[index] = isCompleted;
-                    const miniTile = document.getElementById(`mini-${index + 1}`);
-                    if (miniTile) {
-                        if (isCompleted) {
-                            miniTile.classList.add('complete');
-                        } else {
-                            miniTile.classList.remove('complete');
-                        }
-                    }
+                    updateMinimaps(index, isCompleted);
 
-                    // Build safe checklist HTML
                     let checklistHtml = '';
                     itemList.forEach(item => {
                         const trimmed = item.trim();
@@ -507,7 +652,6 @@
                         }
                     });
 
-                    // Cache tile data
                     const pkg = {
                         id: index + 1,
                         title: title,
@@ -521,7 +665,6 @@
                     };
                     tileDataCache.push(pkg);
 
-                    // Build tile element
                     const tile = document.createElement('div');
                     tile.className = `tile${isCompleted ? ' completed' : ''}`;
                     tile.setAttribute('role', 'button');
@@ -553,11 +696,10 @@
                     fragment.appendChild(tile);
                 });
 
-                // Single DOM append — one reflow instead of 49
                 grid.appendChild(fragment);
 
             } catch (e) {
-                if (e.name === 'AbortError') return; // silently ignore aborted fetches
+                if (e.name === 'AbortError') return;
                 console.error("Sync Error:", e);
             } finally {
                 fetchController = null;
@@ -568,29 +710,58 @@
            MODAL MANAGEMENT
            ============================================ */
 
-        function openModal(e, data) {
+        function hideAllModalViews() {
+            document.getElementById('standard-modal-view').style.display = 'none';
+            document.getElementById('map-modal-view').style.display = 'none';
+            document.getElementById('settings-modal-view').style.display = 'none';
+        }
+
+        function showModal(triggerEl, animateFromTrigger) {
             const overlay = document.getElementById('modal-overlay');
             const box = document.getElementById('modal-box');
 
-            // Clean up any previous ghost state
             if (currentActiveElement && currentActiveElement.isConnected) {
                 currentActiveElement.classList.remove('ghost');
             }
 
-            const trigger = e.currentTarget;
-
-            // Only ghost actual tile elements, not large-map cells
-            if (trigger && trigger.classList.contains('tile')) {
-                currentActiveElement = trigger;
+            if (triggerEl && triggerEl.classList && triggerEl.classList.contains('tile')) {
+                currentActiveElement = triggerEl;
+                currentActiveElement.classList.add('ghost');
+            } else if (triggerEl && triggerEl.id === 'mini-map-trigger') {
+                currentActiveElement = triggerEl;
+                currentActiveElement.classList.add('ghost');
+            } else if (triggerEl && triggerEl.id === 'mini-map-floating') {
+                currentActiveElement = triggerEl;
                 currentActiveElement.classList.add('ghost');
             } else {
-                currentActiveElement = null;
+                currentActiveElement = triggerEl || null;
             }
 
-            // Reset modal mode
+            let rect;
+            if (animateFromTrigger && triggerEl && triggerEl.getBoundingClientRect) {
+                rect = triggerEl.getBoundingClientRect();
+            } else {
+                rect = { top: window.innerHeight / 2, left: window.innerWidth / 2, height: 0, width: 0 };
+            }
+
+            box.style.top = (rect.top + rect.height / 2) + 'px';
+            box.style.left = (rect.left + rect.width / 2) + 'px';
+
+            overlay.style.display = 'flex';
+            setTimeout(() => {
+                overlay.classList.add('active');
+                box.classList.add('active');
+                const closeBtn = box.querySelector('.close-btn');
+                if (closeBtn) closeBtn.focus();
+            }, 10);
+
+            document.body.style.overflow = 'hidden';
+        }
+
+        function openModal(e, data) {
+            const box = document.getElementById('modal-box');
             box.classList.remove('map-mode');
 
-            // Completion state
             if (data.isCompleted) {
                 box.classList.add('completed');
                 document.getElementById('modal-progress-section').style.display = 'none';
@@ -599,11 +770,9 @@
                 document.getElementById('modal-progress-section').style.display = 'block';
             }
 
-            // Show standard view
+            hideAllModalViews();
             document.getElementById('standard-modal-view').style.display = 'block';
-            document.getElementById('map-modal-view').style.display = 'none';
 
-            // Populate content (using innerText for plain text, innerHTML only for pre-sanitized checklist)
             document.getElementById('modal-header').innerText = `${data.id} | ${data.title}`;
 
             const modalImg = document.getElementById('modal-image');
@@ -618,49 +787,19 @@
             document.getElementById('modal-list').innerHTML = data.checklistHtml;
             document.getElementById('modal-desc').innerText = data.description;
 
-            // Update aria label
             box.setAttribute('aria-label', `Details for tile ${data.id}: ${data.title}`);
 
-            // Animate from trigger position
-            const rect = (trigger && trigger.getBoundingClientRect)
-                ? trigger.getBoundingClientRect()
-                : { top: window.innerHeight / 2, left: window.innerWidth / 2, height: 0, width: 0 };
-
-            box.style.top = (rect.top + rect.height / 2) + 'px';
-            box.style.left = (rect.left + rect.width / 2) + 'px';
-
-            overlay.style.display = 'flex';
-            setTimeout(() => {
-                overlay.classList.add('active');
-                box.classList.add('active');
-                // Focus the close button for keyboard accessibility
-                const closeBtn = box.querySelector('.close-btn');
-                if (closeBtn) closeBtn.focus();
-            }, 10);
-
-            document.body.style.overflow = 'hidden';
+            showModal(e.currentTarget, true);
         }
 
         function openMapModal(e) {
-            const overlay = document.getElementById('modal-overlay');
             const box = document.getElementById('modal-box');
-
-            // Clean up previous ghost
-            if (currentActiveElement && currentActiveElement.isConnected) {
-                currentActiveElement.classList.remove('ghost');
-            }
-
-            currentActiveElement = document.getElementById('mini-map-trigger');
-            if (currentActiveElement) {
-                currentActiveElement.classList.add('ghost');
-            }
-
             box.classList.add('map-mode');
             box.classList.remove('completed');
-            document.getElementById('standard-modal-view').style.display = 'none';
+
+            hideAllModalViews();
             document.getElementById('map-modal-view').style.display = 'flex';
 
-            // Build large map grid
             const largeGrid = document.getElementById('large-map-grid');
             largeGrid.innerHTML = '';
 
@@ -673,7 +812,7 @@
                 cell.setAttribute('tabindex', '0');
                 cell.setAttribute('aria-label', `Tile ${i}${completionState[i - 1] ? ' - Complete' : ''}`);
 
-                const tileIndex = i; // capture for closure
+                const tileIndex = i;
                 cell.onclick = (ev) => {
                     ev.stopPropagation();
                     const pkg = tileDataCache[tileIndex - 1];
@@ -692,25 +831,32 @@
             }
             largeGrid.appendChild(mapFragment);
 
-            // Animate from minimap position
-            const rect = currentActiveElement
-                ? currentActiveElement.getBoundingClientRect()
-                : { top: window.innerHeight / 2, left: window.innerWidth / 2, height: 0, width: 0 };
-
-            box.style.top = (rect.top + rect.height / 2) + 'px';
-            box.style.left = (rect.left + rect.width / 2) + 'px';
-
             box.setAttribute('aria-label', 'Bingo board overview map');
 
-            overlay.style.display = 'flex';
-            setTimeout(() => {
-                overlay.classList.add('active');
-                box.classList.add('active');
-                const closeBtn = box.querySelector('.close-btn');
-                if (closeBtn) closeBtn.focus();
-            }, 10);
+            // Determine which minimap triggered this
+            const trigger = e.currentTarget || document.getElementById('mini-map-trigger');
+            showModal(trigger, true);
+        }
 
-            document.body.style.overflow = 'hidden';
+        function openSettingsModal(e) {
+            const box = document.getElementById('modal-box');
+            box.classList.remove('map-mode', 'completed');
+
+            hideAllModalViews();
+            document.getElementById('settings-modal-view').style.display = 'flex';
+
+            // Sync the settings dropdown with current theme
+            const currentTheme = document.documentElement.getAttribute('data-theme') || 'osrs';
+            const settingsDropdown = document.getElementById('settings-theme-dropdown');
+            if (settingsDropdown) settingsDropdown.value = currentTheme;
+
+            // Sync the interval dropdown
+            const intervalDropdown = document.getElementById('settings-sync-interval');
+            if (intervalDropdown) intervalDropdown.value = String(currentSyncInterval);
+
+            box.setAttribute('aria-label', 'Settings');
+
+            showModal(e.currentTarget, true);
         }
 
         function closeModal() {
@@ -761,29 +907,25 @@
            ============================================ */
 
         function init() {
-            // Restore persisted theme
+            // Restore persisted settings
             restoreTheme();
+            restoreSyncInterval();
 
-            // Build minimap
-            const minimap = document.getElementById('minimap');
-            const minimapFragment = document.createDocumentFragment();
-            for (let i = 1; i <= MAX_TILES; i++) {
-                const dot = document.createElement('div');
-                dot.className = 'mini-tile';
-                dot.id = `mini-${i}`;
-                dot.innerText = i;
-                minimapFragment.appendChild(dot);
+            // Build both minimaps
+            buildMinimap('minimap');
+            buildMinimap('minimap-floating');
+
+            // Initialize completion state
+            for (let i = 0; i < MAX_TILES; i++) {
                 completionState.push(false);
             }
-            minimap.appendChild(minimapFragment);
 
             // Load data
             fetchGlobalData();
             fetchData();
 
-            // Auto-sync every 30 seconds
-            if (syncIntervalId) clearInterval(syncIntervalId);
-            syncIntervalId = setInterval(() => fetchData(), 30000);
+            // Start auto-sync
+            restartSyncInterval();
         }
 
         init();
