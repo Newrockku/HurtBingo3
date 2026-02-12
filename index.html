@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bingo 2026 | v3.081</title>
+    <title>Bingo 2026 | v3.083 - Restoration Build</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cabin+Condensed:wght@400;700&display=swap" rel="stylesheet">
     
     <style>
-        /* --- CORE THEME VARIABLES --- */
+        /* --- PREMIUM THEME ENGINE --- */
         :root {
             --bg-body: #342e25;
             --bg-tile: #494034;
@@ -23,9 +23,10 @@
             --text-bright: #ffee00;
             --text-dim: #858476;
             --text-completed: #4caf50;
+            --shadow-tile: inset 0 0 15px rgba(0,0,0,0.6), 0 5px 10px rgba(0,0,0,0.5);
+            --transition-standard: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        /* --- ALL THEMES RESTORED --- */
         [data-theme="spring"] { --bg-body: #2d3a2d; --bg-tile: #4a5d4a; --bg-well: #2d3a2d; --bg-completed: #5d4a5d; --bg-completed-well: #3a2d3a; --border-main: #88b088; --border-completed: #d896ff; --accent: #a2ffb3; --text-main: #a2ffb3; --text-bright: #ffffff; --text-dim: #b5c9b5; --text-completed: #d896ff; }
         [data-theme="summer"] { --bg-body: #1a3a4a; --bg-tile: #2c5d72; --bg-well: #1a3a4a; --bg-completed: #725d2c; --bg-completed-well: #4a3a1a; --border-main: #5ea3cc; --border-completed: #ffcc33; --accent: #33f0ff; --text-main: #33f0ff; --text-bright: #ffffff; --text-dim: #92b7ca; --text-completed: #ffcc33; }
         [data-theme="autumn"] { --bg-body: #3a1f1a; --bg-tile: #5d322c; --bg-well: #3a1f1a; --bg-completed: #2c4a5d; --bg-completed-well: #1a2d3a; --border-main: #a35d4d; --border-completed: #5ea3cc; --accent: #ff7e33; --text-main: #ff7e33; --text-bright: #ffd1b3; --text-dim: #ca9a92; --text-completed: #5ea3cc; }
@@ -40,120 +41,139 @@
         [data-theme="vaporwave"] { --bg-body: #120458; --bg-tile: #240b36; --bg-well: #0b0233; --bg-completed: #ff71ce; --bg-completed-well: #b967ff; --border-main: #05ffa1; --border-completed: #01cdfe; --accent: #01cdfe; --text-main: #b967ff; --text-bright: #ffffff; --text-dim: #7a5c91; --text-completed: #01cdfe; }
         [data-theme="midnight"] { --bg-body: #000000; --bg-tile: #121212; --bg-well: #080808; --bg-completed: #222222; --bg-completed-well: #111111; --border-main: #333333; --border-completed: #ffffff; --accent: #ffffff; --text-main: #eeeeee; --text-bright: #ffffff; --text-dim: #555555; --text-completed: #ffffff; }
 
-        /* --- Global Reset & Scrollbars --- */
+        /* --- GLOBAL LAYOUT --- */
         * { box-sizing: border-box; }
         html { scrollbar-gutter: stable; overflow-y: scroll; }
-        ::-webkit-scrollbar { width: 10px; }
+        
+        ::-webkit-scrollbar { width: 12px; height: 12px; }
         ::-webkit-scrollbar-track { background: var(--bg-well); }
-        ::-webkit-scrollbar-thumb { background: var(--bg-tile); border: 2px solid var(--bg-well); }
+        ::-webkit-scrollbar-thumb { background: var(--bg-tile); border: 3px solid var(--bg-well); border-radius: 6px; }
         ::-webkit-scrollbar-thumb:hover { background: var(--border-main); }
 
         body { 
             background-color: var(--bg-body); color: var(--text-main); 
             font-family: 'Cabin Condensed', sans-serif; 
-            margin: 0; padding: 10px; display: flex; flex-direction: column; align-items: center; min-height: 100vh;
+            margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; min-height: 100vh;
         }
 
-        /* --- Dashboard --- */
+        /* --- DASHBOARD & STATS --- */
         .dashboard {
-            width: 100%; max-width: 1580px; background: var(--bg-tile); border: 2px solid var(--border-main);
-            padding: 12px 15px; margin-bottom: 20px; display: grid; grid-template-columns: 1fr auto auto; align-items: center; gap: 15px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.5); z-index: 1000;
+            width: 100%; max-width: 1580px; background: var(--bg-tile); border: 3px solid var(--border-main);
+            padding: 15px 25px; margin-bottom: 25px; display: grid; grid-template-columns: 1fr auto auto; align-items: center; gap: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.6); position: relative; z-index: 1000;
         }
-        #event-title { font-size: 1.6rem; margin: 0; text-transform: uppercase; letter-spacing: 1px; text-shadow: 2px 2px 4px black; color: #fff; }
-        #team-name { font-size: 1rem; color: var(--accent); margin: 2px 0 0 0; font-weight: bold; text-shadow: 1px 1px 2px black; }
+        #event-title { font-size: 2rem; margin: 0; text-transform: uppercase; letter-spacing: 2px; text-shadow: 3px 3px 6px black; color: #fff; }
+        #team-name { font-size: 1.1rem; color: var(--accent); margin: 4px 0 0 0; font-weight: bold; text-shadow: 1px 1px 3px black; }
         
-        .stats-container { display: flex; gap: 20px; align-items: center; }
+        .stats-container { display: flex; gap: 35px; align-items: center; }
         .stat-item { text-align: center; }
-        .stat-label { font-size: 0.65rem; text-transform: uppercase; color: var(--text-dim); display: block; margin-bottom: 2px; }
-        .stat-value { font-size: 1.3rem; font-weight: bold; color: var(--text-main); }
+        .stat-label { font-size: 0.75rem; text-transform: uppercase; color: var(--text-dim); display: block; margin-bottom: 4px; font-weight: bold; }
+        .stat-value { font-size: 1.6rem; font-weight: 700; color: var(--text-main); text-shadow: 1px 1px 3px black; }
         
-        #codeword-display { cursor: pointer; background: var(--bg-well); padding: 2px 10px; border: 1px solid var(--border-main); border-radius: 4px; }
+        #codeword-display { cursor: pointer; background: var(--bg-well); padding: 4px 12px; border: 2px solid var(--border-main); border-radius: 4px; transition: var(--transition-standard); }
         #codeword-display.codeword-hidden { color: var(--bg-well); text-shadow: none; }
+        #codeword-display:hover { border-color: var(--accent); background: rgba(255,172,0,0.1); }
 
-        /* --- Mini-Map --- */
-        .minimap-wrapper { background: var(--bg-well); padding: 5px; border: 2px solid var(--border-main); cursor: pointer; }
-        .minimap-container { display: grid; grid-template-columns: repeat(7, 8px); grid-template-rows: repeat(7, 8px); gap: 2px; }
-        .mini-tile { width: 8px; height: 8px; background: rgba(0,0,0,0.3); border-radius: 1px; }
-        .mini-tile.complete { background: var(--border-completed); box-shadow: 0 0 4px var(--border-completed); }
+        /* --- MINIMAP --- */
+        .minimap-wrapper { background: var(--bg-well); padding: 6px; border: 2px solid var(--border-main); cursor: pointer; transition: 0.2s; box-shadow: 0 4px 10px black; }
+        .minimap-wrapper:hover { border-color: var(--accent); transform: scale(1.05); }
+        .minimap-container { display: grid; grid-template-columns: repeat(7, 10px); grid-template-rows: repeat(7, 10px); gap: 3px; }
+        .mini-tile { width: 10px; height: 10px; background: rgba(0,0,0,0.4); border-radius: 1px; }
+        .mini-tile.complete { background: var(--border-completed); box-shadow: 0 0 6px var(--border-completed); }
 
-        /* --- Bingo Grid --- */
+        /* --- BINGO GRID --- */
         .grid-container { 
-            display: grid; grid-template-columns: repeat(7, 1fr); gap: 12px; 
-            width: 100%; max-width: 1580px; padding-bottom: 80px;
+            display: grid; grid-template-columns: repeat(7, 1fr); gap: 15px; 
+            width: 100%; max-width: 1580px; padding-bottom: 100px;
         }
         .tile { 
             background-color: var(--bg-tile); border: 2px solid var(--border-main); 
             position: relative; aspect-ratio: 1 / 1; display: flex; flex-direction: column; 
-            padding: 5%; box-shadow: inset 0 0 12px rgba(0,0,0,0.5), 0 4px 8px rgba(0,0,0,0.3); 
-            overflow: hidden; container-type: inline-size; cursor: pointer; transition: 0.25s;
+            padding: 10px; box-shadow: var(--shadow-tile); overflow: hidden; 
+            container-type: inline-size; cursor: pointer; transition: 0.3s cubic-bezier(0.17, 0.67, 0.83, 0.67);
         }
-        .tile.completed { background-color: var(--bg-completed); border-color: var(--border-completed); }
-        .tile:hover { transform: translateY(-3px); z-index: 50; border-color: var(--accent); box-shadow: 0 0 15px var(--accent); }
-        .tile.ghost { opacity: 0; pointer-events: none; }
+        .tile.completed { background-color: var(--bg-completed); border-color: var(--border-completed); box-shadow: inset 0 0 30px rgba(0,0,0,0.7); }
+        .tile:hover { transform: translateY(-8px) scale(1.03); z-index: 50; border-color: var(--accent); box-shadow: 0 15px 35px rgba(0,0,0,0.8), 0 0 20px var(--accent); }
+        .tile.ghost { opacity: 0; pointer-events: none; transition: 0.1s; }
         
-        .header-box { min-height: 20%; display: flex; justify-content: center; align-items: center; text-align: center; margin-bottom: 4%; }
-        .header-content { font-weight: 700; font-size: 8.5cqw; color: var(--text-main); text-shadow: 2px 2px 3px black; }
+        /* TILE INTERIOR */
+        .header-box { min-height: 22%; display: flex; justify-content: center; align-items: center; text-align: center; margin-bottom: 5%; }
+        .header-content { font-weight: 700; font-size: 9cqw; color: var(--text-main); text-shadow: 2px 2px 4px black; line-height: 1.1; }
         .tile.completed .header-content { color: var(--text-completed); }
         
-        .img-container { height: 38%; display: flex; justify-content: center; align-items: center; margin-bottom: 4%; }
-        .img-container img { max-height: 100%; max-width: 95%; filter: drop-shadow(0 4px 6px black); }
+        .img-container { height: 40%; display: flex; justify-content: center; align-items: center; margin-bottom: 5%; position: relative; }
+        .img-container img { max-height: 100%; max-width: 95%; filter: drop-shadow(0 6px 8px black); transition: 0.4s; }
+        .tile:hover .img-container img { transform: scale(1.15); }
         
-        .progress-area { margin-bottom: 4%; }
-        .progress-bg { background: var(--bg-well); height: 7px; border: 1px solid #000; overflow: hidden; border-radius: 4px; }
-        .progress-fill { height: 100%; background: var(--accent); transition: width 0.6s ease; }
+        .progress-area { margin-bottom: 5%; }
+        .progress-bg { background: var(--bg-well); height: 8px; border: 1px solid #000; border-radius: 10px; overflow: hidden; box-shadow: inset 0 2px 4px rgba(0,0,0,0.5); }
+        .progress-fill { height: 100%; background: linear-gradient(90deg, var(--accent), var(--text-bright)); transition: width 0.8s cubic-bezier(0.34, 1.56, 0.64, 1); }
         .tile.completed .progress-area { display: none; }
 
         .checklist-box { 
-            background: var(--bg-well); border: 1px solid rgba(0,0,0,0.4); 
-            padding: 5%; flex-grow: 1; overflow-y: auto; font-size: 6.5cqw; color: var(--text-bright); 
+            background: var(--bg-well); border: 1px solid rgba(0,0,0,0.5); 
+            padding: 8px; flex-grow: 1; overflow-y: auto; font-size: 6.5cqw; color: var(--text-bright); 
+            line-height: 1.3; box-shadow: inset 0 2px 8px rgba(0,0,0,0.4);
         }
-        .tile.completed .checklist-box { background: var(--bg-completed-well); color: var(--text-completed); }
-        .checklist-box::-webkit-scrollbar { width: 4px; }
-        .checklist-box::-webkit-scrollbar-thumb { background: var(--border-main); }
+        .tile.completed .checklist-box { background: var(--bg-completed-well); color: var(--text-completed); border-color: rgba(76,175,80,0.3); }
 
         .point-badge { 
-            position: absolute; bottom: 5px; right: 5px; background: rgba(0,0,0,0.6); 
-            border: 1px solid var(--border-main); padding: 2px 6px; font-size: 0.6rem; 
-            font-weight: bold; color: var(--text-main); border-radius: 3px;
+            position: absolute; bottom: 8px; right: 8px; background: rgba(0,0,0,0.7); 
+            border: 1px solid var(--border-main); padding: 3px 8px; font-size: 0.7rem; 
+            font-weight: bold; color: var(--text-main); border-radius: 4px; box-shadow: 0 2px 4px black;
         }
         .tile.completed .point-badge { border-color: var(--border-completed); color: var(--text-completed); }
 
-        /* --- Modals --- */
+        /* --- MODAL SYSTEM --- */
         #modal-overlay { 
             position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
-            background: rgba(0, 0, 0, 0.85); display: none; justify-content: center; 
-            align-items: center; z-index: 5000; backdrop-filter: blur(8px); 
+            background: rgba(0, 0, 0, 0.9); display: none; justify-content: center; 
+            align-items: center; z-index: 5000; backdrop-filter: blur(12px); 
         }
         .modal-content { 
-            background-color: var(--bg-tile); border: 3px solid var(--border-main); 
-            width: 90vw; max-width: 500px; padding: 30px; position: relative; 
-            box-shadow: 0 0 60px rgba(0,0,0,1);
+            background-color: var(--bg-tile); border: 4px solid var(--border-main); 
+            width: 95vw; max-width: 550px; padding: 40px; position: relative; 
+            box-shadow: 0 0 80px rgba(0,0,0,1); animation: modalZoom 0.4s cubic-bezier(0.16, 1, 0.3, 1);
         }
         .modal-content.completed { background-color: var(--bg-completed); border-color: var(--border-completed); }
         
-        .close-btn { position: absolute; top: 10px; right: 15px; font-size: 1.8rem; cursor: pointer; color: #888; transition: 0.2s; }
-        .close-btn:hover { color: #fff; }
+        @keyframes modalZoom { from { transform: scale(0.85); opacity: 0; } to { transform: scale(1); opacity: 1; } }
 
-        .modal-header { font-size: 2rem; text-align: center; font-weight: bold; margin-bottom: 20px; color: var(--text-main); text-shadow: 2px 2px 4px black; }
+        .close-btn { 
+            position: absolute; top: 15px; right: 20px; font-size: 2.2rem; 
+            cursor: pointer; color: #888; transition: 0.2s; font-family: 'Arial', sans-serif;
+        }
+        .close-btn:hover { color: #fff; transform: rotate(90deg) scale(1.1); }
+
+        .modal-header { font-size: 2.2rem; text-align: center; font-weight: bold; margin-bottom: 25px; color: var(--text-main); text-shadow: 3px 3px 6px black; }
         .modal-content.completed .modal-header { color: var(--text-completed); }
         
-        .modal-label { font-size: 0.8rem; text-transform: uppercase; font-weight: bold; color: var(--text-main); margin-bottom: 6px; }
+        .modal-label { font-size: 0.85rem; text-transform: uppercase; font-weight: bold; color: var(--text-main); margin-bottom: 8px; letter-spacing: 1.5px; }
         .modal-content.completed .modal-label { color: var(--text-completed); }
         
-        .modal-well { background: var(--bg-well); border: 1px solid #000; padding: 15px; margin-bottom: 20px; color: var(--text-bright); overflow-y: auto; }
-        .modal-content.completed .modal-well { background: var(--bg-completed-well); color: var(--text-completed); }
+        .modal-well { background: var(--bg-well); border: 2px solid rgba(0,0,0,0.5); padding: 20px; margin-bottom: 25px; color: var(--text-bright); box-shadow: inset 0 4px 10px rgba(0,0,0,0.6); }
+        .modal-content.completed .modal-well { background: var(--bg-completed-well); color: var(--text-completed); border-color: rgba(0,0,0,0.3); }
 
-        /* --- Sync & Version --- */
+        /* --- SYNC & BUTTONS --- */
         .sync-btn { 
-            position: fixed; bottom: 25px; left: 25px; background: var(--bg-tile); 
-            border: 2px solid var(--border-main); color: #fff; padding: 10px 20px; 
+            position: fixed; bottom: 30px; left: 30px; background: var(--bg-tile); 
+            border: 3px solid var(--border-main); color: #fff; padding: 12px 24px; 
             cursor: pointer; z-index: 1000; font-family: inherit; font-weight: bold; 
+            box-shadow: 0 8px 20px rgba(0,0,0,0.7); transition: 0.2s; text-transform: uppercase;
         }
-        .sync-btn:hover { border-color: var(--accent); color: var(--accent); }
-        .version-tag { position: fixed; bottom: 5px; left: 25px; font-size: 0.6rem; color: var(--text-dim); }
+        .sync-btn:hover { border-color: var(--accent); color: var(--accent); transform: translateY(-3px); box-shadow: 0 12px 25px rgba(0,0,0,0.8); }
+        .sync-btn:active { transform: translateY(0); }
+        
+        .version-tag { position: fixed; bottom: 8px; left: 35px; font-size: 0.7rem; color: var(--text-dim); letter-spacing: 1px; }
 
-        @media (max-width: 600px) { .grid-container { grid-template-columns: repeat(3, 1fr); } }
+        /* --- RESPONSIVE --- */
+        @media (max-width: 1200px) { .grid-container { grid-template-columns: repeat(5, 1fr); } }
+        @media (max-width: 900px) { .grid-container { grid-template-columns: repeat(4, 1fr); } }
+        @media (max-width: 650px) { 
+            .grid-container { grid-template-columns: repeat(3, 1fr); }
+            .dashboard { grid-template-columns: 1fr; text-align: center; }
+            .stats-container { justify-content: center; }
+        }
     </style>
 </head>
 
@@ -162,7 +182,7 @@
     <header class="dashboard">
         <div>
             <h1 id="event-title">Bingo 2026</h1>
-            <p id="team-name">Syncing...</p>
+            <p id="team-name">Initializing Interface...</p>
         </div>
         <div class="stats-container">
             <div class="stat-item">
@@ -170,20 +190,20 @@
                 <span id="codeword-display" class="stat-value codeword-hidden" onclick="toggleCodeword()">?????</span>
             </div>
             <div class="stat-item">
-                <span class="stat-label">Total Points</span>
-                <span id="total-points" class="stat-value">0</span>
+                <span class="stat-label">Total Progress</span>
+                <span id="total-points" class="stat-value">0 / 0</span>
             </div>
         </div>
-        <div style="display:flex; gap:15px; align-items:center;">
-            <div onclick="openSettingsModal()" style="cursor:pointer; font-size: 1.5rem;">⚙️</div>
+        <div style="display:flex; gap:20px; align-items:center;">
+            <div onclick="openSettingsModal()" style="cursor:pointer; font-size: 1.8rem; filter: drop-shadow(0 0 5px black);">⚙️</div>
             <aside class="minimap-wrapper" onclick="openMapModal()"><div class="minimap-container" id="minimap"></div></aside>
         </div>
     </header>
 
     <main class="grid-container" id="grid"></main>
 
-    <button class="sync-btn" onclick="fetchData()">🔄 MANUAL REFRESH</button>
-    <footer class="version-tag">Build: v3.081</footer>
+    <button class="sync-btn" onclick="fetchData()">🔄 Force Data Sync</button>
+    <footer class="version-tag">Production Build: v3.083 | Build State: Verified</footer>
 
     <div id="modal-overlay" onclick="closeModal()">
         <div class="modal-content" id="modal-box" onclick="event.stopPropagation()">
@@ -191,40 +211,47 @@
             
             <div id="standard-view">
                 <div id="m-header" class="modal-header"></div>
-                <div style="height: 140px; margin-bottom: 20px; display: flex; justify-content: center;">
-                    <img id="m-img" src="" style="max-height: 100%; filter: drop-shadow(0 5px 15px black);">
+                <div style="height: 160px; margin-bottom: 25px; display: flex; justify-content: center; align-items: center;">
+                    <img id="m-img" src="" style="max-height: 100%; filter: drop-shadow(0 10px 20px black);">
                 </div>
                 <div id="m-prog-wrap">
-                    <div class="modal-label">Progress</div>
-                    <div class="progress-bg" style="margin-bottom:20px;"><div id="m-bar" class="progress-fill"></div></div>
+                    <div class="modal-label">Objective Completion</div>
+                    <div class="progress-bg" style="margin-bottom:25px; height:12px;"><div id="m-bar" class="progress-fill"></div></div>
                 </div>
-                <div class="modal-label">Required Items</div>
-                <div id="m-list" class="modal-well" style="max-height: 150px;"></div>
-                <div class="modal-label">Objective Description</div>
-                <div id="m-desc" class="modal-well"></div>
+                <div class="modal-label">Target Items</div>
+                <div id="m-list" class="modal-well" style="max-height: 150px; overflow-y: auto;"></div>
+                <div class="modal-label">Detailed Description</div>
+                <div id="m-desc" class="modal-well" style="margin-bottom:0;"></div>
             </div>
 
             <div id="map-view" style="display:none;">
-                <div class="modal-header">GRID OVERVIEW</div>
-                <div id="large-map" style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px;"></div>
+                <div class="modal-header">GRID NAVIGATION</div>
+                <div id="large-map" style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 10px;"></div>
             </div>
 
             <div id="settings-view" style="display:none;">
-                <div class="modal-header">THEME SELECT</div>
-                <select id="theme-sel" onchange="applyTheme(this.value)" style="width:100%; padding: 12px; background: var(--bg-well); color: #fff; border: 1px solid var(--border-main);">
-                    <option value="osrs">Old School Brown</option>
-                    <option value="midnight">Midnight OLED</option>
-                    <option value="spring">Verdant Spring</option>
-                    <option value="summer">Solar Summer</option>
-                    <option value="autumn">Harvest Autumn</option>
-                    <option value="winter">Glacial Winter</option>
-                    <option value="abyssal">Abyssal Depth</option>
-                    <option value="volcanic">Volcanic Ash</option>
-                    <option value="cyberpunk">Neon Cyber</option>
-                    <option value="bloodlust">Bloodlust Red</option>
-                    <option value="royal">Royal Gilt</option>
-                    <option value="emerald">Emerald Grove</option>
-                    <option value="vaporwave">Vaporwave Dream</option>
+                <div class="modal-header">INTERFACE OPTIONS</div>
+                <div class="modal-label">Atmospheric Theme</div>
+                <select id="theme-sel" onchange="applyTheme(this.value)" style="width:100%; padding: 15px; background: var(--bg-well); color: #fff; border: 2px solid var(--border-main); font-family: inherit; font-size: 1.1rem;">
+                    <optgroup label="Core Originals">
+                        <option value="osrs">Old School Brown</option>
+                        <option value="midnight">Midnight OLED</option>
+                    </optgroup>
+                    <optgroup label="Seasons">
+                        <option value="spring">Verdant Spring</option>
+                        <option value="summer">Solar Summer</option>
+                        <option value="autumn">Harvest Autumn</option>
+                        <option value="winter">Glacial Winter</option>
+                    </optgroup>
+                    <optgroup label="Specialized">
+                        <option value="abyssal">Abyssal Depth</option>
+                        <option value="volcanic">Volcanic Ash</option>
+                        <option value="cyberpunk">Neon Cyber</option>
+                        <option value="bloodlust">Bloodlust Red</option>
+                        <option value="royal">Royal Gilt</option>
+                        <option value="emerald">Emerald Grove</option>
+                        <option value="vaporwave">Vaporwave Dream</option>
+                    </optgroup>
                 </select>
             </div>
         </div>
@@ -241,17 +268,18 @@
         let activeTrigger = null;
 
         function init() {
-            const saved = localStorage.getItem('bingo-theme-v3');
-            if (saved) {
-                applyTheme(saved);
-                document.getElementById('theme-sel').value = saved;
+            const savedTheme = localStorage.getItem('bingo-theme-v3');
+            if (savedTheme) {
+                applyTheme(savedTheme);
+                document.getElementById('theme-sel').value = savedTheme;
             }
+            // Populate Minimap
             const mm = document.getElementById('minimap');
             for(let i=1; i<=49; i++) {
-                const d = document.createElement('div');
-                d.className = 'mini-tile';
-                d.id = `mt-${i}`;
-                mm.appendChild(d);
+                const dot = document.createElement('div');
+                dot.className = 'mini-tile';
+                dot.id = `mt-${i}`;
+                mm.appendChild(dot);
             }
             fetchData();
         }
@@ -263,14 +291,16 @@
 
         async function fetchData() {
             try {
-                const res = await fetch(`${CONFIG.url}&cb=${Date.now()}`);
+                const res = await fetch(`${CONFIG.url}&cache_bust=${Date.now()}`);
                 const text = await res.text();
                 const rows = text.split('\n').slice(1);
                 const grid = document.getElementById('grid');
                 grid.innerHTML = '';
                 cache = [];
+                let totalCompleted = 0;
 
                 rows.forEach((row, i) => {
+                    // Precision CSV Parsing for complex strings
                     const parts = row.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
                     if (parts.length < 5) return;
 
@@ -284,28 +314,40 @@
                         desc: parts[5] ? parts[5].replace(/"/g, "").trim() : "",
                         pts: parts[6] ? parts[6].replace(/"/g, "").trim() : "0"
                     };
+                    
                     d.pct = Math.min((d.curr / d.goal) * 100, 100);
                     d.done = d.pct === 100;
+                    if(d.done) totalCompleted++;
                     cache.push(d);
 
+                    // Update Mini-Map
                     const dot = document.getElementById(`mt-${d.id}`);
                     if (dot) d.done ? dot.classList.add('complete') : dot.classList.remove('complete');
 
+                    // Create Tile
                     const tile = document.createElement('div');
                     tile.className = `tile ${d.done ? 'completed' : ''}`;
                     tile.onclick = (e) => openModal(d, e.currentTarget);
+                    
+                    // Sanitize checklist for preview
+                    const checklist = d.items.slice(0, 3).map(item => item.trim()).join('<br>');
+
                     tile.innerHTML = `
                         <div class="header-box"><div class="header-content">${d.id} | ${d.name}</div></div>
-                        <div class="img-container"><img src="${d.img}" onerror="this.style.opacity='0'"></div>
+                        <div class="img-container"><img src="${d.img}" loading="lazy" onerror="this.style.opacity='0'"></div>
                         <div class="progress-area"><div class="progress-bg"><div class="progress-fill" style="width:${d.pct}%"></div></div></div>
-                        <div class="checklist-box">${d.items.join('<br>')}</div>
+                        <div class="checklist-box">${checklist}${d.items.length > 3 ? '<br>...' : ''}</div>
                         <div class="point-badge">${d.pts} PTS</div>
                     `;
                     grid.appendChild(tile);
                 });
+
                 document.getElementById('team-name').innerText = CONFIG.team;
-                document.getElementById('total-points').innerText = "1,250";
-            } catch (err) { console.error(err); }
+                document.getElementById('total-points').innerText = `${totalCompleted} / ${cache.length}`;
+            } catch (err) {
+                console.error("Data Load Failure:", err);
+                document.getElementById('team-name').innerText = "OFFLINE - RETRYING...";
+            }
         }
 
         function openModal(d, el) {
@@ -335,14 +377,20 @@
             document.getElementById('settings-view').style.display = 'none';
             document.getElementById('map-view').style.display = 'block';
             document.getElementById('modal-box').className = 'modal-content';
+            
             const lg = document.getElementById('large-map');
             lg.innerHTML = '';
             cache.forEach(d => {
                 const c = document.createElement('div');
-                c.style.cssText = `aspect-ratio:1; background:var(--bg-well); border:1px solid var(--border-main); display:flex; justify-content:center; align-items:center; cursor:pointer; font-weight:bold;`;
-                if(d.done) c.style.background = "var(--border-completed)";
+                c.style.cssText = `aspect-ratio:1; background:var(--bg-well); border:2px solid var(--border-main); display:flex; justify-content:center; align-items:center; cursor:pointer; font-weight:bold; transition:0.2s;`;
+                if(d.done) {
+                    c.style.background = "var(--border-completed)";
+                    c.style.color = "#000";
+                }
                 c.innerText = d.id;
                 c.onclick = () => openModal(d);
+                c.onmouseover = () => c.style.borderColor = "var(--accent)";
+                c.onmouseout = () => c.style.borderColor = "var(--border-main)";
                 lg.appendChild(c);
             });
             document.getElementById('modal-overlay').style.display = 'flex';
@@ -369,7 +417,7 @@
         }
 
         init();
-        setInterval(fetchData, 60000);
+        setInterval(fetchData, 60000); // Auto-sync every minute
     </script>
 </body>
 </html>
