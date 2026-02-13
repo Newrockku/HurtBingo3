@@ -9,7 +9,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Cabin+Condensed:wght@400;700&display=swap" rel="stylesheet">
 
   <style>
-        :root {
+    :root {
       --bg-body: #342e25;
       --bg-card: #494034;
       --bg-well: #342e25;
@@ -54,7 +54,6 @@
       min-height: 100vh;
     }
 
-        /* --- Event Description Banner --- */
     .event-description-banner {
       width: 100%; max-width: 1400px;
       background: var(--bg-card); border: 2px solid var(--border-main);
@@ -63,23 +62,16 @@
       box-shadow: 0 2px 10px rgba(0,0,0,0.3);
       border-left: 4px solid var(--accent);
     }
-    .event-desc-icon {
-      font-size: 1.4rem; flex-shrink: 0; line-height: 1.4;
-    }
-    .event-desc-text {
-      flex: 1; font-size: 0.9rem; color: var(--text-bright);
-      line-height: 1.5; white-space: pre-line;
-    }
+    .event-desc-icon { font-size: 1.4rem; flex-shrink: 0; line-height: 1.4; }
+    .event-desc-text { flex: 1; font-size: 0.9rem; color: var(--text-bright); line-height: 1.5; white-space: pre-line; }
     .event-desc-dismiss {
       background: none; border: none; color: var(--text-dim);
       font-size: 1.4rem; cursor: pointer; padding: 0 4px;
-      line-height: 1; flex-shrink: 0;
-      transition: color 0.2s ease;
+      line-height: 1; flex-shrink: 0; transition: color 0.2s ease;
     }
     .event-desc-dismiss:hover { color: var(--accent); }
     .event-desc-dismiss:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 
-        /* --- Admin Header --- */
     .admin-header {
       width: 100%; max-width: 1400px;
       background: var(--bg-card); border: 2px solid var(--border-main);
@@ -88,22 +80,14 @@
       flex-wrap: wrap; gap: 12px;
       box-shadow: 0 4px 20px rgba(0,0,0,0.4);
     }
-
     .admin-header-left { display: flex; flex-direction: column; gap: 2px; }
-
     .admin-title {
       font-size: 2rem; margin: 0; font-weight: bold;
       color: var(--text-bright); text-transform: uppercase;
       letter-spacing: 2px; text-shadow: 2px 2px 6px rgba(0,0,0,0.6);
     }
-
-    .admin-subtitle {
-      font-size: 0.9rem; color: var(--text-dim); margin: 0;
-    }
-
-    .admin-header-right {
-      display: flex; gap: 10px; align-items: center; flex-wrap: wrap;
-    }
+    .admin-subtitle { font-size: 0.9rem; color: var(--text-dim); margin: 0; }
+    .admin-header-right { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
 
     .admin-btn {
       background: var(--bg-well); border: 2px solid var(--border-main);
@@ -115,38 +99,25 @@
     .admin-btn:hover { border-color: var(--accent); color: var(--accent); background: var(--bg-card); }
     .admin-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
     .admin-btn svg { width: 16px; height: 16px; fill: currentColor; }
-
     .admin-btn.primary { border-color: var(--accent); color: var(--accent); }
     .admin-btn.primary:hover { background: var(--accent); color: var(--bg-body); }
 
-    /* --- Global Stats Bar --- */
     .global-stats {
       width: 100%; max-width: 1400px;
       display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
       gap: 12px; margin-bottom: 24px;
     }
-
     .global-stat-card {
       background: var(--bg-card); border: 2px solid var(--border-main);
-      padding: 16px 20px; text-align: center;
-      transition: border-color 0.2s ease;
+      padding: 16px 20px; text-align: center; transition: border-color 0.2s ease;
     }
     .global-stat-card:hover { border-color: var(--accent); }
-    .global-stat-label {
-      font-size: 0.65rem; text-transform: uppercase;
-      letter-spacing: 1px; color: var(--text-dim); margin-bottom: 4px;
-    }
-    .global-stat-value {
-      font-size: 1.8rem; font-weight: bold; color: var(--text-bright);
-    }
+    .global-stat-label { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 1px; color: var(--text-dim); margin-bottom: 4px; }
+    .global-stat-value { font-size: 1.8rem; font-weight: bold; color: var(--text-bright); }
     .global-stat-value.accent { color: var(--accent); }
     .global-stat-value.green { color: var(--text-completed); }
 
-    /* --- Leaderboard --- */
-    .leaderboard-section {
-      width: 100%; max-width: 1400px; margin-bottom: 24px;
-    }
-
+    .leaderboard-section { width: 100%; max-width: 1400px; margin-bottom: 24px; }
     .section-title {
       font-size: 1.1rem; text-transform: uppercase; letter-spacing: 1px;
       color: var(--text-dim); margin-bottom: 12px; padding-bottom: 6px;
@@ -155,19 +126,13 @@
     }
     .section-title svg { width: 18px; height: 18px; fill: var(--text-dim); }
 
-    .leaderboard-table {
-      width: 100%; border-collapse: collapse;
-      background: var(--bg-card); border: 2px solid var(--border-main);
-    }
+    .leaderboard-table { width: 100%; border-collapse: collapse; background: var(--bg-card); border: 2px solid var(--border-main); }
     .leaderboard-table th {
       background: var(--bg-well); color: var(--text-dim);
       font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px;
       padding: 10px 16px; text-align: left; border-bottom: 2px solid var(--border-main);
     }
-    .leaderboard-table td {
-      padding: 12px 16px; border-bottom: 1px solid var(--border-main);
-      font-size: 0.95rem; vertical-align: middle;
-    }
+    .leaderboard-table td { padding: 12px 16px; border-bottom: 1px solid var(--border-main); font-size: 0.95rem; vertical-align: middle; }
     .leaderboard-table tr:last-child td { border-bottom: none; }
     .leaderboard-table tr:hover td { background: rgba(255,172,0,0.04); }
 
@@ -175,177 +140,84 @@
       display: inline-flex; align-items: center; justify-content: center;
       width: 28px; height: 28px; border-radius: 50%;
       font-weight: bold; font-size: 0.85rem;
-      border: 2px solid var(--border-main); color: var(--text-dim);
-      background: var(--bg-well);
+      border: 2px solid var(--border-main); color: var(--text-dim); background: var(--bg-well);
     }
     .rank-badge.gold { border-color: var(--gold); color: var(--gold); background: rgba(255,215,0,0.08); }
     .rank-badge.silver { border-color: var(--silver); color: var(--silver); background: rgba(176,168,144,0.08); }
     .rank-badge.bronze { border-color: var(--bronze); color: var(--bronze); background: rgba(160,114,74,0.08); }
 
-    .team-name-cell {
-      display: flex; align-items: center; gap: 10px;
-    }
-    .team-color-dot {
-      width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0;
-      border: 1px solid rgba(255,255,255,0.2);
-    }
-    .team-name-link {
-      color: var(--text-bright); text-decoration: none; font-weight: bold;
-      transition: color 0.2s ease;
-    }
+    .team-name-cell { display: flex; align-items: center; gap: 10px; }
+    .team-color-dot { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; border: 1px solid rgba(255,255,255,0.2); }
+    .team-name-link { color: var(--text-bright); text-decoration: none; font-weight: bold; transition: color 0.2s ease; }
     .team-name-link:hover { color: var(--accent); text-decoration: underline; }
 
     .progress-bar-cell { min-width: 120px; }
-    .lb-progress-bg {
-      background: var(--bg-well); height: 8px; border-radius: 4px;
-      overflow: hidden; border: 1px solid rgba(0,0,0,0.3);
-    }
-    .lb-progress-fill {
-      height: 100%; border-radius: 4px;
-      transition: width 0.5s ease;
-    }
+    .lb-progress-bg { background: var(--bg-well); height: 8px; border-radius: 4px; overflow: hidden; border: 1px solid rgba(0,0,0,0.3); }
+    .lb-progress-fill { height: 100%; border-radius: 4px; transition: width 0.5s ease; }
     .points-cell { font-weight: bold; color: var(--accent); font-size: 1.1rem; }
     .completed-cell { color: var(--text-completed); font-weight: bold; }
-        /* --- Team Cards Grid --- */
-    .teams-section {
-      width: 100%; max-width: 1400px; margin-bottom: 24px;
-    }
 
-    .teams-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-      gap: 16px;
-    }
+    .teams-section { width: 100%; max-width: 1400px; margin-bottom: 24px; }
+    .teams-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 16px; }
 
     .team-card {
       background: var(--bg-card); border: 2px solid var(--border-main);
-      padding: 0; cursor: pointer;
-      transition: all 0.3s ease; position: relative; overflow: hidden;
-      text-decoration: none; color: inherit; display: flex; flex-direction: column;
+      padding: 0; cursor: pointer; transition: all 0.3s ease;
+      position: relative; overflow: hidden; text-decoration: none;
+      color: inherit; display: flex; flex-direction: column;
     }
-    .team-card:hover {
-      border-color: var(--accent); transform: translateY(-3px);
-      box-shadow: 0 8px 30px rgba(255,172,0,0.15);
-    }
+    .team-card:hover { border-color: var(--accent); transform: translateY(-3px); box-shadow: 0 8px 30px rgba(255,172,0,0.15); }
     .team-card:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
 
-    .team-card-header {
-      padding: 16px 20px; display: flex; justify-content: space-between;
-      align-items: center; border-bottom: 1px solid var(--border-main);
-    }
-    .team-card-name {
-      font-size: 1.2rem; font-weight: bold; color: var(--text-bright);
-      display: flex; align-items: center; gap: 8px;
-    }
-    .team-card-rank {
-      font-size: 0.75rem; color: var(--text-dim);
-      background: var(--bg-well); padding: 2px 8px; border-radius: 10px;
-      border: 1px solid var(--border-main);
-    }
-
+    .team-card-header { padding: 16px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-main); }
+    .team-card-name { font-size: 1.2rem; font-weight: bold; color: var(--text-bright); display: flex; align-items: center; gap: 8px; }
+    .team-card-rank { font-size: 0.75rem; color: var(--text-dim); background: var(--bg-well); padding: 2px 8px; border-radius: 10px; border: 1px solid var(--border-main); }
     .team-card-body { padding: 16px 20px; flex: 1; }
-
-    .team-card-stats {
-      display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 14px;
-    }
-    .tc-stat-label {
-      font-size: 0.6rem; text-transform: uppercase;
-      color: var(--text-dim); letter-spacing: 0.5px;
-    }
+    .team-card-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 14px; }
+    .tc-stat-label { font-size: 0.6rem; text-transform: uppercase; color: var(--text-dim); letter-spacing: 0.5px; }
     .tc-stat-value { font-size: 1.3rem; font-weight: bold; }
     .tc-stat-value.points { color: var(--accent); }
     .tc-stat-value.completed { color: var(--text-completed); }
 
     .team-card-progress { margin-bottom: 14px; }
-    .tc-progress-label {
-      display: flex; justify-content: space-between;
-      font-size: 0.7rem; color: var(--text-dim); margin-bottom: 4px;
-    }
-    .tc-progress-bg {
-      background: var(--bg-well); height: 10px; border-radius: 5px;
-      overflow: hidden; border: 1px solid rgba(0,0,0,0.3);
-    }
-    .tc-progress-fill {
-      height: 100%; border-radius: 5px; transition: width 0.5s ease;
-    }
+    .tc-progress-label { display: flex; justify-content: space-between; font-size: 0.7rem; color: var(--text-dim); margin-bottom: 4px; }
+    .tc-progress-bg { background: var(--bg-well); height: 10px; border-radius: 5px; overflow: hidden; border: 1px solid rgba(0,0,0,0.3); }
+    .tc-progress-fill { height: 100%; border-radius: 5px; transition: width 0.5s ease; }
 
-    /* Mini board preview */
-    .team-card-miniboard {
-      display: grid; grid-template-columns: repeat(7, 1fr);
-      gap: 2px; padding: 8px; background: var(--bg-well);
-      border: 1px solid rgba(0,0,0,0.3); border-radius: 3px;
-    }
-    .tc-mini-tile {
-      aspect-ratio: 1; background: var(--bg-well);
-      border-radius: 1px; transition: background 0.3s ease;
-      border: 1px solid rgba(0,0,0,0.2);
-    }
+    .team-card-miniboard { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; padding: 8px; background: var(--bg-well); border: 1px solid rgba(0,0,0,0.3); border-radius: 3px; }
+    .tc-mini-tile { aspect-ratio: 1; background: var(--bg-well); border-radius: 1px; transition: background 0.3s ease; border: 1px solid rgba(0,0,0,0.2); }
     .tc-mini-tile.complete { background: var(--text-completed); }
 
-    .team-card-footer {
-      padding: 10px 20px; border-top: 1px solid var(--border-main);
-      display: flex; justify-content: space-between; align-items: center;
-      font-size: 0.75rem; color: var(--text-dim);
-    }
-    .team-card-footer .view-link {
-      color: var(--accent); font-weight: bold; text-transform: uppercase;
-      letter-spacing: 0.5px; display: flex; align-items: center; gap: 4px;
-    }
+    .team-card-footer { padding: 10px 20px; border-top: 1px solid var(--border-main); display: flex; justify-content: space-between; align-items: center; font-size: 0.75rem; color: var(--text-dim); }
+    .team-card-footer .view-link { color: var(--accent); font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px; display: flex; align-items: center; gap: 4px; }
     .team-card-footer .view-link svg { width: 14px; height: 14px; fill: currentColor; }
 
-    /* --- Activity / Event Log --- */
-    .activity-section {
-      width: 100%; max-width: 1400px; margin-bottom: 24px;
-    }
-
-    .activity-list {
-      background: var(--bg-card); border: 2px solid var(--border-main);
-      max-height: 300px; overflow-y: auto;
-    }
-    .activity-item {
-      padding: 10px 16px; border-bottom: 1px solid var(--border-main);
-      display: flex; align-items: center; gap: 12px; font-size: 0.85rem;
-    }
+    .activity-section { width: 100%; max-width: 1400px; margin-bottom: 24px; }
+    .activity-list { background: var(--bg-card); border: 2px solid var(--border-main); max-height: 300px; overflow-y: auto; }
+    .activity-item { padding: 10px 16px; border-bottom: 1px solid var(--border-main); display: flex; align-items: center; gap: 12px; font-size: 0.85rem; }
     .activity-item:last-child { border-bottom: none; }
     .activity-item:hover { background: rgba(255,255,255,0.02); }
-
-    .activity-icon {
-      width: 32px; height: 32px; border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
-      flex-shrink: 0; font-size: 0.9rem;
-    }
+    .activity-icon { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 0.9rem; }
     .activity-icon.tile-complete { background: rgba(76,175,80,0.12); color: var(--text-completed); }
     .activity-icon.points { background: rgba(255,172,0,0.12); color: var(--accent); }
     .activity-icon.event { background: rgba(200,155,60,0.12); color: var(--accent-secondary); }
-
     .activity-text { flex: 1; }
     .activity-text strong { color: var(--text-bright); }
     .activity-time { font-size: 0.7rem; color: var(--text-dim); flex-shrink: 0; }
 
-    /* --- Footer --- */
-    .admin-footer {
-      width: 100%; max-width: 1400px;
-      padding: 15px 0 10px 0; font-size: 0.65rem;
-      color: var(--border-main);
-      display: flex; align-items: center; gap: 6px; flex-wrap: wrap;
-    }
-    .admin-footer .sync-btn {
-      cursor: pointer; color: var(--text-dim); text-decoration: underline;
-    }
+    .admin-footer { width: 100%; max-width: 1400px; padding: 15px 0 10px 0; font-size: 0.65rem; color: var(--border-main); display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+    .admin-footer .sync-btn { cursor: pointer; color: var(--text-dim); text-decoration: underline; }
     .admin-footer .sync-btn:hover { color: var(--accent); }
-
     .sync-flash { animation: flash-sync 1s ease-out; }
     @keyframes flash-sync { 0% { color: var(--accent); } 100% { color: var(--border-main); } }
     .sync-error { color: var(--danger); }
 
-    /* --- Responsive --- */
     @media (max-width: 900px) {
       .admin-header { padding: 14px 18px; }
       .admin-title { font-size: 1.4rem; }
       .teams-grid { grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); }
       .leaderboard-table th, .leaderboard-table td { padding: 8px 10px; font-size: 0.85rem; }
     }
-
     @media (max-width: 600px) {
       body { padding: 10px; }
       .admin-header { flex-direction: column; align-items: flex-start; }
@@ -353,10 +225,8 @@
       .global-stats { grid-template-columns: repeat(2, 1fr); }
       .teams-grid { grid-template-columns: 1fr; }
       .leaderboard-table { font-size: 0.8rem; }
-      .leaderboard-table th:nth-child(4),
-      .leaderboard-table td:nth-child(4) { display: none; }
+      .leaderboard-table th:nth-child(4), .leaderboard-table td:nth-child(4) { display: none; }
     }
-
     @media (prefers-reduced-motion: reduce) {
       * { transition: none !important; animation: none !important; }
       .team-card:hover { transform: none !important; }
@@ -364,7 +234,6 @@
   </style>
 </head>
 <body>
-  <!-- Admin Header -->
   <header class="admin-header">
     <div class="admin-header-left">
       <h1 class="admin-title">⬡ Bingo Command Center</h1>
@@ -382,14 +251,15 @@
     </div>
   </header>
 
-  <!-- Global Stats -->
-  <div class="global-stats" id="global-stats">
-      <!-- Event Description Banner -->
+  <!-- Event Description Banner -->
   <div class="event-description-banner" id="event-description-banner" style="display:none;">
     <div class="event-desc-icon">📜</div>
     <div class="event-desc-text" id="event-desc-text"></div>
     <button class="event-desc-dismiss" id="event-desc-dismiss" aria-label="Dismiss">&times;</button>
   </div>
+
+  <!-- Global Stats -->
+  <div class="global-stats" id="global-stats">
     <div class="global-stat-card">
       <div class="global-stat-label">Total Teams</div>
       <div class="global-stat-value accent" id="stat-total-teams">0</div>
@@ -456,7 +326,6 @@
     </div>
   </div>
 
-  <!-- Footer -->
   <footer class="admin-footer">
     <span>Admin Dashboard v1.1</span>
     <span>&middot;</span>
@@ -465,18 +334,7 @@
   </footer>
     <script>
 (() => {
-  const BOARD_PAGE = 'index.html';
-
-  /*
-    TEAM_MAP: Up to 8 teams.
-    Each entry needs:
-      - name: Display name
-      - url: Published Google Sheet CSV URL
-      - color: Hex color for the team dot / accent
-      - codeword: (optional)
-      - points: Starting/total points override
-  */
-
+  /* ========================= CONFIG & STATE ========================= */
   const MAX_TILES = 49;
   const BOARD_PAGE_DEFAULT = 'index.html';
 
@@ -486,7 +344,6 @@
     customVars: 'bingo-custom-vars'
   };
 
-  // Fallback only if nothing is saved in localStorage
   const DEFAULT_TEAMS = {
     Warriors: {
       name: "The Spreadsheet Warriors",
@@ -502,7 +359,9 @@
   let teamData = {};
   let syncIntervalId = null;
   let syncMs = 30000;
+  let descDismissed = false;
 
+  /* ========================= DOM ========================= */
   const $ = (id) => document.getElementById(id);
   const DOM = {
     eventSubtitle: $('event-subtitle'),
@@ -522,7 +381,7 @@
     descDismiss: $('event-desc-dismiss'),
   };
 
-  /* --- Load shared config from localStorage --- */
+  /* ========================= SHARED CONFIG ========================= */
   function loadSharedConfig() {
     try {
       const savedTeams = localStorage.getItem(STORAGE_KEYS.teams);
@@ -531,8 +390,25 @@
       TEAM_MAP = { ...DEFAULT_TEAMS };
     }
 
-  let descDismissed = false;
+    try {
+      const savedEvent = localStorage.getItem(STORAGE_KEYS.eventConfig);
+      eventConfig = savedEvent ? JSON.parse(savedEvent) : {};
+    } catch {
+      eventConfig = {};
+    }
 
+    syncMs = eventConfig.syncInterval || 30000;
+  }
+
+  function getBoardPage() {
+    return eventConfig.boardPage || BOARD_PAGE_DEFAULT;
+  }
+
+  function getEventName() {
+    return eventConfig.name || 'Bingo 2026';
+  }
+
+  /* ========================= EVENT DESCRIPTION ========================= */
   function renderEventDescription() {
     if (!DOM.descBanner || !DOM.descText) return;
 
@@ -545,26 +421,9 @@
     DOM.descBanner.style.display = 'flex';
   }
 
-    try {
-      const savedEvent = localStorage.getItem(STORAGE_KEYS.eventConfig);
-      eventConfig = savedEvent ? JSON.parse(savedEvent) : {};
-    } catch {
-      eventConfig = {};
-    }
+  /* ========================= UTILS ========================= */
+  const normalizeNL = (s) => String(s).replace(/\r\n/g, '\n').replace(/\r/g, '\n');
 
-    // Use event config sync interval if set
-    syncMs = eventConfig.syncInterval || 30000;
-  }
-
-  function getBoardPage() {
-    return eventConfig.boardPage || BOARD_PAGE_DEFAULT;
-  }
-
-  function getEventName() {
-    return eventConfig.name || 'Bingo 2026';
-  }
-
-    const normalizeNL = (s) => String(s).replace(/\r\n/g, '\n').replace(/\r/g, '\n');
   const escapeHTML = (str) => {
     const d = document.createElement('div');
     d.appendChild(document.createTextNode(String(str ?? '')));
@@ -604,9 +463,18 @@
     void DOM.lastSync.offsetWidth;
     DOM.lastSync.classList.add('sync-flash');
   };
-    /* ========================= FETCH TEAM DATA ========================= */
+
+  /* ========================= FETCH ========================= */
   async function fetchTeamData(teamKey) {
     const team = TEAM_MAP[teamKey];
+    if (!team || !team.url) {
+      teamData[teamKey] = {
+        tiles: [], completion: Array(MAX_TILES).fill(false),
+        completedCount: 0, totalPercent: 0, tileCount: 0
+      };
+      return;
+    }
+
     try {
       const res = await fetch(`${team.url}&t=${Date.now()}`, {
         headers: { 'pragma': 'no-cache', 'cache-control': 'no-cache' }
@@ -628,7 +496,7 @@
         const isCompleted = percent === 100;
         const points = cols[6] || '0';
         completion[count] = isCompleted;
-        tiles.push({ title: cols[0] || `Tile ${count+1}`, percent, isCompleted, points });
+        tiles.push({ title: cols[0] || `Tile ${count + 1}`, percent, isCompleted, points });
         count++;
       }
 
@@ -650,12 +518,10 @@
     }
   }
 
-    async function fetchAllTeams() {
-    // Re-read config in case settings page changed it
+  async function fetchAllTeams() {
     loadSharedConfig();
 
     const keys = Object.keys(TEAM_MAP);
-
     if (keys.length === 0) {
       renderEmpty();
       flashSync();
@@ -667,8 +533,10 @@
     renderAll();
   }
 
-  /* ========================= RENDER ========================= */
+  /* ========================= RENDER: EMPTY STATE ========================= */
   function renderEmpty() {
+    renderEventDescription();
+
     DOM.totalTeams.innerText = '0';
     DOM.totalCompleted.innerText = '0';
     DOM.totalPoints.innerText = '0';
@@ -680,28 +548,24 @@
     DOM.leaderboardBody.innerHTML = `
       <tr><td colspan="5" style="text-align:center; color:var(--text-dim); padding:24px;">
         No teams configured. <a href="settings.html" style="color:var(--accent);">Add teams in Game Settings</a>
-      </td></tr>
-    `;
+      </td></tr>`;
 
     DOM.teamsGrid.innerHTML = `
       <div style="grid-column:1/-1; text-align:center; padding:40px 20px; color:var(--text-dim);">
         <div style="font-size:2rem; margin-bottom:10px;">📋</div>
         <div style="font-size:1rem; margin-bottom:8px;">No teams found</div>
-        <a href="settings.html" class="admin-btn primary" style="display:inline-flex;">
-          Configure Teams
-        </a>
-      </div>
-    `;
+        <a href="settings.html" class="admin-btn primary" style="display:inline-flex;">Configure Teams</a>
+      </div>`;
 
     DOM.activityList.innerHTML = `
       <div class="activity-item">
         <div class="activity-icon event">📋</div>
         <div class="activity-text">No teams configured. <a href="settings.html" style="color:var(--accent);">Go to settings</a></div>
         <div class="activity-time">-</div>
-      </div>
-    `;
+      </div>`;
   }
 
+  /* ========================= RENDER: DATA ========================= */
   function getSortedTeams() {
     return Object.keys(TEAM_MAP).sort((a, b) => {
       const pa = Number(TEAM_MAP[a].points || 0);
@@ -737,7 +601,7 @@
       DOM.leadingTeam.style.color = TEAM_MAP[sorted[0]].color;
     }
 
-        DOM.eventSubtitle.innerText = `Event: ${getEventName()} · ${totalTeams} Teams · ${totalCompleted} Tiles Completed`;
+    DOM.eventSubtitle.innerText = `Event: ${getEventName()} · ${totalTeams} Teams · ${totalCompleted} Tiles Completed`;
   }
 
   function renderLeaderboard(sorted) {
@@ -765,8 +629,7 @@
             <div class="lb-progress-fill" style="width:${Math.round(data.totalPercent)}%; background:${getProgressColor(data.totalPercent)};"></div>
           </div>
         </td>
-        <td class="completed-cell">${data.completedCount}/${MAX_TILES}</td>
-      `;
+        <td class="completed-cell">${data.completedCount}/${MAX_TILES}</td>`;
       frag.appendChild(tr);
     });
 
@@ -788,7 +651,6 @@
       card.setAttribute('role', 'link');
       card.setAttribute('aria-label', `View ${team.name} board`);
 
-      // Build mini-tile grid
       let miniTiles = '';
       for (let i = 0; i < MAX_TILES; i++) {
         miniTiles += `<div class="tc-mini-tile${data.completion[i] ? ' complete' : ''}"></div>`;
@@ -830,8 +692,7 @@
             View Board
             <svg viewBox="0 0 24 24"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"/></svg>
           </span>
-        </div>
-      `;
+        </div>`;
 
       frag.appendChild(card);
     });
@@ -879,8 +740,7 @@
       item.innerHTML = `
         <div class="activity-icon ${act.icon}">${act.symbol}</div>
         <div class="activity-text">${act.text}</div>
-        <div class="activity-time">${act.time}</div>
-      `;
+        <div class="activity-time">${act.time}</div>`;
       frag.appendChild(item);
     }
 
@@ -895,10 +755,10 @@
     renderTeamCards(sorted);
     renderActivity(sorted);
   }
-    /* ========================= INIT ========================= */
+
+  /* ========================= INIT ========================= */
   function init() {
     loadSharedConfig();
-    
     renderEventDescription();
 
     DOM.descDismiss.addEventListener('click', () => {
