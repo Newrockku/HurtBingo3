@@ -537,7 +537,7 @@
   <main class="grid-container" id="grid" role="grid" aria-label="Bingo board"></main>
 
   <footer class="page-footer">
-    <span>v3.083</span>
+    <span>v3.090</span>
     <span>&middot;</span>
     <span id="last-sync-text" aria-live="polite">Last Sync: Never</span>
     <span class="sync-btn" id="sync-now" role="button" tabindex="0">[Sync Now]</span>
@@ -671,6 +671,33 @@
             </div>
           </div>
 
+          <!-- Event Configuration -->
+          <div class="settings-section">
+            <div class="settings-section-title">Event Configuration</div>
+            <div class="settings-row" style="flex-direction:column; align-items:flex-start;">
+              <label style="color:var(--text-bright); margin-bottom:4px;">Event Name</label>
+              <input type="text" id="settings-event-name" class="settings-select" style="width:100%; margin-bottom:12px;" placeholder="Bingo 2026">
+            </div>
+            <div class="settings-row" style="flex-direction:column; align-items:flex-start;">
+              <label style="color:var(--text-bright); margin-bottom:4px;">Codeword</label>
+              <input type="text" id="settings-event-codeword" class="settings-select" style="width:100%; margin-bottom:12px;" placeholder="Enter codeword">
+            </div>
+            <div class="settings-row" style="flex-direction:column; align-items:flex-start;">
+              <label style="color:var(--text-bright); margin-bottom:4px;">Description (optional)</label>
+              <textarea id="settings-event-description" style="width:100%; min-height:60px; padding:8px; margin-bottom:12px; background:var(--bg-well); border:1px solid var(--border-main); color:var(--text-bright); font-family:'Cabin Condensed'; border-radius:3px;" placeholder="Brief event description..."></textarea>
+            </div>
+            <div class="settings-row" style="flex-direction:column; align-items:flex-start;">
+              <label style="color:var(--text-bright); margin-bottom:4px;">CSV URL</label>
+              <textarea id="settings-csv-url" style="width:100%; min-height:60px; padding:8px; background:var(--bg-well); border:1px solid var(--border-main); color:var(--text-bright); font-family:monospace; font-size:0.8rem; border-radius:3px;" placeholder="Paste CSV URL here..."></textarea>
+            </div>
+          </div>
+
+          <!-- Teams Section -->
+          <div class="settings-section">
+            <div class="settings-section-title">Teams Configuration</div>
+            <div id="teams-config-container"></div>
+          </div>
+
           <!-- Data Section -->
           <div class="settings-section">
             <div class="settings-section-title">Data</div>
@@ -690,13 +717,13 @@
           </div>
         </div>
 
-        <div class="settings-version">Bingo Board &middot; v3.083</div>
+        <div class="settings-version">Bingo Board &middot; v3.090</div>
       </div>
     </div>
   </div>
     <script>
 (() => {
-  const APP_VERSION = '3.083';
+  const APP_VERSION = '3.090';
   const MAX_TILES = 49;
 
   const STORAGE_KEYS = {
@@ -896,16 +923,23 @@
   };
 
   const DEFAULT_TEAMS = {
-    Warriors: {
-      name: "The Spreadsheet Warriors",
-      url: "https://docs.google.com/spreadsheets/d/e/2PACX-1vRFOGe_j8BL0X5Cwvy3LNmsrWG82IAXlWpump0Sw6PKWLz-1gxbisdbPuTmJ_CmjLA_q-Q6y9jTfFwq/pub?gid=1593254680&single=true&output=csv",
-      codeword: "BINGO_BLITZ",
-      points: 1250
-    }
+    'Team1': { name: "Team 1", url: "", points: 0, teamNumber: 1 },
+    'Team2': { name: "Team 2", url: "", points: 0, teamNumber: 2 },
+    'Team3': { name: "Team 3", url: "", points: 0, teamNumber: 3 },
+    'Team4': { name: "Team 4", url: "", points: 0, teamNumber: 4 },
+    'Team5': { name: "Team 5", url: "", points: 0, teamNumber: 5 },
+    'Team6': { name: "Team 6", url: "", points: 0, teamNumber: 6 },
+    'Team7': { name: "Team 7", url: "", points: 0, teamNumber: 7 },
+    'Team8': { name: "Team 8", url: "", points: 0, teamNumber: 8 }
   };
 
   let TEAM_MAP = {};
-  let eventConfig = {};
+  let eventConfig = {
+    name: 'Bingo 2026',
+    codeword: '',
+    description: '',
+    syncInterval: 30000
+  };
   let currentTeamKey = '';
   let codewordSecret = '';
   let lastSeenHash = null;
@@ -928,9 +962,19 @@
 
     try {
       const savedEvent = localStorage.getItem(STORAGE_KEYS.eventConfig);
-      eventConfig = savedEvent ? JSON.parse(savedEvent) : {};
+      eventConfig = savedEvent ? JSON.parse(savedEvent) : {
+        name: 'Bingo 2026',
+        codeword: '',
+        description: '',
+        syncInterval: 30000
+      };
     } catch {
-      eventConfig = {};
+      eventConfig = {
+        name: 'Bingo 2026',
+        codeword: '',
+        description: '',
+        syncInterval: 30000
+      };
     }
 
     const params = new URLSearchParams(window.location.search);
@@ -1157,12 +1201,6 @@
     }
   };
 
-  const openModal = (tile) => {
-    if (tile.noData) return;
-    modalOpen = true;
-    // ... rest of modal code
-  };
-
   const buildBigMap = () => {
     DOM.bigMap.innerHTML = '';
     const frag = document.createDocumentFragment();
@@ -1264,6 +1302,21 @@
     DOM.viewSettings.style.display = 'flex';
     DOM.themeSel.value = storageLoad(STORAGE_KEYS.theme, 'osrs');
     DOM.intervalSel.value = String(syncMs);
+    
+    // Load event config
+    const eventNameInput = $('settings-event-name');
+    const eventCodewordInput = $('settings-event-codeword');
+    const eventDescriptionInput = $('settings-event-description');
+    const csvUrlInput = $('settings-csv-url');
+    
+    if (eventNameInput) eventNameInput.value = eventConfig.name || '';
+    if (eventCodewordInput) eventCodewordInput.value = eventConfig.codeword || '';
+    if (eventDescriptionInput) eventDescriptionInput.value = eventConfig.description || '';
+    if (csvUrlInput && TEAM_MAP['Team1']) csvUrlInput.value = TEAM_MAP['Team1'].url || '';
+    
+    // Refresh team panel
+    TeamManager.buildTeamsPanel();
+    
     ThemeEditor.refreshCustomDropdown();
     ThemeEditor.refreshCustomList();
     ThemeEditor.updateEditButton();
@@ -1297,7 +1350,7 @@
     const t = TEAM_MAP[currentTeamKey];
     DOM.teamName.innerText = t.name || currentTeamKey;
     DOM.totalPoints.innerText = Number(t.points || 0).toLocaleString();
-    codewordSecret = t.codeword || '';
+    codewordSecret = eventConfig.codeword || '';
   };
 
   const renderEventDescription = () => {
@@ -1340,7 +1393,7 @@
       const team = TEAM_MAP[currentTeamKey];
 
       if (!team.url) {
-        syncError('No URL configured for team');
+        syncError('No CSV URL configured');
         return;
       }
 
@@ -1357,18 +1410,18 @@
       tiles = Array(MAX_TILES).fill(null);
       resetMinimaps();
 
-      const TEAM_COLUMNS = {
-        'Warriors': { itemsCol: 4, currentCol: 5, goalCol: 6 },
-        'Legends': { itemsCol: 7, currentCol: 8, goalCol: 9 },
-        'Nexus': { itemsCol: 10, currentCol: 11, goalCol: 12 },
-        'Phoenix': { itemsCol: 13, currentCol: 14, goalCol: 15 },
-        'Titans': { itemsCol: 16, currentCol: 17, goalCol: 18 },
-        'Vanguard': { itemsCol: 19, currentCol: 20, goalCol: 21 },
-        'Zenith': { itemsCol: 22, currentCol: 23, goalCol: 24 },
-        'Apex': { itemsCol: 25, currentCol: 26, goalCol: 27 }
-      };
+      const lines = raw.split('\n');
+      const teamNumber = team.teamNumber || 1;
+      
+      // Calculate which columns belong to this team
+      // Format: Image(0) | Title(1) | Desc(2) | Points(3) | Team1Items(4) | Team1Current(5) | Team1Goal(6) | Team2Items(7) | Team2Current(8) | Team2Goal(9) | ...
+      const itemsCol = 4 + ((teamNumber - 1) * 3);
+      const currentCol = 5 + ((teamNumber - 1) * 3);
+      const goalCol = 6 + ((teamNumber - 1) * 3);
 
-      const rows = raw.split('\n').slice(1); // Skip header
+      console.log(`Team: ${currentTeamKey} (Team${teamNumber}), Columns: Items=${itemsCol}, Current=${currentCol}, Goal=${goalCol}`);
+
+      const rows = lines.slice(1);
       let count = 0;
 
       for (const line of rows) {
@@ -1384,17 +1437,9 @@
         const description = cols[2] || '';
         const points = cols[3] || '0';
         
-        // Get this team's data from the unified CSV
-        const teamConfig = TEAM_COLUMNS[currentTeamKey];
-        if (!teamConfig) {
-          count++;
-          tiles[count - 1] = { id, title, img, percent: 0, barColor: getProgressColor(0), checklistHtml: '', description, isCompleted: false, points, noData: true };
-          continue;
-        }
-        
-        const items = cols[teamConfig.itemsCol] ? cols[teamConfig.itemsCol].split(',').map(s => s.trim()).filter(Boolean) : [];
-        const current = Math.max(0, parseInt(cols[teamConfig.currentCol], 10) || 0);
-        const goal = Math.max(1, parseInt(cols[teamConfig.goalCol], 10) || 1);
+        const items = cols[itemsCol] ? cols[itemsCol].split(',').map(s => s.trim()).filter(Boolean) : [];
+        const current = Math.max(0, parseInt(cols[currentCol], 10) || 0);
+        const goal = Math.max(1, parseInt(cols[goalCol], 10) || 1);
         const percent = Math.min((current / goal) * 100, 100);
         const isCompleted = percent === 100;
         
@@ -1409,7 +1454,6 @@
         count++;
       }
 
-      // Fill remaining tiles with no-data
       for (let i = count; i < MAX_TILES; i++) {
         tiles[i] = { id: i + 1, title: 'No Data', img: '', percent: 0, barColor: getProgressColor(0), checklistHtml: '', description: '', isCompleted: false, points: '0', noData: true };
       }
@@ -1419,6 +1463,68 @@
       if (e.name !== 'AbortError') { console.error(e); syncError('Network error'); }
     } finally { fetchController = null; }
   }
+
+  /* ========================= TEAM MANAGER ========================= */
+  const TeamManager = (() => {
+    const buildTeamsPanel = () => {
+      const container = document.getElementById('teams-config-container');
+      if (!container) return;
+      container.innerHTML = '';
+      
+      const frag = document.createDocumentFragment();
+      for (let i = 1; i <= 8; i++) {
+        const teamKey = `Team${i}`;
+        const team = TEAM_MAP[teamKey] || {};
+        
+        const row = document.createElement('div');
+        row.className = 'settings-row';
+        row.style.flexDirection = 'column';
+        row.style.alignItems = 'flex-start';
+        row.style.borderBottom = '1px solid var(--border-main)';
+        row.style.paddingBottom = '12px';
+        row.style.marginBottom = '12px';
+        
+        row.innerHTML = `
+          <label style="display:block; margin-bottom:6px; font-weight:bold; color:var(--text-bright);">Team ${i}</label>
+          <input type="text" class="team-name-input" data-team="${teamKey}" value="${escapeHTML(team.name || `Team ${i}`)}"
+                 placeholder="Team Name" style="width:100%; padding:6px 8px; margin-bottom:6px; background:var(--bg-well); border:1px solid var(--border-main); color:var(--text-bright); font-family:'Cabin Condensed'; border-radius:3px;">
+          <input type="number" class="team-points-input" data-team="${teamKey}" value="${team.points || 0}"
+                 placeholder="Points" style="width:100%; padding:6px 8px; background:var(--bg-well); border:1px solid var(--border-main); color:var(--text-bright); font-family:'Cabin Condensed'; border-radius:3px;">
+          <div style="font-size:0.65rem; color:var(--text-dim); margin-top:4px;">Data will be pulled from columns for Team ${i} in the CSV</div>
+        `;
+        
+        frag.appendChild(row);
+      }
+      container.appendChild(frag);
+    };
+
+    const saveTeamConfig = () => {
+      for (let i = 1; i <= 8; i++) {
+        const teamKey = `Team${i}`;
+        const nameInput = document.querySelector(`.team-name-input[data-team="${teamKey}"]`);
+        const pointsInput = document.querySelector(`.team-points-input[data-team="${teamKey}"]`);
+        
+        if (nameInput) {
+          TEAM_MAP[teamKey].name = nameInput.value.trim() || `Team ${i}`;
+          TEAM_MAP[teamKey].points = parseInt(pointsInput.value, 10) || 0;
+        }
+      }
+      storageSave(STORAGE_KEYS.teams, JSON.stringify(TEAM_MAP));
+    };
+
+    const init = () => {
+      buildTeamsPanel();
+      
+      // Save team config when inputs change
+      const container = document.getElementById('teams-config-container');
+      if (container) {
+        container.addEventListener('change', saveTeamConfig);
+        container.addEventListener('blur', saveTeamConfig, true);
+      }
+    };
+
+    return { buildTeamsPanel, init };
+  })();
 
   /* ========================= THEME EDITOR ========================= */
   const ThemeEditor = (() => {
@@ -1851,6 +1957,46 @@
       ThemeEditor.updateEditButton();
       ThemeEditor.closeEditor(false);
     });
+
+    // Event config inputs
+    const eventNameInput = $('settings-event-name');
+    const eventCodewordInput = $('settings-event-codeword');
+    const eventDescriptionInput = $('settings-event-description');
+    const csvUrlInput = $('settings-csv-url');
+
+    if (eventNameInput) {
+      eventNameInput.addEventListener('blur', () => {
+        eventConfig.name = eventNameInput.value.trim() || 'Bingo 2026';
+        storageSave(STORAGE_KEYS.eventConfig, JSON.stringify(eventConfig));
+        fetchGlobal();
+      });
+    }
+
+    if (eventCodewordInput) {
+      eventCodewordInput.addEventListener('blur', () => {
+        eventConfig.codeword = eventCodewordInput.value.trim();
+        storageSave(STORAGE_KEYS.eventConfig, JSON.stringify(eventConfig));
+        codewordSecret = eventConfig.codeword;
+      });
+    }
+
+    if (eventDescriptionInput) {
+      eventDescriptionInput.addEventListener('blur', () => {
+        eventConfig.description = eventDescriptionInput.value.trim();
+        storageSave(STORAGE_KEYS.eventConfig, JSON.stringify(eventConfig));
+        renderEventDescription();
+      });
+    }
+
+    if (csvUrlInput) {
+      csvUrlInput.addEventListener('blur', () => {
+        const url = csvUrlInput.value.trim();
+        for (let i = 1; i <= 8; i++) {
+          TEAM_MAP[`Team${i}`].url = url;
+        }
+        storageSave(STORAGE_KEYS.teams, JSON.stringify(TEAM_MAP));
+      });
+    }
 
     // Sync interval change
     DOM.intervalSel.addEventListener('change', () => {
