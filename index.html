@@ -658,7 +658,18 @@
 (() => {
   const APP_VERSION = '3.083';
   const MAX_TILES = 49;
-  const TEAM_MAP = {
+
+  const STORAGE_KEYS = {
+    theme: 'bingo-theme',
+    syncInterval: 'bingo-sync-interval',
+    codewordVisible: 'bingo-codeword-visible',
+    customThemes: 'bingo-custom-themes',
+    eventConfig: 'bingo-event-config',
+    teams: 'bingo-teams-config'
+  };
+
+  // Fallback team if nothing in storage
+  const DEFAULT_TEAMS = {
     Warriors: {
       name: "The Spreadsheet Warriors",
       url: "https://docs.google.com/spreadsheets/d/e/2PACX-1vRFOGe_j8BL0X5Cwvy3LNmsrWG82IAXlWpump0Sw6PKWLz-1gxbisdbPuTmJ_CmjLA_q-Q6y9jTfFwq/pub?gid=1593254680&single=true&output=csv",
@@ -667,12 +678,38 @@
     }
   };
 
-  const STORAGE_KEYS = {
-    theme: 'bingo-theme',
-    syncInterval: 'bingo-sync-interval',
-    codewordVisible: 'bingo-codeword-visible',
-    customThemes: 'bingo-custom-themes'
-  };
+  let TEAM_MAP = {};
+  let eventConfig = {};
+  let currentTeamKey = '';
+
+  function loadSharedConfig() {
+    try {
+      const savedTeams = localStorage.getItem(STORAGE_KEYS.teams);
+      TEAM_MAP = savedTeams ? JSON.parse(savedTeams) : { ...DEFAULT_TEAMS };
+    } catch {
+      TEAM_MAP = { ...DEFAULT_TEAMS };
+    }
+
+    try {
+      const savedEvent = localStorage.getItem(STORAGE_KEYS.eventConfig);
+      eventConfig = savedEvent ? JSON.parse(savedEvent) : {};
+    } catch {
+      eventConfig = {};
+    }
+
+    // Determine which team to show from URL param
+    const params = new URLSearchParams(window.location.search);
+    const requestedTeam = params.get('team');
+    const teamKeys = Object.keys(TEAM_MAP);
+
+    if (requestedTeam && TEAM_MAP[requestedTeam]) {
+      currentTeamKey = requestedTeam;
+    } else if (teamKeys.length > 0) {
+      currentTeamKey = teamKeys[0];
+    } else {
+      currentTeamKey = '';
+    }
+  }
 
   const THEME_VARS = [
     '--bg-body','--bg-tile','--bg-well','--bg-completed','--bg-completed-well',
@@ -859,7 +896,6 @@
     }
   };
 
-  let currentTeamKey = 'Warriors';
   let codewordSecret = '';
   let lastSeenHash = null;
   let completion = Array(MAX_TILES).fill(false);
@@ -1168,13 +1204,32 @@
 
   /* ========================= FETCH ========================= */
   const fetchGlobal = () => {
+    if (!currentTeamKey || !TEAM_MAP[currentTeamKey]) {
+      DOM.teamName.innerText = 'No team configured';
+      DOM.totalPoints.innerText = '0';
+      codewordSecret = '';
+      // Update event title from config
+      const titleEl = document.getElementById('event-title');
+      if (titleEl) titleEl.innerText = eventConfig.name || 'Bingo 2026';
+      return;
+    }
+
     const t = TEAM_MAP[currentTeamKey];
-    DOM.teamName.innerText = t.name;
+    DOM.teamName.innerText = t.name || currentTeamKey;
     DOM.totalPoints.innerText = Number(t.points || 0).toLocaleString();
     codewordSecret = t.codeword || '';
+
+    // Update event title from shared config
+    const titleEl = document.getElementById('event-title');
+    if (titleEl) titleEl.innerText = eventConfig.name || 'Bingo 2026';
   };
 
   async function fetchData(manual = false) {
+    if (!currentTeamKey || !TEAM_MAP[currentTeamKey]) {
+      syncError('No team configured');
+      return;
+    }
+
     if (fetchController) fetchController.abort();
     fetchController = new AbortController();
     try {
@@ -1589,12 +1644,15 @@
   }
 
   function init() {
+    // Load team/event config from shared localStorage
+    loadSharedConfig();
+
     const savedTheme = storageLoad(STORAGE_KEYS.theme, 'osrs');
     applyTheme(savedTheme);
 
     ThemeEditor.init();
 
-    syncMs = parseInt(storageLoad(STORAGE_KEYS.syncInterval, '30000'), 10) || 30000;
+    syncMs = parseInt(storageLoad(STORAGE_KEYS.syncInterval, String(eventConfig.syncInterval || 30000)), 10) || 30000;
     DOM.intervalSel.value = String(syncMs);
 
     miniNodes.forEach(arr => arr.length = 0);

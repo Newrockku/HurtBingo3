@@ -433,7 +433,6 @@
   </footer>
     <script>
 (() => {
-  const MAX_TILES = 49;
   const BOARD_PAGE = 'index.html';
 
   /*
@@ -445,40 +444,32 @@
       - codeword: (optional)
       - points: Starting/total points override
   */
-  const TEAM_MAP = {
+
+  const MAX_TILES = 49;
+  const BOARD_PAGE_DEFAULT = 'index.html';
+
+  const STORAGE_KEYS = {
+    eventConfig: 'bingo-event-config',
+    teams: 'bingo-teams-config',
+    customVars: 'bingo-custom-vars'
+  };
+
+  // Fallback only if nothing is saved in localStorage
+  const DEFAULT_TEAMS = {
     Warriors: {
       name: "The Spreadsheet Warriors",
       url: "https://docs.google.com/spreadsheets/d/e/2PACX-1vRFOGe_j8BL0X5Cwvy3LNmsrWG82IAXlWpump0Sw6PKWLz-1gxbisdbPuTmJ_CmjLA_q-Q6y9jTfFwq/pub?gid=1593254680&single=true&output=csv",
       color: "#e94560",
       codeword: "BINGO_BLITZ",
       points: 1250
-    },
-    Legends: {
-      name: "The Lucky Legends",
-      url: "https://docs.google.com/spreadsheets/d/e/2PACX-1vRFOGe_j8BL0X5Cwvy3LNmsrWG82IAXlWpump0Sw6PKWLz-1gxbisdbPuTmJ_CmjLA_q-Q6y9jTfFwq/pub?gid=1593254680&single=true&output=csv",
-      color: "#0f9b8e",
-      codeword: "LUCKY_STRIKE",
-      points: 980
-    },
-    Titans: {
-      name: "The Tile Titans",
-      url: "https://docs.google.com/spreadsheets/d/e/2PACX-1vRFOGe_j8BL0X5Cwvy3LNmsrWG82IAXlWpump0Sw6PKWLz-1gxbisdbPuTmJ_CmjLA_q-Q6y9jTfFwq/pub?gid=1593254680&single=true&output=csv",
-      color: "#ffd700",
-      codeword: "TITAN_POWER",
-      points: 870
-    },
-    Nomads: {
-      name: "The Bingo Nomads",
-      url: "https://docs.google.com/spreadsheets/d/e/2PACX-1vRFOGe_j8BL0X5Cwvy3LNmsrWG82IAXlWpump0Sw6PKWLz-1gxbisdbPuTmJ_CmjLA_q-Q6y9jTfFwq/pub?gid=1593254680&single=true&output=csv",
-      color: "#a855f7",
-      codeword: "WANDERER",
-      points: 640
     }
   };
 
-  let teamData = {};   // { key: { tiles[], completion[], completedCount, totalPercent } }
+  let TEAM_MAP = {};
+  let eventConfig = {};
+  let teamData = {};
   let syncIntervalId = null;
-  const syncMs = 30000;
+  let syncMs = 30000;
 
   const $ = (id) => document.getElementById(id);
   const DOM = {
@@ -495,6 +486,35 @@
     syncNow: $('admin-sync-now'),
     refreshAll: $('refresh-all-btn'),
   };
+
+  /* --- Load shared config from localStorage --- */
+  function loadSharedConfig() {
+    try {
+      const savedTeams = localStorage.getItem(STORAGE_KEYS.teams);
+      TEAM_MAP = savedTeams ? JSON.parse(savedTeams) : { ...DEFAULT_TEAMS };
+    } catch {
+      TEAM_MAP = { ...DEFAULT_TEAMS };
+    }
+
+    try {
+      const savedEvent = localStorage.getItem(STORAGE_KEYS.eventConfig);
+      eventConfig = savedEvent ? JSON.parse(savedEvent) : {};
+    } catch {
+      eventConfig = {};
+    }
+
+    // Use event config sync interval if set
+    syncMs = eventConfig.syncInterval || 30000;
+  }
+
+  function getBoardPage() {
+    return eventConfig.boardPage || BOARD_PAGE_DEFAULT;
+  }
+
+  function getEventName() {
+    return eventConfig.name || 'Bingo 2026';
+  }
+
     const normalizeNL = (s) => String(s).replace(/\r\n/g, '\n').replace(/\r/g, '\n');
   const escapeHTML = (str) => {
     const d = document.createElement('div');
@@ -581,14 +601,58 @@
     }
   }
 
-  async function fetchAllTeams() {
+    async function fetchAllTeams() {
+    // Re-read config in case settings page changed it
+    loadSharedConfig();
+
     const keys = Object.keys(TEAM_MAP);
+
+    if (keys.length === 0) {
+      renderEmpty();
+      flashSync();
+      return;
+    }
+
     await Promise.allSettled(keys.map(k => fetchTeamData(k)));
     flashSync();
     renderAll();
   }
 
   /* ========================= RENDER ========================= */
+  function renderEmpty() {
+    DOM.totalTeams.innerText = '0';
+    DOM.totalCompleted.innerText = '0';
+    DOM.totalPoints.innerText = '0';
+    DOM.avgCompletion.innerText = '0%';
+    DOM.leadingTeam.innerText = 'No teams';
+    DOM.leadingTeam.style.color = 'var(--text-dim)';
+    DOM.eventSubtitle.innerText = `Event: ${getEventName()} · No teams configured`;
+
+    DOM.leaderboardBody.innerHTML = `
+      <tr><td colspan="5" style="text-align:center; color:var(--text-dim); padding:24px;">
+        No teams configured. <a href="settings.html" style="color:var(--accent);">Add teams in Game Settings</a>
+      </td></tr>
+    `;
+
+    DOM.teamsGrid.innerHTML = `
+      <div style="grid-column:1/-1; text-align:center; padding:40px 20px; color:var(--text-dim);">
+        <div style="font-size:2rem; margin-bottom:10px;">📋</div>
+        <div style="font-size:1rem; margin-bottom:8px;">No teams found</div>
+        <a href="settings.html" class="admin-btn primary" style="display:inline-flex;">
+          Configure Teams
+        </a>
+      </div>
+    `;
+
+    DOM.activityList.innerHTML = `
+      <div class="activity-item">
+        <div class="activity-icon event">📋</div>
+        <div class="activity-text">No teams configured. <a href="settings.html" style="color:var(--accent);">Go to settings</a></div>
+        <div class="activity-time">-</div>
+      </div>
+    `;
+  }
+
   function getSortedTeams() {
     return Object.keys(TEAM_MAP).sort((a, b) => {
       const pa = Number(TEAM_MAP[a].points || 0);
@@ -624,7 +688,7 @@
       DOM.leadingTeam.style.color = TEAM_MAP[sorted[0]].color;
     }
 
-    DOM.eventSubtitle.innerText = `Event: Bingo 2026 · ${totalTeams} Teams · ${totalCompleted} Tiles Completed`;
+        DOM.eventSubtitle.innerText = `Event: ${getEventName()} · ${totalTeams} Teams · ${totalCompleted} Tiles Completed`;
   }
 
   function renderLeaderboard(sorted) {
@@ -643,7 +707,7 @@
         <td>
           <div class="team-name-cell">
             <div class="team-color-dot" style="background:${team.color};"></div>
-            <a href="${BOARD_PAGE}?team=${encodeURIComponent(key)}" class="team-name-link">${escapeHTML(team.name)}</a>
+            <a href="${getBoardPage()}?team=${encodeURIComponent(key)}" class="team-name-link">${escapeHTML(team.name)}</a>
           </div>
         </td>
         <td class="points-cell">${Number(team.points || 0).toLocaleString()}</td>
@@ -671,7 +735,7 @@
 
       const card = document.createElement('a');
       card.className = 'team-card';
-      card.href = `${BOARD_PAGE}?team=${encodeURIComponent(key)}`;
+      card.href = `${getBoardPage()}?team=${encodeURIComponent(key)}`;
       card.setAttribute('role', 'link');
       card.setAttribute('aria-label', `View ${team.name} board`);
 
@@ -783,25 +847,25 @@
   }
     /* ========================= INIT ========================= */
   function init() {
-    // Sync now
+    loadSharedConfig();
+
     DOM.syncNow.addEventListener('click', () => fetchAllTeams());
     DOM.syncNow.addEventListener('keydown', (e) => {
       if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); fetchAllTeams(); }
     });
     DOM.refreshAll.addEventListener('click', () => fetchAllTeams());
 
-    // Visibility pause
     document.addEventListener('visibilitychange', () => {
       if (document.hidden) {
         if (syncIntervalId) clearInterval(syncIntervalId);
         syncIntervalId = null;
       } else {
+        loadSharedConfig();
         syncIntervalId = setInterval(() => fetchAllTeams(), syncMs);
         fetchAllTeams();
       }
     });
 
-    // Initial fetch
     fetchAllTeams();
     syncIntervalId = setInterval(() => fetchAllTeams(), syncMs);
   }
