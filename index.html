@@ -232,6 +232,9 @@
       background-color: var(--bg-completed); border-color: var(--border-completed);
       box-shadow: 0 0 50px rgba(0,0,0,0.8), 0 0 30px 5px var(--border-completed);
     }
+    .modal-content.completed ::-webkit-scrollbar-track { background: var(--bg-completed); }
+    .modal-content.completed ::-webkit-scrollbar-thumb { background: var(--bg-completed-well); border-color: var(--bg-completed); }
+
     .modal-content.active {
       opacity: 1; top: 50% !important; left: 50% !important;
       transform: translate(-50%, -50%) scale(1); pointer-events: auto;
@@ -244,7 +247,7 @@
     }
     .modal-content.completed .modal-header { color: var(--text-completed); }
 
-    .modal-img { height: 120px; margin-bottom: 12px; display: flex; justify-content: center; }
+    .modal-img { height: 250px; margin-bottom: 12px; display: flex; justify-content: center; }
     .modal-img img { max-height: 100%; filter: drop-shadow(4px 4px 6px black); }
 
     .modal-label { font-size: 0.7rem; text-transform: uppercase; font-weight: bold; margin-bottom: 2px; color: var(--text-main); }
@@ -571,7 +574,7 @@
   <main class="grid-container" id="grid" role="grid" aria-label="Bingo board"></main>
 
   <footer class="page-footer">
-    <span>v3.301</span>
+    <span>v3.302</span>
     <span>&middot;</span>
     <span id="last-sync-text" aria-live="polite">Last Sync: Never</span>
     <span class="sync-btn" id="sync-now" role="button" tabindex="0">[Sync Now]</span>
@@ -724,14 +727,14 @@
           </div>
         </div>
 
-        <div class="settings-version">Bingo Board &middot; v3.301</div>
+        <div class="settings-version">Bingo Board &middot; v3.302</div>
       </div>
     </div>
   </div>
 
   <script>
 (() => {
-  const APP_VERSION = '3.301';
+  const APP_VERSION = '3.302';
   let maxTiles = 49;
   let gridCols = 7;
   let gridRows = 7;
@@ -1211,7 +1214,7 @@
 
       const headerBox = document.createElement('div');
       headerBox.className = 'header-box';
-      headerBox.innerHTML = `<div class="header-content">${escapeHTML(tile.title)}</div>`;
+      headerBox.innerHTML = `<div class="header-content">${tile.id} | ${escapeHTML(tile.title)}</div>`;
 
       const imgContainer = document.createElement('div');
       imgContainer.className = 'img-container';
