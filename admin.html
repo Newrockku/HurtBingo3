@@ -215,7 +215,7 @@
       <p class="admin-header-subtitle">Event Management & Team Monitoring</p>
     </div>
     <div class="admin-header-right">
-      <span class="version-badge">v3.090</span>
+      <span class="version-badge">v3.100</span>
       <a href="settings.html" class="nav-btn">⚙️ Settings</a>
       <a href="index.html?admin=true" class="nav-btn">👁️ Preview</a>
     </div>
@@ -236,6 +236,18 @@
       <div class="stat-item">
         <span class="stat-label">CSV URL</span>
         <span style="font-size:0.75rem; color:var(--text-dim); word-break:break-all;" id="csv-url-display">Not configured</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-label">Format</span>
+        <span class="stat-value" id="event-format-display">-</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-label">Board Size</span>
+        <span class="stat-value" id="event-boardsize-display">-</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-label">Team Count</span>
+        <span class="stat-value" id="event-teamcount-display">-</span>
       </div>
       <div class="stat-item" style="margin-top: 12px;">
         <span class="stat-label">Description</span>
@@ -274,7 +286,7 @@
 
   <script>
 (() => {
-  const APP_VERSION = '3.090';
+  const APP_VERSION = '3.100';
 
   const STORAGE_KEYS = {
     eventConfig: 'bingo-event-config',
@@ -302,7 +314,10 @@
     name: 'Bingo 2026',
     codeword: '',
     description: '',
-    syncInterval: 30000
+    syncInterval: 30000,
+    format: '',
+    boardSize: '',
+    teamCount: ''
   };
   let teamsConfig = {};
 
@@ -342,6 +357,9 @@
     const codewordEl = $('event-codeword-display');
     const csvEl = $('csv-url-display');
     const descEl = $('event-desc-display');
+    const fmtEl = $('event-format-display');
+    const sizeEl = $('event-boardsize-display');
+    const countEl = $('event-teamcount-display');
 
     if (nameEl) nameEl.textContent = eventConfig.name || 'Bingo 2026';
     if (codewordEl) codewordEl.textContent = eventConfig.codeword ? '••••••' : '(Not set)';
@@ -349,6 +367,9 @@
       ? teamsConfig.Team1.url
       : 'Not configured';
     if (descEl) descEl.textContent = eventConfig.description || '(No description)';
+    if (fmtEl) fmtEl.textContent = eventConfig.format || '-';
+    if (sizeEl) sizeEl.textContent = eventConfig.boardSize || '-';
+    if (countEl) countEl.textContent = eventConfig.teamCount || '-';
 
     const titleEl = $('admin-event-title');
     if (titleEl) titleEl.textContent = `${eventConfig.name || 'Bingo 2026'} Admin`;

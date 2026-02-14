@@ -246,6 +246,21 @@
         <div class="form-hint-text">Players can dismiss this banner</div>
       </div>
 
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Format</label>
+          <input type="text" id="event-format" class="form-input" placeholder="e.g. Lockout">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Board Size</label>
+          <input type="text" id="event-boardsize" class="form-input" placeholder="e.g. 7x7">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Team Count</label>
+          <input type="text" id="event-teamcount" class="form-input" placeholder="e.g. 2">
+        </div>
+      </div>
+
       <div class="form-group">
         <label class="form-label">CSV Data URL</label>
         <textarea id="csv-url" class="form-textarea" placeholder="https://docs.google.com/spreadsheets/export?..."></textarea>
@@ -254,6 +269,7 @@
 
       <div class="form-actions">
         <button class="btn" id="save-event-btn">💾 Save Event Configuration</button>
+        <button class="btn" id="import-csv-btn" style="margin-left:auto;">📥 Import Settings from CSV</button>
       </div>
     </div>
 
@@ -261,10 +277,12 @@
     <div class="settings-section">
       <h2 class="settings-section-title">📊 CSV Format Reference</h2>
       <div style="background:var(--bg-well); padding:12px; border-radius:4px; font-family:monospace; font-size:0.8rem; color:var(--text-dim); overflow-x:auto;">
-        <div style="color:var(--text-bright);">Image | Title | Description | Points | Team1Items | Team1Current | Team1Goal | Team2Items | Team2Current | Team2Goal | Team3Items | ...</div>
+        <div style="color:var(--text-bright);">BingoTitle | Codeword | Format | BoardSize | TeamCount | TeamNames | TileImage | TileTitle | TileDescription | TilePointValue | Team1Items | Team1Current | Team1Goal | ...</div>
         <div style="margin-top:8px; color:var(--text-dim);">
           Column Pattern:<br/>
-          Team N: Items(4+((N-1)*3)) | Current(5+((N-1)*3)) | Goal(6+((N-1)*3))
+          Metadata (Cols 0-5): Title, Codeword, Format, Size, Count, TeamNames<br/>
+          Tile Data (Starts Col 6): Image, Title, Desc, Points<br/>
+          Team N Data: Items(10+((N-1)*3)) | Current(11+((N-1)*3)) | Goal(12+((N-1)*3))
         </div>
       </div>
     </div>
@@ -300,7 +318,7 @@
 
   <script>
 (() => {
-  const APP_VERSION = '3.090';
+  const APP_VERSION = '3.100';
 
   const STORAGE_KEYS = {
     eventConfig: 'bingo-event-config',
@@ -328,7 +346,10 @@
     name: 'Bingo 2026',
     codeword: '',
     description: '',
-    syncInterval: 30000
+    syncInterval: 30000,
+    format: '',
+    boardSize: '',
+    teamCount: ''
   };
 
   let eventConfig = { ...DEFAULT_EVENT };
@@ -382,6 +403,9 @@
     eventConfig.name = ($('event-name').value.trim() || 'Bingo 2026').substring(0, 50);
     eventConfig.codeword = $('event-codeword').value.trim();
     eventConfig.description = $('event-description').value.trim();
+    eventConfig.format = $('event-format').value.trim();
+    eventConfig.boardSize = $('event-boardsize').value.trim();
+    eventConfig.teamCount = $('event-teamcount').value.trim();
 
     const csvUrl = $('csv-url').value.trim();
     
@@ -435,10 +459,68 @@
     showToast('✓ config.json downloaded!');
   };
 
+  const parseCSVRow = (row) => {
+    const cols = []; let cur = '', inQ = false;
+    for (let i = 0; i < row.length; i++) {
+      const ch = row[i];
+      if (inQ) {
+        if (ch === '"' && row[i + 1] === '"') { cur += '"'; i++; }
+        else if (ch === '"') inQ = false;
+        else cur += ch;
+      } else {
+        if (ch === '"') inQ = true;
+        else if (ch === ',') { cols.push(cur.trim()); cur = ''; }
+        else cur += ch;
+      }
+    }
+    cols.push(cur.trim());
+    return cols;
+  };
+
+  const importFromCSV = async () => {
+    const url = $('csv-url').value.trim();
+    if (!url) { showToast('❌ Enter CSV URL first'); return; }
+    
+    try {
+      showToast('⏳ Fetching CSV...');
+      const res = await fetch(url);
+      if (!res.ok) throw new Error('Fetch failed');
+      const text = await res.text();
+      const rows = text.split('\n');
+      if (rows.length < 2) throw new Error('CSV empty or missing data');
+      
+      // Parse first data row (index 1, assuming index 0 is header)
+      const dataRow = parseCSVRow(rows[1]);
+      
+      // 0:BingoTitle, 1:Codeword, 2:Format, 3:BoardSize, 4:TeamCount, 5:TeamNames
+      if (dataRow[0]) $('event-name').value = dataRow[0];
+      if (dataRow[1]) $('event-codeword').value = dataRow[1];
+      if (dataRow[2]) $('event-format').value = dataRow[2];
+      if (dataRow[3]) $('event-boardsize').value = dataRow[3];
+      if (dataRow[4]) $('event-teamcount').value = dataRow[4];
+      
+      if (dataRow[5]) {
+        const names = dataRow[5].split(',').map(s => s.trim());
+        names.forEach((name, idx) => {
+          const key = `Team${idx+1}`;
+          if (teamsConfig[key]) {
+            teamsConfig[key].name = name;
+          }
+        });
+        renderTeamsGrid(); // Refresh grid with new names
+      }
+      
+      showToast('✓ Settings populated! Click Save to persist.');
+    } catch (e) { showToast('❌ Import failed: ' + e.message); }
+  };
+
   const renderEventForm = () => {
     $('event-name').value = eventConfig.name || '';
     $('event-codeword').value = eventConfig.codeword || '';
     $('event-description').value = eventConfig.description || '';
+    $('event-format').value = eventConfig.format || '';
+    $('event-boardsize').value = eventConfig.boardSize || '';
+    $('event-teamcount').value = eventConfig.teamCount || '';
     
     // CSV URL is same for all teams
     const csvUrl = teamsConfig.Team1?.url || '';
@@ -484,6 +566,7 @@
     $('save-event-btn').addEventListener('click', saveEventConfig);
     $('save-teams-btn').addEventListener('click', saveTeamsConfig);
     $('download-config-btn').addEventListener('click', downloadConfig);
+    $('import-csv-btn').addEventListener('click', importFromCSV);
   };
 
   init();

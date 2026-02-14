@@ -700,7 +700,7 @@
 
   <script>
 (() => {
-  const APP_VERSION = '3.090';
+  const APP_VERSION = '3.100';
   const MAX_TILES = 49;
 
   const STORAGE_KEYS = {
@@ -915,7 +915,10 @@
     name: 'Bingo 2026',
     codeword: '',
     description: '',
-    syncInterval: 30000
+    syncInterval: 30000,
+    format: '',
+    boardSize: '',
+    teamCount: ''
   };
   let currentTeamKey = '';
   let codewordSecret = '';
@@ -1400,10 +1403,10 @@
       const teamNumber = team.teamNumber || 1;
       
       // Calculate which columns belong to this team
-      // Format: Image(0) | Title(1) | Desc(2) | Points(3) | Team1Items(4) | Team1Current(5) | Team1Goal(6) | Team2Items(7) | Team2Current(8) | Team2Goal(9) | ...
-      const itemsCol = 4 + ((teamNumber - 1) * 3);
-      const currentCol = 5 + ((teamNumber - 1) * 3);
-      const goalCol = 6 + ((teamNumber - 1) * 3);
+      // New Format: Metadata(0-5) | TileData(6-9) | TeamData(10+)
+      const itemsCol = 10 + ((teamNumber - 1) * 3);
+      const currentCol = 11 + ((teamNumber - 1) * 3);
+      const goalCol = 12 + ((teamNumber - 1) * 3);
 
       console.log(`Team: ${currentTeamKey} (Team${teamNumber}), Columns: Items=${itemsCol}, Current=${currentCol}, Goal=${goalCol}`);
 
@@ -1415,13 +1418,34 @@
         if (!line || !line.trim()) continue;
         
         const cols = parseCSVRow(line.trim());
-        if (cols.length < 4) continue;
+        if (cols.length < 10) continue;
+
+        // Parse Metadata from first data row
+        if (count === 0) {
+          if (cols[0]) {
+            eventConfig.name = cols[0];
+            const titleEl = document.getElementById('event-title');
+            if (titleEl) titleEl.innerText = eventConfig.name;
+          }
+          if (cols[1]) {
+            eventConfig.codeword = cols[1];
+            codewordSecret = eventConfig.codeword;
+          }
+          // Update Team Name from CSV if available (Col 5 = TeamNames)
+          if (cols[5]) {
+            const names = cols[5].split(',').map(s => s.trim());
+            if (names[teamNumber - 1]) {
+              DOM.teamName.innerText = names[teamNumber - 1];
+            }
+          }
+        }
         
         const id = count + 1;
-        const img = safeImgSrc(cols[0] || '');
-        const title = cols[1] || `Tile ${id}`;
-        const description = cols[2] || '';
-        const points = cols[3] || '0';
+        // Tile Data starts at col 6
+        const img = safeImgSrc(cols[6] || '');
+        const title = cols[7] || `Tile ${id}`;
+        const description = cols[8] || '';
+        const points = cols[9] || '0';
         
         const items = cols[itemsCol] ? cols[itemsCol].split(',').map(s => s.trim()).filter(Boolean) : [];
         const current = Math.max(0, parseInt(cols[currentCol], 10) || 0);
