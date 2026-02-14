@@ -298,6 +298,38 @@
       </div>
     </div>
 
+    <!-- GitHub Integration Section -->
+    <div class="settings-section">
+      <h2 class="settings-section-title">☁️ Cloud Save (GitHub)</h2>
+      <p style="font-size:0.9rem; color:var(--text-dim); margin-bottom:12px;">
+        Save settings directly to your repository without manual uploads. Requires a <a href="https://github.com/settings/tokens" target="_blank" style="color:var(--accent);">Personal Access Token</a> with <code>repo</code> scope.
+      </p>
+      
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Owner</label>
+          <input type="text" id="gh-owner" class="form-input" placeholder="e.g. username">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Repo Name</label>
+          <input type="text" id="gh-repo" class="form-input" placeholder="e.g. Bingotest">
+        </div>
+        <div class="form-group">
+          <label class="form-label">File Path</label>
+          <input type="text" id="gh-path" class="form-input" value="config.json">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Personal Access Token</label>
+        <input type="password" id="gh-token" class="form-input" placeholder="ghp_...">
+      </div>
+
+      <div class="form-actions">
+        <button class="btn" id="gh-save-btn">☁️ Commit to GitHub</button>
+      </div>
+    </div>
+
     <!-- Global Persistence Section -->
     <div class="settings-section">
       <h2 class="settings-section-title">🌍 Global Persistence</h2>
@@ -306,6 +338,7 @@
       </p>
       <div class="form-actions" style="margin-top:0; padding-top:0; border:none;">
         <button class="btn" id="download-config-btn">⬇️ Download config.json</button>
+        <button class="btn" id="load-live-btn" style="margin-left:auto;">🔄 Load Live Config</button>
       </div>
     </div>
   </div>
@@ -387,8 +420,13 @@
     // 1. Load from LocalStorage (fallback)
     eventConfig = storageLoad(STORAGE_KEYS.eventConfig, { ...DEFAULT_EVENT });
     teamsConfig = storageLoad(STORAGE_KEYS.teams, { ...DEFAULT_TEAMS });
+    // 1. Load Local Draft (pass null to check existence)
+    const localEvent = storageLoad(STORAGE_KEYS.eventConfig, null);
+    const localTeams = storageLoad(STORAGE_KEYS.teams, null);
 
     // 2. Try to load from config.json (Override)
+    // 2. Fetch Remote
+    let remoteData = null;
     try {
       const res = await fetch('config.json?t=' + Date.now());
       if (res.ok) {
@@ -396,7 +434,21 @@
         if (data.eventConfig) eventConfig = { ...eventConfig, ...data.eventConfig };
         if (data.teams) teamsConfig = data.teams;
       }
+      if (res.ok) remoteData = await res.json();
     } catch (e) { /* Ignore if file missing */ }
+
+    // 3. Priority: Local Draft > Remote > Defaults
+    if (localEvent || localTeams) {
+      eventConfig = localEvent || { ...DEFAULT_EVENT };
+      teamsConfig = localTeams || { ...DEFAULT_TEAMS };
+      if (remoteData) showToast('ℹ️ Loaded local draft. Use "Load Live Config" to discard.');
+    } else if (remoteData) {
+      if (remoteData.eventConfig) eventConfig = remoteData.eventConfig;
+      if (remoteData.teams) teamsConfig = remoteData.teams;
+    } else {
+      eventConfig = { ...DEFAULT_EVENT };
+      teamsConfig = { ...DEFAULT_TEAMS };
+    }
   };
 
   const saveEventConfig = () => {
@@ -421,6 +473,67 @@
     storageSave(STORAGE_KEYS.teams, teamsConfig);         // Then save teams with CSV URL
 
     showToast('✓ Saved locally! Don\'t forget to download & commit config.json.');
+  };
+
+  const saveToGitHub = async () => {
+    const owner = $('gh-owner').value.trim();
+    const repo = $('gh-repo').value.trim();
+    const path = $('gh-path').value.trim();
+    const token = $('gh-token').value.trim();
+
+    if (!owner || !repo || !path || !token) {
+      showToast('❌ Missing GitHub details');
+      return;
+    }
+
+    // Save GH settings locally
+    localStorage.setItem('bingo-gh-config', JSON.stringify({ owner, repo, path, token }));
+
+    const btn = $('gh-save-btn');
+    const originalText = btn.textContent;
+    btn.textContent = '⏳ Committing...';
+    btn.disabled = true;
+
+    try {
+      const apiUrl = `https://api.github.com/repos/${owner}/${repo}/contents/${path}`;
+      const headers = {
+        'Authorization': `token ${token}`,
+        'Accept': 'application/vnd.github.v3+json',
+        'Content-Type': 'application/json'
+      };
+
+      // 1. Get current SHA
+      let sha = null;
+      try {
+        const getRes = await fetch(apiUrl, { headers });
+        if (getRes.ok) {
+          const getData = await getRes.json();
+          sha = getData.sha;
+        }
+      } catch (e) { /* File might not exist yet */ }
+
+      // 2. Prepare content
+      const content = { eventConfig, teams: teamsConfig };
+      const jsonContent = JSON.stringify(content, null, 2);
+      // Base64 encode (handle UTF-8)
+      const b64Content = btoa(unescape(encodeURIComponent(jsonContent)));
+
+      // 3. PUT request
+      const body = {
+        message: `Update config.json via Admin Settings (v${APP_VERSION})`,
+        content: b64Content
+      };
+      if (sha) body.sha = sha;
+
+      const putRes = await fetch(apiUrl, { method: 'PUT', headers, body: JSON.stringify(body) });
+
+      if (!putRes.ok) {
+        const err = await putRes.json();
+        throw new Error(err.message || 'Commit failed');
+      }
+      showToast('✅ Successfully committed to GitHub!');
+    } catch (e) { showToast('❌ Error: ' + e.message); }
+    finally { btn.textContent = originalText; btn.disabled = false; }
   };
 
   const saveTeamsConfig = () => {
@@ -457,6 +570,22 @@
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
     showToast('✓ config.json downloaded!');
+  };
+
+  const loadLiveConfig = async () => {
+    try {
+      const res = await fetch('config.json?t=' + Date.now());
+      if (res.ok) {
+        const data = await res.json();
+        if (data.eventConfig) eventConfig = data.eventConfig;
+        if (data.teams) teamsConfig = data.teams;
+        renderEventForm();
+        renderTeamsGrid();
+        storageSave(STORAGE_KEYS.eventConfig, eventConfig);
+        storageSave(STORAGE_KEYS.teams, teamsConfig);
+        showToast('✓ Live config loaded and saved locally.');
+      } else { showToast('❌ config.json not found.'); }
+    } catch (e) { showToast('❌ Failed to load config.'); }
   };
 
   const parseCSVRow = (row) => {
@@ -558,8 +687,22 @@
     grid.appendChild(frag);
   };
 
+  const loadGhSettings = () => {
+    try {
+      const saved = localStorage.getItem('bingo-gh-config');
+      if (saved) {
+        const { owner, repo, path, token } = JSON.parse(saved);
+        if(owner) $('gh-owner').value = owner;
+        if(repo) $('gh-repo').value = repo;
+        if(path) $('gh-path').value = path;
+        if(token) $('gh-token').value = token;
+      }
+    } catch {}
+  };
+
   const init = async () => {
     await loadConfig();
+    loadGhSettings();
     renderEventForm();
     renderTeamsGrid();
 
@@ -567,6 +710,8 @@
     $('save-teams-btn').addEventListener('click', saveTeamsConfig);
     $('download-config-btn').addEventListener('click', downloadConfig);
     $('import-csv-btn').addEventListener('click', importFromCSV);
+    $('load-live-btn').addEventListener('click', loadLiveConfig);
+    $('gh-save-btn').addEventListener('click', saveToGitHub);
   };
 
   init();
