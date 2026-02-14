@@ -336,6 +336,7 @@
           <div class="stat-item"><span class="stat-label">Format</span><span class="stat-value" id="event-format-display">-</span></div>
           <div class="stat-item"><span class="stat-label">Board Size</span><span class="stat-value" id="event-boardsize-display">-</span></div>
           <div class="stat-item"><span class="stat-label">Team Count</span><span class="stat-value" id="event-teamcount-display">-</span></div>
+          <div class="stat-item"><span class="stat-label">Bonuses</span><span class="stat-value" id="event-bonuses-display">-</span></div>
           <div class="stat-item" style="grid-column: 1/-1;">
             <span class="stat-label">CSV URL</span>
             <span style="font-size:0.75rem; color:var(--text-dim); word-break:break-all;" id="csv-url-display">Not configured</span>
@@ -377,14 +378,14 @@
   </div>
 
   <footer class="page-footer">
-    <span>v3.310</span>
+    <span>v3.311</span>
     <span>&middot;</span>
     <span>Bingo Board Admin</span>
   </footer>
 
   <script>
 (() => {
-  const APP_VERSION = '3.310';
+  const APP_VERSION = '3.311';
 
   const STORAGE_KEYS = {
     eventConfig: 'bingo-event-config',
@@ -685,6 +686,7 @@
     const fmtEl = $('event-format-display');
     const sizeEl = $('event-boardsize-display');
     const countEl = $('event-teamcount-display');
+    const bonusEl = $('event-bonuses-display');
 
     if (nameEl) nameEl.textContent = eventConfig.name || 'Bingo 2026';
     if (codewordEl) codewordEl.textContent = eventConfig.codeword || '(Not set)';
@@ -694,6 +696,10 @@
     if (fmtEl) fmtEl.textContent = eventConfig.format || '-';
     if (sizeEl) sizeEl.textContent = eventConfig.boardSize || '-';
     if (countEl) countEl.textContent = eventConfig.teamCount || '-';
+    if (bonusEl) {
+      const b = eventConfig.bonuses || { row:0, col:0, diag:0 };
+      bonusEl.textContent = `R:${b.row} | C:${b.col} | D:${b.diag}`;
+    }
 
     const titleEl = $('admin-event-title');
     if (titleEl) titleEl.textContent = `${eventConfig.name || 'Bingo 2026'} | Admin`;
@@ -744,14 +750,14 @@
   };
 
   const calculateBingos = (grid, cols, rows) => {
-    let count = 0;
+    let rCount = 0, cCount = 0, dCount = 0;
     // Rows
     for (let r = 0; r < rows; r++) {
       let full = true;
       for (let c = 0; c < cols; c++) {
         if (!grid[r * cols + c]) { full = false; break; }
       }
-      if (full) count++;
+      if (full) rCount++;
     }
     // Cols
     for (let c = 0; c < cols; c++) {
@@ -759,7 +765,7 @@
       for (let r = 0; r < rows; r++) {
         if (!grid[r * cols + c]) { full = false; break; }
       }
-      if (full) count++;
+      if (full) cCount++;
     }
     // Diagonals (if square)
     if (cols === rows) {
@@ -767,14 +773,14 @@
       for (let i = 0; i < cols; i++) {
         if (!grid[i * cols + i]) { full1 = false; break; }
       }
-      if (full1) count++;
+      if (full1) dCount++;
       let full2 = true;
       for (let i = 0; i < cols; i++) {
         if (!grid[i * cols + (cols - 1 - i)]) { full2 = false; break; }
       }
-      if (full2) count++;
+      if (full2) dCount++;
     }
-    return count;
+    return { rows: rCount, cols: cCount, diags: dCount, total: rCount + cCount + dCount };
   };
 
   const renderTileStats = (tileStats, totalTeams) => {
@@ -922,6 +928,13 @@
         }
         if (metaCols[4]) eventConfig.teamCount = metaCols[4];
 
+        // Parse Bonuses from Col 10 in Rows 2, 3, 4 (Indices 2, 3, 4)
+        let rowBonus = 0, colBonus = 0, diagBonus = 0;
+        if (rows[2]) { const c = parseCSVRow(rows[2]); rowBonus = parseInt(c[10]) || 0; }
+        if (rows[3]) { const c = parseCSVRow(rows[3]); colBonus = parseInt(c[10]) || 0; }
+        if (rows[4]) { const c = parseCSVRow(rows[4]); diagBonus = parseInt(c[10]) || 0; }
+        eventConfig.bonuses = { row: rowBonus, col: colBonus, diag: diagBonus };
+
         // Update Teams from vertical column 5 (index 5) in rows 1..N
         Object.values(teamsConfig).forEach(team => {
           const tNum = team.teamNumber;
@@ -967,7 +980,9 @@
 
         // Calculate Bingos
         Object.keys(teamsConfig).forEach(key => {
-          teamsConfig[key].bingos = calculateBingos(teamCompletions[key], gridCols, gridRows);
+          const stats = calculateBingos(teamCompletions[key], gridCols, gridRows);
+          teamsConfig[key].bingos = stats.total;
+          teamsConfig[key].points += (stats.rows * rowBonus) + (stats.cols * colBonus) + (stats.diags * diagBonus);
         });
 
         // Persist updates to storage so loadConfig() doesn't revert them next cycle
