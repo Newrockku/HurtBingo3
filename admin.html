@@ -378,14 +378,14 @@
   </div>
 
   <footer class="page-footer">
-    <span>v3.311</span>
+    <span>v3.312</span>
     <span>&middot;</span>
     <span>Bingo Board Admin</span>
   </footer>
 
   <script>
 (() => {
-  const APP_VERSION = '3.311';
+  const APP_VERSION = '3.312';
 
   const STORAGE_KEYS = {
     eventConfig: 'bingo-event-config',
@@ -836,8 +836,8 @@
 
       // Calculate completion
       const teamNum = team.teamNumber || 1;
-      const currentCol = 11 + ((teamNum - 1) * 3);
-      const goalCol = 12 + ((teamNum - 1) * 3);
+      const currentCol = 12 + ((teamNum - 1) * 3);
+      const goalCol = 13 + ((teamNum - 1) * 3);
       
       let gridHtml = '';
       for(let i=0; i<maxTiles; i++) {
@@ -966,8 +966,8 @@
 
           Object.entries(teamsConfig).forEach(([key, team]) => {
             const tNum = team.teamNumber;
-            const curCol = 11 + ((tNum - 1) * 3);
-            const goalCol = 12 + ((tNum - 1) * 3);
+            const curCol = 12 + ((tNum - 1) * 3);
+            const goalCol = 13 + ((tNum - 1) * 3);
             const cur = parseInt(cols[curCol], 10) || 0;
             const goal = parseInt(cols[goalCol], 10) || 1;
             if (cur >= goal) {

@@ -574,7 +574,7 @@
   <main class="grid-container" id="grid" role="grid" aria-label="Bingo board"></main>
 
   <footer class="page-footer">
-    <span>v3.311</span>
+    <span>v3.312</span>
     <span>&middot;</span>
     <span id="last-sync-text" aria-live="polite">Last Sync: Never</span>
     <span class="sync-btn" id="sync-now" role="button" tabindex="0">[Sync Now]</span>
@@ -727,14 +727,14 @@
           </div>
         </div>
 
-        <div class="settings-version">Bingo Board &middot; v3.311</div>
+        <div class="settings-version">Bingo Board &middot; v3.312</div>
       </div>
     </div>
   </div>
 
   <script>
 (() => {
-  const APP_VERSION = '3.311';
+  const APP_VERSION = '3.312';
   let maxTiles = 49;
   let gridCols = 7;
   let gridRows = 7;
@@ -1596,10 +1596,10 @@
       const teamNumber = team.teamNumber || 1;
       
       // Calculate which columns belong to this team
-      // New Format: Metadata(0-5) | TileData(6-9) | TeamData(10+)
-      const itemsCol = 10 + ((teamNumber - 1) * 3);
-      const currentCol = 11 + ((teamNumber - 1) * 3);
-      const goalCol = 12 + ((teamNumber - 1) * 3);
+      // New Format: Metadata(0-5) | TileData(6-9) | Bonus(10) | TeamData(11+)
+      const itemsCol = 11 + ((teamNumber - 1) * 3);
+      const currentCol = 12 + ((teamNumber - 1) * 3);
+      const goalCol = 13 + ((teamNumber - 1) * 3);
 
       console.log(`Team: ${currentTeamKey} (Team${teamNumber}), Columns: Items=${itemsCol}, Current=${currentCol}, Goal=${goalCol}`);
 
