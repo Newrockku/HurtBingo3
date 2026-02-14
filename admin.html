@@ -237,6 +237,12 @@
       font-size: 0.75rem; color: var(--text-dim);
     }
 
+    .stat-list-item {
+      display: flex; justify-content: space-between; padding: 4px 0;
+      border-bottom: 1px solid var(--bg-well); font-size: 0.9rem;
+    }
+    .stat-list-item:last-child { border-bottom: none; }
+
     @media (max-width: 768px) {
       body { padding: 12px; }
       .admin-header { padding: 12px; }
@@ -325,6 +331,21 @@
       </div>
     </div>
 
+    <!-- Tile Statistics -->
+    <div class="card" style="grid-column: 1 / -1;">
+      <h2 class="card-title">📊 Tile Statistics</h2>
+      <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap:30px;">
+        <div>
+          <h3 style="font-size:1rem; color:var(--text-dim); border-bottom:1px solid var(--border-main); padding-bottom:5px; margin-top:0;">Easiest Tiles (Most Completed)</h3>
+          <div id="stats-most-completed" style="display:flex; flex-direction:column; gap:2px;"></div>
+        </div>
+        <div>
+          <h3 style="font-size:1rem; color:var(--text-dim); border-bottom:1px solid var(--border-main); padding-bottom:5px; margin-top:0;">Hardest Tiles (Least Completed)</h3>
+          <div id="stats-least-completed" style="display:flex; flex-direction:column; gap:2px;"></div>
+        </div>
+      </div>
+    </div>
+
     <!-- Team Boards Grid -->
     <div style="grid-column: 1 / -1;">
       <h2 class="section-title">Team Boards</h2>
@@ -335,14 +356,14 @@
   </div>
 
   <footer class="page-footer">
-    <span>v3.305</span>
+    <span>v3.306</span>
     <span>&middot;</span>
     <span>Bingo Board Admin</span>
   </footer>
 
   <script>
 (() => {
-  const APP_VERSION = '3.305';
+  const APP_VERSION = '3.306';
 
   const STORAGE_KEYS = {
     eventConfig: 'bingo-event-config',
@@ -664,7 +685,8 @@
     const teams = Object.entries(teamsConfig).map(([key, team]) => ({
       key,
       name: team.name || key,
-      points: team.points || 0
+      points: team.points || 0,
+      bingos: team.bingos || 0
     }));
 
     teams.sort((a, b) => b.points - a.points);
@@ -686,7 +708,10 @@
 
       row.innerHTML = `
         <div class="leaderboard-rank">${medal || idx + 1}</div>
-        <div class="leaderboard-name">${team.name}</div>
+        <div class="leaderboard-name">
+          ${team.name}
+          <span style="font-size:0.75rem; color:var(--text-dim); margin-left:6px;">(${team.bingos} Bingos)</span>
+        </div>
         <div class="leaderboard-points">${team.points}</div>
       `;
 
@@ -695,6 +720,60 @@
 
     container.innerHTML = '';
     container.appendChild(frag);
+  };
+
+  const calculateBingos = (grid, cols, rows) => {
+    let count = 0;
+    // Rows
+    for (let r = 0; r < rows; r++) {
+      let full = true;
+      for (let c = 0; c < cols; c++) {
+        if (!grid[r * cols + c]) { full = false; break; }
+      }
+      if (full) count++;
+    }
+    // Cols
+    for (let c = 0; c < cols; c++) {
+      let full = true;
+      for (let r = 0; r < rows; r++) {
+        if (!grid[r * cols + c]) { full = false; break; }
+      }
+      if (full) count++;
+    }
+    // Diagonals (if square)
+    if (cols === rows) {
+      let full1 = true;
+      for (let i = 0; i < cols; i++) {
+        if (!grid[i * cols + i]) { full1 = false; break; }
+      }
+      if (full1) count++;
+      let full2 = true;
+      for (let i = 0; i < cols; i++) {
+        if (!grid[i * cols + (cols - 1 - i)]) { full2 = false; break; }
+      }
+      if (full2) count++;
+    }
+    return count;
+  };
+
+  const renderTileStats = (tileStats, totalTeams) => {
+    const mostEl = $('stats-most-completed');
+    const leastEl = $('stats-least-completed');
+    if (!mostEl || !leastEl) return;
+
+    // Sort by count
+    const sorted = [...tileStats].sort((a, b) => b.count - a.count);
+    const most = sorted.slice(0, 5);
+    const least = sorted.slice(-5).reverse(); // Show 0s
+
+    const createRow = (t) => `
+      <div class="stat-list-item">
+        <span style="color:var(--text-bright);">${t.id}. ${t.title}</span>
+        <span style="font-weight:bold; color:${t.count > 0 ? 'var(--accent)' : 'var(--text-dim)'};">${t.count}/${totalTeams}</span>
+      </div>`;
+
+    mostEl.innerHTML = most.map(createRow).join('') || '<div style="color:var(--text-dim)">No data</div>';
+    leastEl.innerHTML = least.map(createRow).join('') || '<div style="color:var(--text-dim)">No data</div>';
   };
 
   const updateBoardSize = (sizeStr) => {
@@ -834,20 +913,40 @@
         // Calculate Points for all teams
         Object.keys(teamsConfig).forEach(k => teamsConfig[k].points = 0); // Reset
 
+        // Prepare for Stats
+        const maxTiles = gridCols * gridRows;
+        const tileStats = Array.from({length: maxTiles}, (_, i) => ({ id: i+1, title: `Tile ${i+1}`, count: 0 }));
+        const teamCompletions = {};
+        Object.keys(teamsConfig).forEach(k => teamCompletions[k] = new Array(maxTiles).fill(false));
+
         const dataRows = rows.slice(1); // Skip header
-        dataRows.forEach(row => {
+        dataRows.forEach((row, rIndex) => {
+          if (rIndex >= maxTiles) return;
           const cols = parseCSVRow(row);
           if (cols.length < 10) return;
+          
+          // Tile Title for Stats
+          if (cols[7]) tileStats[rIndex].title = cols[7];
+
           const points = parseInt(cols[9], 10) || 0;
 
-          Object.values(teamsConfig).forEach(team => {
+          Object.entries(teamsConfig).forEach(([key, team]) => {
             const tNum = team.teamNumber;
             const curCol = 11 + ((tNum - 1) * 3);
             const goalCol = 12 + ((tNum - 1) * 3);
             const cur = parseInt(cols[curCol], 10) || 0;
             const goal = parseInt(cols[goalCol], 10) || 1;
-            if (cur >= goal) team.points += points;
+            if (cur >= goal) {
+              team.points += points;
+              teamCompletions[key][rIndex] = true;
+              tileStats[rIndex].count++;
+            }
           });
+        });
+
+        // Calculate Bingos
+        Object.keys(teamsConfig).forEach(key => {
+          teamsConfig[key].bingos = calculateBingos(teamCompletions[key], gridCols, gridRows);
         });
 
         // Persist updates to storage so loadConfig() doesn't revert them next cycle
@@ -856,6 +955,7 @@
         
         // Update UI components that depend on metadata
         renderEventOverview();
+        renderTileStats(tileStats, Object.keys(teamsConfig).length);
         renderLeaderboard();
       }
 
