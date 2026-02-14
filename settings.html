@@ -393,8 +393,6 @@
     storageSave(STORAGE_KEYS.teams, teamsConfig);         // Then save teams with CSV URL
   };
 
-  };
-
   const parseCSVRow = (row) => {
     const cols = []; let cur = '', inQ = false;
     for (let i = 0; i < row.length; i++) {
