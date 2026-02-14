@@ -83,7 +83,7 @@
 
     .dashboard-container {
       max-width: 1400px; margin: 0 auto;
-      display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
       gap: 30px;
     }
 
@@ -145,6 +145,11 @@
     .stat-value {
       font-size: 1.3rem; font-weight: bold;
       color: var(--text-main);
+    }
+
+    .stats-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 30px;
     }
 
     /* Boards Grid */
@@ -247,7 +252,10 @@
       body { padding: 12px; }
       .admin-header { padding: 12px; }
       .admin-header-left h1 { font-size: 1.4rem; }
-      .dashboard-container { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 600px) {
+      .dashboard-container { gap: 15px; }
+      .stats-grid { gap: 15px; }
     }
   </style>
 </head>
@@ -334,7 +342,7 @@
     <!-- Tile Statistics -->
     <div class="card">
       <h2 class="card-title">📊 Tile Statistics</h2>
-      <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap:30px;">
+      <div class="stats-grid">
         <div>
           <h3 style="font-size:1rem; color:var(--text-dim); border-bottom:1px solid var(--border-main); padding-bottom:5px; margin-top:0;">Easiest Tiles (Most Completed)</h3>
           <div id="stats-most-completed" style="display:flex; flex-direction:column; gap:2px;"></div>
@@ -356,14 +364,14 @@
   </div>
 
   <footer class="page-footer">
-    <span>v3.307</span>
+    <span>v3.308</span>
     <span>&middot;</span>
     <span>Bingo Board Admin</span>
   </footer>
 
   <script>
 (() => {
-  const APP_VERSION = '3.307';
+  const APP_VERSION = '3.308';
 
   const STORAGE_KEYS = {
     eventConfig: 'bingo-event-config',
