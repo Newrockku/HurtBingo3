@@ -5,26 +5,26 @@
     "description": "Test Description",
     "syncInterval": 30000,
     "format": "Blackout",
-    "boardSize": "5 x 5",
+    "boardSize": "7 x 7",
     "teamCount": "6"
   },
   "teams": {
     "Team1": {
       "name": "Hurt",
       "url": "https://docs.google.com/spreadsheets/d/e/2PACX-1vRFOGe_j8BL0X5Cwvy3LNmsrWG82IAXlWpump0Sw6PKWLz-1gxbisdbPuTmJ_CmjLA_q-Q6y9jTfFwq/pub?gid=1593254680&single=true&output=csv",
-      "points": 0,
+      "points": 107,
       "teamNumber": 1
     },
     "Team2": {
       "name": "Team 2",
       "url": "https://docs.google.com/spreadsheets/d/e/2PACX-1vRFOGe_j8BL0X5Cwvy3LNmsrWG82IAXlWpump0Sw6PKWLz-1gxbisdbPuTmJ_CmjLA_q-Q6y9jTfFwq/pub?gid=1593254680&single=true&output=csv",
-      "points": 0,
+      "points": 28,
       "teamNumber": 2
     },
     "Team3": {
       "name": "Team 3",
       "url": "https://docs.google.com/spreadsheets/d/e/2PACX-1vRFOGe_j8BL0X5Cwvy3LNmsrWG82IAXlWpump0Sw6PKWLz-1gxbisdbPuTmJ_CmjLA_q-Q6y9jTfFwq/pub?gid=1593254680&single=true&output=csv",
-      "points": 0,
+      "points": 24,
       "teamNumber": 3
     },
     "Team4": {

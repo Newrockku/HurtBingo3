@@ -574,7 +574,7 @@
   <main class="grid-container" id="grid" role="grid" aria-label="Bingo board"></main>
 
   <footer class="page-footer">
-    <span>v3.302</span>
+    <span>v3.303</span>
     <span>&middot;</span>
     <span id="last-sync-text" aria-live="polite">Last Sync: Never</span>
     <span class="sync-btn" id="sync-now" role="button" tabindex="0">[Sync Now]</span>
@@ -727,14 +727,14 @@
           </div>
         </div>
 
-        <div class="settings-version">Bingo Board &middot; v3.302</div>
+        <div class="settings-version">Bingo Board &middot; v3.303</div>
       </div>
     </div>
   </div>
 
   <script>
 (() => {
-  const APP_VERSION = '3.302';
+  const APP_VERSION = '3.303';
   let maxTiles = 49;
   let gridCols = 7;
   let gridRows = 7;
@@ -967,6 +967,7 @@
   let syncIntervalId = null;
   let syncMs = 30000;
   let modalOpen = false;
+  let currentModalTileIndex = null;
   let lastTriggerEl = null;
   let ghostEl = null;
 
@@ -1308,6 +1309,7 @@
     DOM.overlay.classList.remove('active');
     DOM.box.classList.remove('active');
     modalOpen = false;
+    currentModalTileIndex = null;
     if (ghostEl?.isConnected) ghostEl.classList.remove('ghost');
     setTimeout(() => {
       DOM.overlay.style.display = 'none';
@@ -1316,14 +1318,8 @@
     }, 500);
   };
 
-  const openTileModalByIndex = (tileIndex, triggerEl) => {
-    const t = tiles[tileIndex];
-    if (!t || t.noData) return;
-    
+  const updateModalContent = (t) => {
     DOM.box.classList.toggle('completed', !!t.isCompleted);
-    hideViews();
-    DOM.viewStd.style.display = 'block';
-    
     DOM.modalHeader.innerText = `${t.id} | ${t.title}`;
     DOM.modalPoints.innerText = `${t.points} PTS`;
     DOM.modalProgressSection.style.display = t.isCompleted ? 'none' : 'block';
@@ -1332,17 +1328,30 @@
     DOM.modalList.innerHTML = t.checklistHtml || '';
     DOM.modalDesc.innerText = t.description || '(No description)';
     
-    DOM.modalImage.src = '';
-    DOM.modalImage.onerror = null;
-    DOM.modalImage.style.visibility = 'visible';
     DOM.modalImage.alt = t.title;
+    DOM.modalImage.onerror = () => handleImgError(DOM.modalImage);
     
     if (t.img) {
-      DOM.modalImage.onerror = () => handleImgError(DOM.modalImage);
-      DOM.modalImage.src = t.img;
+      if (DOM.modalImage.getAttribute('src') !== t.img) {
+        DOM.modalImage.style.visibility = 'visible';
+        DOM.modalImage.src = t.img;
+      }
     } else {
       handleImgError(DOM.modalImage);
     }
+  };
+
+  const openTileModalByIndex = (tileIndex, triggerEl) => {
+    const t = tiles[tileIndex];
+    if (!t || t.noData) return;
+    
+    currentModalTileIndex = tileIndex;
+    hideViews();
+    DOM.viewStd.style.display = 'block';
+    
+    DOM.modalImage.src = '';
+    DOM.modalImage.style.visibility = 'visible';
+    updateModalContent(t);
     
     showModal(triggerEl, true);
   };
@@ -1617,6 +1626,11 @@
 
       renderGrid();
       updateCompletedStat();
+
+      if (modalOpen && currentModalTileIndex !== null) {
+        const t = tiles[currentModalTileIndex];
+        if (t) updateModalContent(t);
+      }
     } catch (e) {
       if (e.name !== 'AbortError') { console.error(e); syncError('Network error'); }
     } finally { fetchController = null; }
