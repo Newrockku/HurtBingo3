@@ -335,14 +335,14 @@
   </div>
 
   <footer class="page-footer">
-    <span>v3.230</span>
+    <span>v3.240</span>
     <span>&middot;</span>
     <span>Bingo Board Admin</span>
   </footer>
 
   <script>
 (() => {
-  const APP_VERSION = '3.230';
+  const APP_VERSION = '3.240';
 
   const STORAGE_KEYS = {
     eventConfig: 'bingo-event-config',
@@ -563,7 +563,9 @@
   let teamsConfig = {};
   let gridCols = 7;
   let gridRows = 7;
-  let lastSeenHash = null;
+  let appliedHash = null;
+  let candidateHash = null;
+  let stabilityCount = 0;
   let fetchController = null;
 
   const $ = id => document.getElementById(id);
@@ -777,8 +779,29 @@
       if (fetchController.signal.aborted) return;
       
       const h = simpleHash(text);
-      if (lastSeenHash === h) return;
-      lastSeenHash = h;
+      
+      // Stability Check: Prevent flickering by requiring 2 consecutive identical reads
+      if (appliedHash === null) {
+        appliedHash = h; // First load, trust immediately
+      } else if (h === appliedHash) {
+        candidateHash = null;
+        stabilityCount = 0;
+        return; // No change
+      } else {
+        // Content changed
+        if (h === candidateHash) {
+          stabilityCount++;
+        } else {
+          candidateHash = h;
+          stabilityCount = 1;
+        }
+        
+        if (stabilityCount < 2) return; // Wait for confirmation
+        
+        appliedHash = h;
+        candidateHash = null;
+        stabilityCount = 0;
+      }
 
       const rows = text.split('\n').map(r => r.trim()).filter(r => r);
       
