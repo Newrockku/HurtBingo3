@@ -336,7 +336,7 @@
   </div>
 
   <footer class="page-footer">
-    <span>v3.303</span>
+    <span>v3.304</span>
     <span>&middot;</span>
     <span>Bingo Board Settings</span>
   </footer>
@@ -345,7 +345,7 @@
 
   <script>
 (() => {
-  const APP_VERSION = '3.303';
+  const APP_VERSION = '3.304';
 
   const STORAGE_KEYS = {
     eventConfig: 'bingo-event-config',
@@ -662,12 +662,17 @@
       // Rebuild Teams based on Count
       const count = parseInt(eventConfig.teamCount, 10) || 8;
       const newTeams = {};
-      const names = dataRow[5] ? dataRow[5].split(',').map(s => s.trim()) : [];
 
       for (let i = 1; i <= count; i++) {
         const key = `Team${i}`;
+        let tName = `Team ${i}`;
+        if (rows[i]) {
+           const rCols = parseCSVRow(rows[i]);
+           if (rCols[5]) tName = rCols[5];
+        }
+
         newTeams[key] = {
-          name: names[i-1] || `Team ${i}`,
+          name: tName,
           url: url,
           points: teamsConfig[key]?.points || 0,
           teamNumber: i

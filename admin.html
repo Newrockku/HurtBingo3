@@ -335,14 +335,14 @@
   </div>
 
   <footer class="page-footer">
-    <span>v3.303</span>
+    <span>v3.304</span>
     <span>&middot;</span>
     <span>Bingo Board Admin</span>
   </footer>
 
   <script>
 (() => {
-  const APP_VERSION = '3.303';
+  const APP_VERSION = '3.304';
 
   const STORAGE_KEYS = {
     eventConfig: 'bingo-event-config',
@@ -722,8 +722,7 @@
     const maxTiles = gridCols * gridRows;
 
     teams.forEach(([key, team]) => {
-      const baseUrl = window.location.origin + window.location.pathname.replace('admin.html', 'index.html');
-      const teamUrl = `${baseUrl}?team=${key}&fromAdmin=true`;
+      const teamUrl = `index.html?team=${key}&fromAdmin=true`;
       
       const card = document.createElement('a');
       card.className = 'team-board-card';
@@ -823,16 +822,14 @@
         }
         if (metaCols[4]) eventConfig.teamCount = metaCols[4];
 
-        // Update Teams if names provided
-        if (metaCols[5]) {
-          const names = metaCols[5].split(',').map(s => s.trim());
-          Object.keys(teamsConfig).forEach(key => {
-            const tNum = teamsConfig[key].teamNumber;
-            if (tNum && names[tNum - 1]) {
-              teamsConfig[key].name = names[tNum - 1];
-            }
-          });
-        }
+        // Update Teams from vertical column 5 (index 5) in rows 1..N
+        Object.values(teamsConfig).forEach(team => {
+          const tNum = team.teamNumber;
+          if (tNum && rows[tNum]) {
+             const rCols = parseCSVRow(rows[tNum]);
+             if (rCols[5]) team.name = rCols[5];
+          }
+        });
 
         // Calculate Points for all teams
         Object.keys(teamsConfig).forEach(k => teamsConfig[k].points = 0); // Reset
