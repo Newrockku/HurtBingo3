@@ -43,7 +43,7 @@
 
     .settings-header {
       background: var(--bg-tile); border: 2px solid var(--border-main);
-      padding: 20px; margin-bottom: 30px;
+      padding: 20px; margin: 0 auto 30px auto; max-width: 900px;
       display: flex; justify-content: space-between; align-items: center;
       flex-wrap: wrap; gap: 15px;
       box-shadow: 0 4px 15px rgba(0,0,0,0.5);
@@ -345,7 +345,7 @@
   </div>
 
   <footer class="page-footer">
-    <span>v3.315</span>
+    <span>v3.316</span>
     <span>&middot;</span>
     <span>Bingo Board Settings</span>
   </footer>
@@ -354,7 +354,7 @@
 
   <script>
 (() => {
-  const APP_VERSION = '3.315';
+  const APP_VERSION = '3.316';
 
   const STORAGE_KEYS = {
     eventConfig: 'bingo-event-config',
