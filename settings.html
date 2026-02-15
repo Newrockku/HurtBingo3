@@ -306,6 +306,15 @@
         <div class="form-hint-text">Defined in CSV (Tile Description of first tile if used as meta, or custom logic)</div>
       </div>
 
+      <div class="form-group">
+        <label class="form-label">Security</label>
+        <div class="settings-row" style="justify-content: flex-start; gap: 10px;">
+          <input type="checkbox" id="event-require-passcodes" style="width:18px; height:18px; cursor:pointer;">
+          <label for="event-require-passcodes" class="settings-row-label" style="cursor:pointer;">Require Team Passcodes</label>
+        </div>
+        <div class="form-hint-text">If unchecked, passcodes are ignored and players can switch teams freely.</div>
+      </div>
+
       <!-- Team Passcodes Section -->
       <div class="settings-section" style="margin-top: 20px; box-shadow: none; border: none; padding: 0; background: none;">
         <h3 class="settings-section-title" style="border: none; color: var(--text-bright);">🔒 Team Passcodes</h3>
@@ -342,7 +351,7 @@
   </div>
 
   <footer class="page-footer">
-    <span>v3.317</span>
+    <span>v3.318</span>
     <span>&middot;</span>
     <span>Bingo Board Settings</span>
   </footer>
@@ -351,7 +360,7 @@
 
   <script>
 (() => {
-  const APP_VERSION = '3.317';
+  const APP_VERSION = '3.318';
 
   const STORAGE_KEYS = {
     eventConfig: 'bingo-event-config',
@@ -382,7 +391,8 @@
     syncInterval: 30000,
     format: '',
     boardSize: '',
-    teamCount: ''
+    teamCount: '',
+    requirePasscodes: true
   };
 
   const THEME_VARS = [
@@ -645,6 +655,12 @@
     // 1. Load from LocalStorage (fallback)
     eventConfig = storageLoad(STORAGE_KEYS.eventConfig, { ...DEFAULT_EVENT });
     teamsConfig = storageLoad(STORAGE_KEYS.teams, { ...DEFAULT_TEAMS });
+    
+    // Fix: Ensure teamsConfig is populated if storage was empty object
+    if (!teamsConfig || Object.keys(teamsConfig).length === 0) {
+      teamsConfig = { ...DEFAULT_TEAMS };
+    }
+
     const savedTheme = storageLoad(STORAGE_KEYS.theme, 'osrs');
     applyTheme(savedTheme);
   };
@@ -752,6 +768,7 @@
     $('event-format').value = eventConfig.format || '';
     $('event-boardsize').value = eventConfig.boardSize || '';
     $('event-teamcount').value = eventConfig.teamCount || '';
+    $('event-require-passcodes').checked = eventConfig.requirePasscodes !== false;
     
     // CSV URL is same for all teams
     const csvUrl = teamsConfig.Team1?.url || '';
@@ -777,6 +794,11 @@
 
     $('import-csv-btn').addEventListener('click', importFromCSV);
     $('download-config-btn').addEventListener('click', downloadConfig);
+    
+    $('event-require-passcodes').addEventListener('change', (e) => {
+      eventConfig.requirePasscodes = e.target.checked;
+      storageSave(STORAGE_KEYS.eventConfig, eventConfig);
+    });
   };
 
   init();

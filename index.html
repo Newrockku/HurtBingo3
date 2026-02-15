@@ -757,7 +757,7 @@
 
   <script>
 (() => {
-  const APP_VERSION = '3.317';
+  const APP_VERSION = '3.318';
   let maxTiles = 49;
   let gridCols = 7;
   let gridRows = 7;
@@ -2067,6 +2067,9 @@
   }
 
   const checkPasscode = (adminMode, fromAdmin) => {
+    // If passcodes are disabled globally, allow access
+    if (eventConfig.requirePasscodes === false) return true;
+
     const team = TEAM_MAP[currentTeamKey];
     // If no team selected, or admin mode, or no passcode set -> allow
     if (!team || !team.passcode || adminMode || fromAdmin) return true;
