@@ -17,10 +17,11 @@
     }
     * { box-sizing: border-box; }
     html { scrollbar-gutter: stable; overflow-y: scroll; }
-    ::-webkit-scrollbar { width: 8px; }
+    ::-webkit-scrollbar { width: 8px; height: 8px; }
     ::-webkit-scrollbar-track { background: var(--bg-well); }
     ::-webkit-scrollbar-thumb { background: var(--bg-tile); border: 2px solid var(--bg-well); }
     ::-webkit-scrollbar-thumb:hover { background: var(--border-main); }
+    ::-webkit-scrollbar-corner { background: var(--bg-well); }
     body {
       background-color: var(--bg-body); color: var(--text-main);
       font-family: 'Cabin Condensed', sans-serif; margin: 0; padding: 20px;
@@ -172,14 +173,14 @@
   </div>
 
   <footer class="page-footer">
-    <span>v3.329</span>
+    <span>v3.330</span>
     <span>&middot;</span>
     <span>Bingo Gains Tracker</span>
   </footer>
 
   <script>
   (() => {
-    const APP_VERSION = '3.329';
+    const APP_VERSION = '3.330';
     const SNAPSHOT_1_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRFOGe_j8BL0X5Cwvy3LNmsrWG82IAXlWpump0Sw6PKWLz-1gxbisdbPuTmJ_CmjLA_q-Q6y9jTfFwq/pub?gid=138917819&single=true&output=csv';
     const SNAPSHOT_2_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRFOGe_j8BL0X5Cwvy3LNmsrWG82IAXlWpump0Sw6PKWLz-1gxbisdbPuTmJ_CmjLA_q-Q6y9jTfFwq/pub?gid=2084936163&single=true&output=csv';
 
