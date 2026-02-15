@@ -49,8 +49,8 @@
     .gains-container { max-width: 95%; margin: 0 auto; }
     .table-wrapper {
       background: var(--bg-tile); border: 2px solid var(--border-main);
-      padding: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.3);
-      overflow-x: auto;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+      overflow: auto; max-height: 65vh;
     }
     table {
       width: 100%; border-collapse: collapse; font-size: 0.9rem;
@@ -66,6 +66,8 @@
       font-weight: bold; color: var(--text-bright);
       text-transform: uppercase; letter-spacing: 0.5px;
       cursor: pointer; user-select: none;
+      position: sticky; top: 0; z-index: 15;
+      background-color: var(--bg-well);
     }
     th:hover { background-color: var(--bg-body); color: var(--accent); }
     th .sort-arrow {
@@ -119,14 +121,14 @@
   </div>
 
   <footer class="page-footer">
-    <span>v3.325</span>
+    <span>v3.326</span>
     <span>&middot;</span>
     <span>Bingo Gains Tracker</span>
   </footer>
 
   <script>
   (() => {
-    const APP_VERSION = '3.325';
+    const APP_VERSION = '3.326';
     const SNAPSHOT_1_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRFOGe_j8BL0X5Cwvy3LNmsrWG82IAXlWpump0Sw6PKWLz-1gxbisdbPuTmJ_CmjLA_q-Q6y9jTfFwq/pub?gid=138917819&single=true&output=csv';
     const SNAPSHOT_2_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRFOGe_j8BL0X5Cwvy3LNmsrWG82IAXlWpump0Sw6PKWLz-1gxbisdbPuTmJ_CmjLA_q-Q6y9jTfFwq/pub?gid=2084936163&single=true&output=csv';
 
