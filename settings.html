@@ -72,6 +72,16 @@
       background: var(--bg-tile);
     }
 
+    #admin-back-btn {
+      border-color: var(--accent);
+      color: var(--accent);
+      font-weight: bold;
+    }
+    #admin-back-btn:hover {
+      background: var(--accent);
+      color: var(--bg-body);
+    }
+
     .settings-container {
       max-width: 900px; margin: 0 auto;
     }
@@ -227,7 +237,45 @@
   <header class="settings-header" role="banner">
     <h1>⚙️ Settings</h1>
     <div class="settings-header-right">
-      <a href="admin.html" class="nav-btn">← Back to Admin</a>
+      <select id="settings-theme-dropdown" class="nav-btn" style="padding: 6px; border-radius: 0;">
+        <optgroup label="Classic">
+          <option value="osrs">OSRS (Original)</option>
+          <option value="midnight">Midnight OLED</option>
+          <option value="parchment">Parchment</option>
+        </optgroup>
+        <optgroup label="Seasons">
+          <option value="spring">Spring</option>
+          <option value="summer">Summer</option>
+          <option value="autumn">Autumn</option>
+          <option value="winter">Winter</option>
+        </optgroup>
+        <optgroup label="Aesthetic">
+          <option value="abyssal">Abyssal</option>
+          <option value="volcanic">Volcanic</option>
+          <option value="cyberpunk">Cyberpunk</option>
+          <option value="bloodlust">Bloodlust</option>
+          <option value="royal">Royal</option>
+          <option value="emerald">Emerald</option>
+          <option value="solar">Solar</option>
+          <option value="vaporwave">Vaporwave</option>
+          <option value="tox">Toxic</option>
+        </optgroup>
+        <optgroup label="Elements">
+          <option value="ocean">Ocean Depths</option>
+          <option value="frost">Frost</option>
+          <option value="sandstorm">Sandstorm</option>
+          <option value="nebula">Nebula</option>
+          <option value="forest">Enchanted Forest</option>
+        </optgroup>
+        <optgroup label="Moods">
+          <option value="noir">Film Noir</option>
+          <option value="sakura">Sakura</option>
+          <option value="copper">Copper Patina</option>
+          <option value="arctic">Arctic Aurora</option>
+          <option value="obsidian">Obsidian Gold</option>
+        </optgroup>
+      </select>
+      <a href="admin.html" id="admin-back-btn" class="nav-btn">← Admin</a>
     </div>
   </header>
 
@@ -298,52 +346,6 @@
       <div id="team-passcodes-list"></div>
     </div>
 
-    <!-- Appearance Section -->
-    <div class="settings-section">
-      <h2 class="settings-section-title">🎨 Appearance</h2>
-      <div class="form-group">
-        <label class="form-label">Theme</label>
-        <select id="settings-theme-dropdown" class="form-select">
-          <optgroup label="Classic">
-            <option value="osrs">OSRS (Original)</option>
-            <option value="midnight">Midnight OLED</option>
-            <option value="parchment">Parchment</option>
-          </optgroup>
-          <optgroup label="Seasons">
-            <option value="spring">Spring</option>
-            <option value="summer">Summer</option>
-            <option value="autumn">Autumn</option>
-            <option value="winter">Winter</option>
-          </optgroup>
-          <optgroup label="Aesthetic">
-            <option value="abyssal">Abyssal</option>
-            <option value="volcanic">Volcanic</option>
-            <option value="cyberpunk">Cyberpunk</option>
-            <option value="bloodlust">Bloodlust</option>
-            <option value="royal">Royal</option>
-            <option value="emerald">Emerald</option>
-            <option value="solar">Solar</option>
-            <option value="vaporwave">Vaporwave</option>
-            <option value="tox">Toxic</option>
-          </optgroup>
-          <optgroup label="Elements">
-            <option value="ocean">Ocean Depths</option>
-            <option value="frost">Frost</option>
-            <option value="sandstorm">Sandstorm</option>
-            <option value="nebula">Nebula</option>
-            <option value="forest">Enchanted Forest</option>
-          </optgroup>
-          <optgroup label="Moods">
-            <option value="noir">Film Noir</option>
-            <option value="sakura">Sakura</option>
-            <option value="copper">Copper Patina</option>
-            <option value="arctic">Arctic Aurora</option>
-            <option value="obsidian">Obsidian Gold</option>
-          </optgroup>
-        </select>
-      </div>
-    </div>
-
     <!-- Global Config Export -->
     <div class="settings-section">
       <h2 class="settings-section-title">🌍 Share Settings</h2>
@@ -357,7 +359,7 @@
   </div>
 
   <footer class="page-footer">
-    <span>v3.333</span>
+    <span>v3.334</span>
     <span>&middot;</span>
     <span>Bingo Board Settings</span>
   </footer>
@@ -366,7 +368,7 @@
 
   <script>
 (() => {
-  const APP_VERSION = '3.333';
+  const APP_VERSION = '3.334';
 
   const STORAGE_KEYS = {
     eventConfig: 'bingo-event-config',
