@@ -1537,23 +1537,24 @@
       const lines = raw.split('\n');
       
       // Parse Metadata from first data row (index 1) BEFORE init arrays
-      // Parse Bonuses from Col 10 in Rows 2, 3, 4 (Indices 1, 2, 3)
+      // Parse Bonuses from Col 11 in Rows 2, 3, 4 (Indices 1, 2, 3)
       let rowBonus = 0, colBonus = 0, diagBonus = 0;
-      if (lines[1]) { const c = parseCSVRow(lines[1]); rowBonus = parseInt(c[10]) || 0; }
-      if (lines[2]) { const c = parseCSVRow(lines[2]); colBonus = parseInt(c[10]) || 0; }
-      if (lines[3]) { const c = parseCSVRow(lines[3]); diagBonus = parseInt(c[10]) || 0; }
+      if (lines[1]) { const c = parseCSVRow(lines[1]); rowBonus = parseInt(c[11]) || 0; }
+      if (lines[2]) { const c = parseCSVRow(lines[2]); colBonus = parseInt(c[11]) || 0; }
+      if (lines[3]) { const c = parseCSVRow(lines[3]); diagBonus = parseInt(c[11]) || 0; }
 
       if (lines.length > 1) {
         const metaCols = parseCSVRow(lines[1].trim());
-        if (metaCols.length >= 5) {
+        if (metaCols.length >= 6) {
           if (metaCols[0]) eventConfig.name = metaCols[0];
-          if (metaCols[1]) eventConfig.codeword = metaCols[1];
-          if (metaCols[2]) eventConfig.format = metaCols[2];
-          if (metaCols[3]) {
-            eventConfig.boardSize = metaCols[3];
+          if (metaCols[1]) eventConfig.description = metaCols[1];
+          if (metaCols[2]) eventConfig.codeword = metaCols[2];
+          if (metaCols[3]) eventConfig.format = metaCols[3];
+          if (metaCols[4]) {
+            eventConfig.boardSize = metaCols[4];
             updateBoardSize(eventConfig.boardSize);
           }
-          if (metaCols[4]) eventConfig.teamCount = metaCols[4];
+          if (metaCols[5]) eventConfig.teamCount = metaCols[5];
 
           // Dynamic Team Generation based on Count
           const count = parseInt(eventConfig.teamCount, 10);
@@ -1589,10 +1590,10 @@
       const teamNumber = team.teamNumber || 1;
       
       // Calculate which columns belong to this team
-      // New Format: Metadata(0-5) | TileData(6-9) | Bonus(10) | TeamData(11+)
-      const itemsCol = 11 + ((teamNumber - 1) * 3);
-      const currentCol = 12 + ((teamNumber - 1) * 3);
-      const goalCol = 13 + ((teamNumber - 1) * 3);
+      // New Format: Metadata(0-6) | TileData(7-10) | Bonus(11) | TeamData(12+)
+      const itemsCol = 12 + ((teamNumber - 1) * 3);
+      const currentCol = 13 + ((teamNumber - 1) * 3);
+      const goalCol = 14 + ((teamNumber - 1) * 3);
 
       console.log(`Team: ${currentTeamKey} (Team${teamNumber}), Columns: Items=${itemsCol}, Current=${currentCol}, Goal=${goalCol}`);
 
@@ -1605,7 +1606,7 @@
         if (!line || !line.trim()) continue;
         
         const cols = parseCSVRow(line.trim());
-        if (cols.length < 10) continue;
+        if (cols.length < 11) continue;
 
         // Parse Metadata from first data row
         if (count === 0) {
@@ -1613,21 +1614,22 @@
           const titleEl = document.getElementById('event-title');
           if (titleEl) titleEl.innerText = eventConfig.name;
           codewordSecret = eventConfig.codeword;
+          renderEventDescription(); // Re-render description now that we've loaded it
         }
         
-        // Update Team Names from vertical column 5
-        if (cols[5]) {
+        // Update Team Names from vertical column 6
+        if (cols[6]) {
            const tKey = `Team${count + 1}`;
-           if (TEAM_MAP[tKey]) TEAM_MAP[tKey].name = cols[5];
-           if (count + 1 === teamNumber) DOM.teamName.innerText = cols[5];
+           if (TEAM_MAP[tKey]) TEAM_MAP[tKey].name = cols[6];
+           if (count + 1 === teamNumber) DOM.teamName.innerText = cols[6];
         }
 
         const id = count + 1;
-        // Tile Data starts at col 6
-        const img = safeImgSrc(cols[6] || '');
-        const title = cols[7] || `Tile ${id}`;
-        const description = cols[8] || '';
-        const pointsVal = parseInt(cols[9], 10) || 0;
+        // Tile Data starts at col 7
+        const img = safeImgSrc(cols[7] || '');
+        const title = cols[8] || `Tile ${id}`;
+        const description = cols[9] || '';
+        const pointsVal = parseInt(cols[10], 10) || 0;
         
         const items = cols[itemsCol] ? cols[itemsCol].split(',').map(s => s.trim()).filter(Boolean) : [];
         const current = Math.max(0, parseInt(cols[currentCol], 10) || 0);
