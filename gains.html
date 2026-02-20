@@ -121,48 +121,56 @@
     <h1>📊 Gains Tracker</h1>
     <div style="display:flex; gap:10px; align-items:center;">
       <select id="theme-select" class="nav-btn" style="padding: 6px; border-radius: 0;">
-        <optgroup label="Classic">
-          <option value="osrs">OSRS (Original)</option>
-          <option value="midnight">Midnight OLED</option>
-          <option value="parchment">Parchment</option>
-          <option value="high_contrast">High Contrast</option>
-        </optgroup>
-        <optgroup label="Seasons">
-          <option value="spring">Spring</option>
-          <option value="summer">Summer</option>
-          <option value="autumn">Autumn</option>
-          <option value="winter">Winter</option>
-        </optgroup>
-        <optgroup label="Elements">
-          <option value="ocean">Ocean Depths</option>
-          <option value="forest">Enchanted Forest</option>
-          <option value="volcanic">Volcanic</option>
-          <option value="sandstorm">Sandstorm</option>
-          <option value="nebula">Nebula</option>
-        </optgroup>
-        <optgroup label="Materials">
-          <option value="obsidian">Obsidian Gold</option>
-          <option value="copper">Copper Patina</option>
-          <option value="emerald">Emerald</option>
-        </optgroup>
-        <optgroup label="Aesthetic">
-          <option value="cyberpunk">Cyberpunk</option>
-          <option value="vaporwave">Vaporwave</option>
-          <option value="dracula">Dracula</option>
-          <option value="nord">Nordic</option>
-        </optgroup>
-        <optgroup label="Moods">
-          <option value="abyssal">Abyssal</option>
-          <option value="noir">Film Noir</option>
-          <option value="sakura">Sakura</option>
-          <option value="tox">Toxic</option>
-          <option value="bloodlust">Bloodlust</option>
-          <option value="royal">Royal</option>
-          <option value="solar">Solar</option>
-          <option value="coffee">Coffee Shop</option>
-          <option value="lavender">Lavender</option>
-          <option value="mint">Mint Fresh</option>
-        </optgroup>
+        <option value="osrs">OSRS (Original)</option>
+        <option value="midnight">Midnight OLED</option>
+        <option value="high_contrast">High Contrast</option>
+        <option value="spring">Spring</option>
+        <option value="summer">Summer</option>
+        <option value="autumn">Autumn</option>
+        <option value="winter">Winter</option>
+        <option value="abyssal">Abyssal</option>
+        <option value="volcanic">Volcanic</option>
+        <option value="cyberpunk">Cyberpunk</option>
+        <option value="bloodlust">Bloodlust</option>
+        <option value="royal">Royal</option>
+        <option value="emerald">Emerald</option>
+        <option value="solar">Solar</option>
+        <option value="vaporwave">Vaporwave</option>
+        <option value="tox">Toxic</option>
+        <option value="ocean">Ocean Depths</option>
+        <option value="sandstorm">Sandstorm</option>
+        <option value="nebula">Nebula</option>
+        <option value="forest">Enchanted Forest</option>
+        <option value="noir">Film Noir</option>
+        <option value="sakura">Sakura</option>
+        <option value="copper">Copper Patina</option>
+        <option value="obsidian">Obsidian Gold</option>
+        <option value="lavender">Lavender</option>
+        <option value="mint">Mint Fresh</option>
+        <option value="dracula">Dracula</option>
+        <option value="nord">Nordic</option>
+        <option value="coffee">Coffee Shop</option>
+        <option value="slate">Slate</option>
+        <option value="dusk">Dusk</option>
+        <option value="moss">Moss</option>
+        <option value="berry">Berry</option>
+        <option value="glacier">Glacier</option>
+        <option value="terminal">Terminal</option>
+        <option value="paper">Paper</option>
+        <option value="swamp">Swamp</option>
+        <option value="moon">Moon</option>
+        <option value="sun">Sun</option>
+        <option value="sky">Sky</option>
+        <option value="fire">Fire</option>
+        <option value="ice">Ice</option>
+        <option value="void">Void</option>
+        <option value="grapes">Grapes</option>
+        <option value="chocolate">Chocolate</option>
+        <option value="lime">Lime</option>
+        <option value="rose">Rose</option>
+        <option value="bumblebee">Bumblebee</option>
+        <option value="blueprint">Blueprint</option>
+        <option value="leather">Leather</option>
       </select>
       <a href="admin.html" id="admin-back-btn" class="nav-btn" style="display:none;">← Admin</a>
     </div>
@@ -210,7 +218,6 @@
     const THEMES = {
       osrs: null,
       midnight: {'--bg-body':'#000000','--bg-tile':'#0e0e0e','--bg-well':'#060606','--bg-completed':'#1a1a1a','--bg-completed-well':'#0d0d0d','--border-main':'#2a2a2a','--border-completed':'#e0e0e0','--accent':'#ffffff','--text-main':'#d4d4d4','--text-bright':'#ffffff','--text-dim':'#4a4a4a','--text-completed':'#e0e0e0'},
-      parchment: {'--bg-body':'#2c2416','--bg-tile':'#3d3322','--bg-well':'#241e12','--bg-completed':'#2a3a1e','--bg-completed-well':'#1e2c14','--border-main':'#6b5b3e','--border-completed':'#8aba5a','--accent':'#d4a843','--text-main':'#d4a843','--text-bright':'#f0dca0','--text-dim':'#7a6b50','--text-completed':'#8aba5a'},
       high_contrast: {'--bg-body':'#000000','--bg-tile':'#000000','--bg-well':'#000000','--bg-completed':'#000000','--bg-completed-well':'#000000','--border-main':'#ffffff','--border-completed':'#ffff00','--accent':'#ffff00','--text-main':'#ffffff','--text-bright':'#ffffff','--text-dim':'#d0d0d0','--text-completed':'#ffff00'},
       spring: {'--bg-body':'#1e2e1e','--bg-tile':'#2a402a','--bg-well':'#162416','--bg-completed':'#3d2a4d','--bg-completed-well':'#2a1c36','--border-main':'#5a8a5a','--border-completed':'#c77dff','--accent':'#7dffb3','--text-main':'#7dffb3','--text-bright':'#d0ffe0','--text-dim':'#6a8a6a','--text-completed':'#c77dff'},
       summer: {'--bg-body':'#0f2a3a','--bg-tile':'#1a4058','--bg-well':'#0a1f2d','--bg-completed':'#5a4010','--bg-completed-well':'#3d2b0a','--border-main':'#3a7ea8','--border-completed':'#ffc833','--accent':'#00e5ff','--text-main':'#00e5ff','--text-bright':'#b3f5ff','--text-dim':'#4a7a8f','--text-completed':'#ffc833'},
@@ -237,7 +244,28 @@
       mint: {'--bg-body':'#102018','--bg-tile':'#183024','--bg-well':'#0a1410','--bg-completed':'#183828','--bg-completed-well':'#0e2418','--border-main':'#285038','--border-completed':'#50ffb0','--accent':'#50ffb0','--text-main':'#50ffb0','--text-bright':'#b0ffe0','--text-dim':'#306048','--text-completed':'#50ffb0'},
       dracula: {'--bg-body':'#282a36','--bg-tile':'#44475a','--bg-well':'#21222c','--bg-completed':'#383a59','--bg-completed-well':'#282a36','--border-main':'#6272a4','--border-completed':'#50fa7b','--accent':'#ff79c6','--text-main':'#f8f8f2','--text-bright':'#ffffff','--text-dim':'#6272a4','--text-completed':'#50fa7b'},
       nord: {'--bg-body':'#2e3440','--bg-tile':'#3b4252','--bg-well':'#242933','--bg-completed':'#434c5e','--bg-completed-well':'#2e3440','--border-main':'#4c566a','--border-completed':'#a3be8c','--accent':'#88c0d0','--text-main':'#eceff4','--text-bright':'#ffffff','--text-dim':'#4c566a','--text-completed':'#a3be8c'},
-      coffee: {'--bg-body':'#201814','--bg-tile':'#30241e','--bg-well':'#140e0c','--bg-completed':'#382820','--bg-completed-well':'#241814','--border-main':'#503830','--border-completed':'#e0c0a0','--accent':'#d0a080','--text-main':'#e0c0a0','--text-bright':'#f0e0d0','--text-dim':'#604840','--text-completed':'#e0c0a0'}
+      coffee: {'--bg-body':'#201814','--bg-tile':'#30241e','--bg-well':'#140e0c','--bg-completed':'#382820','--bg-completed-well':'#241814','--border-main':'#503830','--border-completed':'#e0c0a0','--accent':'#d0a080','--text-main':'#e0c0a0','--text-bright':'#f0e0d0','--text-dim':'#604840','--text-completed':'#e0c0a0'},
+      slate: {'--bg-body':'#202225','--bg-tile':'#2f3136','--bg-well':'#202225','--bg-completed':'#40444b','--bg-completed-well':'#2f3136','--border-main':'#202225','--border-completed':'#7289da','--accent':'#7289da','--text-main':'#dcddde','--text-bright':'#ffffff','--text-dim':'#72767d','--text-completed':'#7289da'},
+      dusk: {'--bg-body':'#231a24','--bg-tile':'#332233','--bg-well':'#1a101a','--bg-completed':'#402040','--bg-completed-well':'#2a152a','--border-main':'#503050','--border-completed':'#ff80a0','--accent':'#ff80a0','--text-main':'#e0c0d0','--text-bright':'#ffe0f0','--text-dim':'#705060','--text-completed':'#ff80a0'},
+      moss: {'--bg-body':'#1a241a','--bg-tile':'#2a332a','--bg-well':'#101a10','--bg-completed':'#304030','--bg-completed-well':'#203020','--border-main':'#3a4a3a','--border-completed':'#80a080','--accent':'#80a080','--text-main':'#a0c0a0','--text-bright':'#d0e0d0','--text-dim':'#506050','--text-completed':'#80a080'},
+      berry: {'--bg-body':'#241018','--bg-tile':'#331a24','--bg-well':'#1a0810','--bg-completed':'#401828','--bg-completed-well':'#2a0e1a','--border-main':'#502030','--border-completed':'#ff6090','--accent':'#ff6090','--text-main':'#e0a0b0','--text-bright':'#ffc0d0','--text-dim':'#704050','--text-completed':'#ff6090'},
+      glacier: {'--bg-body':'#102028','--bg-tile':'#1a3038','--bg-well':'#081820','--bg-completed':'#204050','--bg-completed-well':'#103040','--border-main':'#305060','--border-completed':'#80d0f0','--accent':'#80d0f0','--text-main':'#a0e0f0','--text-bright':'#d0f0ff','--text-dim':'#406070','--text-completed':'#80d0f0'},
+      terminal: {'--bg-body':'#000000','--bg-tile':'#0a0a0a','--bg-well':'#000000','--bg-completed':'#002000','--bg-completed-well':'#001000','--border-main':'#004000','--border-completed':'#00ff00','--accent':'#00ff00','--text-main':'#00ff00','--text-bright':'#80ff80','--text-dim':'#008000','--text-completed':'#00ff00'},
+      paper: {'--bg-body':'#f0f0f0','--bg-tile':'#ffffff','--bg-well':'#e0e0e0','--bg-completed':'#e0f0e0','--bg-completed-well':'#d0e0d0','--border-main':'#c0c0c0','--border-completed':'#40a040','--accent':'#404040','--text-main':'#202020','--text-bright':'#000000','--text-dim':'#808080','--text-completed':'#40a040'},
+      swamp: {'--bg-body':'#141810','--bg-tile':'#202818','--bg-well':'#0c1008','--bg-completed':'#283020','--bg-completed-well':'#182014','--border-main':'#304020','--border-completed':'#80a040','--accent':'#80a040','--text-main':'#a0b080','--text-bright':'#d0e0a0','--text-dim':'#405030','--text-completed':'#80a040'},
+      moon: {'--bg-body':'#202020','--bg-tile':'#303030','--bg-well':'#181818','--bg-completed':'#404040','--bg-completed-well':'#282828','--border-main':'#505050','--border-completed':'#e0e0e0','--accent':'#e0e0e0','--text-main':'#c0c0c0','--text-bright':'#ffffff','--text-dim':'#707070','--text-completed':'#e0e0e0'},
+      sun: {'--bg-body':'#302810','--bg-tile':'#403818','--bg-well':'#201808','--bg-completed':'#504020','--bg-completed-well':'#302810','--border-main':'#605020','--border-completed':'#ffc040','--accent':'#ffc040','--text-main':'#e0c060','--text-bright':'#ffe080','--text-dim':'#806030','--text-completed':'#ffc040'},
+      sky: {'--bg-body':'#102838','--bg-tile':'#183850','--bg-well':'#082030','--bg-completed':'#204860','--bg-completed-well':'#103040','--border-main':'#305070','--border-completed':'#60a0ff','--accent':'#60a0ff','--text-main':'#80c0ff','--text-bright':'#b0e0ff','--text-dim':'#406080','--text-completed':'#60a0ff'},
+      fire: {'--bg-body':'#281008','--bg-tile':'#381810','--bg-well':'#180804','--bg-completed':'#482010','--bg-completed-well':'#281008','--border-main':'#502010','--border-completed':'#ff4000','--accent':'#ff4000','--text-main':'#ff8040','--text-bright':'#ffc080','--text-dim':'#803020','--text-completed':'#ff4000'},
+      ice: {'--bg-body':'#102830','--bg-tile':'#183840','--bg-well':'#082028','--bg-completed':'#204850','--bg-completed-well':'#103038','--border-main':'#305060','--border-completed':'#00ffff','--accent':'#00ffff','--text-main':'#80ffff','--text-bright':'#c0ffff','--text-dim':'#408080','--text-completed':'#00ffff'},
+      void: {'--bg-body':'#080010','--bg-tile':'#100020','--bg-well':'#040008','--bg-completed':'#200040','--bg-completed-well':'#100020','--border-main':'#300060','--border-completed':'#a000ff','--accent':'#a000ff','--text-main':'#c080ff','--text-bright':'#e0b0ff','--text-dim':'#500080','--text-completed':'#a000ff'},
+      grapes: {'--bg-body':'#181020','--bg-tile':'#241830','--bg-well':'#100818','--bg-completed':'#302040','--bg-completed-well':'#201030','--border-main':'#402850','--border-completed':'#a060d0','--accent':'#a060d0','--text-main':'#c090e0','--text-bright':'#e0c0f0','--text-dim':'#604070','--text-completed':'#a060d0'},
+      chocolate: {'--bg-body':'#281810','--bg-tile':'#382418','--bg-well':'#180c08','--bg-completed':'#483020','--bg-completed-well':'#281810','--border-main':'#503020','--border-completed':'#c08040','--accent':'#c08040','--text-main':'#d0a060','--text-bright':'#e0c090','--text-dim':'#704030','--text-completed':'#c08040'},
+      lime: {'--bg-body':'#102010','--bg-tile':'#183018','--bg-well':'#081808','--bg-completed':'#204020','--bg-completed-well':'#102810','--border-main':'#285028','--border-completed':'#80ff00','--accent':'#80ff00','--text-main':'#a0ff40','--text-bright':'#c0ff80','--text-dim':'#408020','--text-completed':'#80ff00'},
+      rose: {'--bg-body':'#281018','--bg-tile':'#381824','--bg-well':'#180810','--bg-completed':'#482030','--bg-completed-well':'#281018','--border-main':'#502030','--border-completed':'#ff80a0','--accent':'#ff80a0','--text-main':'#ffb0c0','--text-bright':'#ffe0e8','--text-dim':'#804050','--text-completed':'#ff80a0'},
+      bumblebee: {'--bg-body':'#101010','--bg-tile':'#202020','--bg-well':'#080808','--bg-completed':'#303010','--bg-completed-well':'#202008','--border-main':'#404040','--border-completed':'#ffcc00','--accent':'#ffcc00','--text-main':'#ffe060','--text-bright':'#fff0a0','--text-dim':'#605020','--text-completed':'#ffcc00'},
+      blueprint: {'--bg-body':'#002040','--bg-tile':'#003060','--bg-well':'#001020','--bg-completed':'#004080','--bg-completed-well':'#002850','--border-main':'#0050a0','--border-completed':'#ffffff','--accent':'#ffffff','--text-main':'#e0e0ff','--text-bright':'#ffffff','--text-dim':'#6080a0','--text-completed':'#ffffff'},
+      leather: {'--bg-body':'#2c1e14','--bg-tile':'#3e2b1c','--bg-well':'#1e140c','--bg-completed':'#4e3624','--bg-completed-well':'#322216','--border-main':'#5e422e','--border-completed':'#cba67e','--accent':'#cba67e','--text-main':'#dcc0a0','--text-bright':'#f0e0c8','--text-dim':'#7a5c40','--text-completed':'#cba67e'}
     };
 
     const applyTheme = (name) => {
