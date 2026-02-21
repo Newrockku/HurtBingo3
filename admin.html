@@ -83,7 +83,7 @@
 
     .dashboard-container {
       max-width: 1400px; margin: 0 auto;
-      display: grid; grid-template-columns: repeat(4, 1fr);
+      display: grid; grid-template-columns: repeat(3, 1fr);
       gap: 30px;
     }
 
@@ -91,7 +91,6 @@
       background: var(--bg-tile); border: 2px solid var(--border-main);
       padding: 20px; border-radius: 0;
       box-shadow: 0 2px 10px rgba(0,0,0,0.3);
-      grid-column: span 2;
     }
 
     .collapsible {
@@ -248,7 +247,17 @@
       display: flex; justify-content: space-between; padding: 4px 0;
       border-bottom: 1px solid var(--bg-well); font-size: 0.9rem;
     }
+    .update-item {
+      font-size: 0.85rem; padding: 6px 0; border-bottom: 1px solid var(--bg-well);
+      display: flex; flex-direction: column; gap: 2px;
+      animation: fadeIn 0.5s ease;
+    }
     .stat-list-item:last-child { border-bottom: none; }
+    .update-item:last-child { border-bottom: none; }
+    .update-time { font-size: 0.7rem; color: var(--text-dim); }
+    .update-content { color: var(--text-bright); }
+    .update-highlight { color: var(--accent); font-weight: bold; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
 
     @media (max-width: 768px) {
       body { padding: 12px; }
@@ -281,56 +290,6 @@
     </div>
     <div class="admin-header-right">
       <select id="theme-select" class="nav-btn" style="padding: 6px; border-radius: 0;">
-        <option value="osrs">OSRS (Original)</option>
-        <option value="abyssal">Abyssal</option>
-        <option value="autumn">Autumn</option>
-        <option value="berry">Berry</option>
-        <option value="bloodlust">Bloodlust</option>
-        <option value="blueprint">Blueprint</option>
-        <option value="bumblebee">Bumblebee</option>
-        <option value="chocolate">Chocolate</option>
-        <option value="coffee">Coffee Shop</option>
-        <option value="copper">Copper Patina</option>
-        <option value="cyberpunk">Cyberpunk</option>
-        <option value="dracula">Dracula</option>
-        <option value="dusk">Dusk</option>
-        <option value="emerald">Emerald</option>
-        <option value="forest">Enchanted Forest</option>
-        <option value="noir">Film Noir</option>
-        <option value="fire">Fire</option>
-        <option value="glacier">Glacier</option>
-        <option value="grapes">Grapes</option>
-        <option value="high_contrast">High Contrast</option>
-        <option value="ice">Ice</option>
-        <option value="lavender">Lavender</option>
-        <option value="leather">Leather</option>
-        <option value="lime">Lime</option>
-        <option value="midnight">Midnight OLED</option>
-        <option value="mint">Mint Fresh</option>
-        <option value="moon">Moon</option>
-        <option value="moss">Moss</option>
-        <option value="nebula">Nebula</option>
-        <option value="nord">Nordic</option>
-        <option value="obsidian">Obsidian Gold</option>
-        <option value="ocean">Ocean Depths</option>
-        <option value="paper">Paper</option>
-        <option value="rose">Rose</option>
-        <option value="royal">Royal</option>
-        <option value="sakura">Sakura</option>
-        <option value="sandstorm">Sandstorm</option>
-        <option value="sky">Sky</option>
-        <option value="slate">Slate</option>
-        <option value="solar">Solar</option>
-        <option value="spring">Spring</option>
-        <option value="summer">Summer</option>
-        <option value="sun">Sun</option>
-        <option value="swamp">Swamp</option>
-        <option value="terminal">Terminal</option>
-        <option value="tox">Toxic</option>
-        <option value="vaporwave">Vaporwave</option>
-        <option value="void">Void</option>
-        <option value="volcanic">Volcanic</option>
-        <option value="winter">Winter</option>
       </select>
       <a href="settings.html" class="nav-btn" style="display:inline-flex; align-items:center; gap: 8px;">
         <svg style="width:18px; height:18px; fill:currentColor;" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58a.49.49 0 00.12-.61l-1.92-3.32a.49.49 0 00-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54a.484.484 0 00-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96a.49.49 0 00-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.07.62-.07.94s.02.64.07.94l-2.03 1.58a.49.49 0 00-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6A3.6 3.6 0 1115.6 12 3.611 3.611 0 0112 15.6z"/></svg>
@@ -392,6 +351,14 @@
       </div>
     </div>
 
+    <!-- Recent Updates -->
+    <div class="card">
+      <h2 class="card-title"><svg style="width:1em; height:1em; fill:currentColor; vertical-align: -0.15em; margin-right: 8px;" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M21 10.12h-6.78l2.74-2.82c-2.73-2.7-7.15-2.8-9.88-.1-2.73 2.71-2.73 7.08 0 9.79s7.15 2.71 9.88 0C18.32 15.65 19 14.08 19 12.1h2c0 1.98-.88 4.55-2.64 6.29-3.51 3.48-9.21 3.48-13.39 0-3.51-3.47-3.51-9.11 0-12.58 3.51-3.47 9.21-3.47 12.71 0l2.71 2.71v-6.78h2v8.38zM12.5 8v4.25l3.5 2.08-.72 1.21L11 13V8h1.5z"/></svg>Recent Updates</h2>
+      <div id="recent-updates-list" style="display:flex; flex-direction:column; max-height: 300px; overflow-y: auto;">
+        <div style="color:var(--text-dim); text-align:center; padding: 10px;">Listening for updates...</div>
+      </div>
+    </div>
+
     <!-- Team Boards Grid -->
     <div style="grid-column: 1 / -1;">
       <h2 class="section-title">Team Boards</h2>
@@ -437,6 +404,22 @@
   const THEME_VARS = window.BINGO_THEME_VARS;
   const THEMES = window.BINGO_THEMES;
 
+  const loadCustomThemes = () => {
+    try {
+      const custom = JSON.parse(localStorage.getItem(STORAGE_KEYS.customThemes) || '{}');
+      const sel = $('theme-select');
+      for (const [slug, data] of Object.entries(custom)) {
+        THEMES[slug] = data.vars;
+        if (sel && !sel.querySelector(`option[value="${slug}"]`)) {
+           const opt = document.createElement('option');
+           opt.value = slug;
+           opt.textContent = data.name;
+           sel.appendChild(opt);
+        }
+      }
+    } catch {}
+  };
+
   let eventConfig = {
     name: 'Bingo 2026',
     codeword: '',
@@ -453,6 +436,8 @@
   let candidateHash = null;
   let stabilityCount = 0;
   let fetchController = null;
+  let previousTeamCompletions = null;
+  let recentUpdates = [];
 
   const $ = id => document.getElementById(id);
 
@@ -643,6 +628,26 @@
     leastEl.innerHTML = least.map(createRow).join('') || '<div style="color:var(--text-dim)">No data</div>';
   };
 
+  const addRecentUpdate = (teamName, tileTitle) => {
+    const now = new Date().toLocaleTimeString();
+    recentUpdates.unshift({ time: now, team: teamName, tile: tileTitle });
+    if (recentUpdates.length > 20) recentUpdates.pop();
+    renderRecentUpdates();
+  };
+
+  const renderRecentUpdates = () => {
+    const container = $('recent-updates-list');
+    if (!container) return;
+    if (recentUpdates.length === 0) return; // Keep "Listening..." if empty
+
+    container.innerHTML = recentUpdates.map(u => `
+      <div class="update-item">
+        <div class="update-time">${u.time}</div>
+        <div class="update-content"><span class="update-highlight">${escapeHTML(u.team)}</span> completed <span class="update-highlight">${escapeHTML(u.tile)}</span></div>
+      </div>
+    `).join('');
+  };
+
   const updateBoardSize = (sizeStr) => {
     let c = 7, r = 7;
     if (sizeStr && typeof sizeStr === 'string') {
@@ -819,6 +824,22 @@
           });
         });
 
+        // Detect Recent Updates
+        if (previousTeamCompletions) {
+           Object.keys(teamCompletions).forEach(teamKey => {
+              const oldArr = previousTeamCompletions[teamKey];
+              const newArr = teamCompletions[teamKey];
+              if (!oldArr) return;
+
+              newArr.forEach((isComplete, idx) => {
+                 if (isComplete && !oldArr[idx]) {
+                    addRecentUpdate(teamsConfig[teamKey].name || teamKey, tileStats[idx].title);
+                 }
+              });
+           });
+        }
+        previousTeamCompletions = JSON.parse(JSON.stringify(teamCompletions));
+
         // Calculate Bingos
         Object.keys(teamsConfig).forEach(key => {
           const stats = calculateBingos(teamCompletions[key], gridCols, gridRows);
@@ -858,6 +879,17 @@
   const setupThemeDropdown = () => {
     const sel = $('theme-select');
     if (!sel) return;
+
+    // Populate standard themes
+    if (window.BINGO_THEME_METADATA) {
+      window.BINGO_THEME_METADATA.forEach(meta => {
+        const opt = document.createElement('option');
+        opt.value = meta.value;
+        opt.textContent = meta.label;
+        sel.appendChild(opt);
+      });
+    }
+
     sel.value = storageLoad(STORAGE_KEYS.theme, 'osrs');
     sel.addEventListener('change', () => applyTheme(sel.value));
 
@@ -873,6 +905,7 @@
   };
 
   const init = async () => {
+    loadCustomThemes();
     await loadConfig();
     renderEventOverview();
     renderLeaderboard();

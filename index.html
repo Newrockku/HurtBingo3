@@ -639,56 +639,6 @@
               </div>
               <label for="settings-theme-dropdown" class="sr-only">Select Theme</label>
               <select id="settings-theme-dropdown" class="settings-select">
-                <option value="osrs">OSRS (Original)</option>
-                <option value="abyssal">Abyssal</option>
-                <option value="autumn">Autumn</option>
-                <option value="berry">Berry</option>
-                <option value="bloodlust">Bloodlust</option>
-                <option value="blueprint">Blueprint</option>
-                <option value="bumblebee">Bumblebee</option>
-                <option value="chocolate">Chocolate</option>
-                <option value="coffee">Coffee Shop</option>
-                <option value="copper">Copper Patina</option>
-                <option value="cyberpunk">Cyberpunk</option>
-                <option value="dracula">Dracula</option>
-                <option value="dusk">Dusk</option>
-                <option value="emerald">Emerald</option>
-                <option value="forest">Enchanted Forest</option>
-                <option value="noir">Film Noir</option>
-                <option value="fire">Fire</option>
-                <option value="glacier">Glacier</option>
-                <option value="grapes">Grapes</option>
-                <option value="high_contrast">High Contrast</option>
-                <option value="ice">Ice</option>
-                <option value="lavender">Lavender</option>
-                <option value="leather">Leather</option>
-                <option value="lime">Lime</option>
-                <option value="midnight">Midnight OLED</option>
-                <option value="mint">Mint Fresh</option>
-                <option value="moon">Moon</option>
-                <option value="moss">Moss</option>
-                <option value="nebula">Nebula</option>
-                <option value="nord">Nordic</option>
-                <option value="obsidian">Obsidian Gold</option>
-                <option value="ocean">Ocean Depths</option>
-                <option value="paper">Paper</option>
-                <option value="rose">Rose</option>
-                <option value="royal">Royal</option>
-                <option value="sakura">Sakura</option>
-                <option value="sandstorm">Sandstorm</option>
-                <option value="sky">Sky</option>
-                <option value="slate">Slate</option>
-                <option value="solar">Solar</option>
-                <option value="spring">Spring</option>
-                <option value="summer">Summer</option>
-                <option value="sun">Sun</option>
-                <option value="swamp">Swamp</option>
-                <option value="terminal">Terminal</option>
-                <option value="tox">Toxic</option>
-                <option value="vaporwave">Vaporwave</option>
-                <option value="void">Void</option>
-                <option value="volcanic">Volcanic</option>
-                <option value="winter">Winter</option>
                 <optgroup id="custom-theme-optgroup" label="Custom Themes"></optgroup>
               </select>
             </div>
@@ -1885,6 +1835,18 @@
     if (params.get('fromAdmin') === 'true') {
       const backBtn = $('admin-back-btn');
       if (backBtn) backBtn.style.display = 'flex';
+    }
+
+    // Populate standard themes
+    if (DOM.themeSel && window.BINGO_THEME_METADATA) {
+      const optGroup = DOM.themeSel.querySelector('optgroup');
+      window.BINGO_THEME_METADATA.forEach(meta => {
+        const opt = document.createElement('option');
+        opt.value = meta.value;
+        opt.textContent = meta.label;
+        if (optGroup) DOM.themeSel.insertBefore(opt, optGroup);
+        else DOM.themeSel.appendChild(opt);
+      });
     }
 
     const savedTheme = storageLoad(STORAGE_KEYS.theme, 'osrs');

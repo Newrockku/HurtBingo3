@@ -118,59 +118,9 @@
 <body>
 
   <header class="gains-header" role="banner">
-    <h1>📊 Gains Tracker</h1>
+    <h1><svg style="width:1em; height:1em; fill:currentColor; vertical-align: -0.15em; margin-right: 10px;" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M5 9.2h3V19H5zM10.6 5h3v14h-3zm5.6 8h3v6h-3z"/></svg>Gains Tracker</h1>
     <div style="display:flex; gap:10px; align-items:center;">
       <select id="theme-select" class="nav-btn" style="padding: 6px; border-radius: 0;">
-        <option value="osrs">OSRS (Original)</option>
-        <option value="abyssal">Abyssal</option>
-        <option value="autumn">Autumn</option>
-        <option value="berry">Berry</option>
-        <option value="bloodlust">Bloodlust</option>
-        <option value="blueprint">Blueprint</option>
-        <option value="bumblebee">Bumblebee</option>
-        <option value="chocolate">Chocolate</option>
-        <option value="coffee">Coffee Shop</option>
-        <option value="copper">Copper Patina</option>
-        <option value="cyberpunk">Cyberpunk</option>
-        <option value="dracula">Dracula</option>
-        <option value="dusk">Dusk</option>
-        <option value="emerald">Emerald</option>
-        <option value="forest">Enchanted Forest</option>
-        <option value="noir">Film Noir</option>
-        <option value="fire">Fire</option>
-        <option value="glacier">Glacier</option>
-        <option value="grapes">Grapes</option>
-        <option value="high_contrast">High Contrast</option>
-        <option value="ice">Ice</option>
-        <option value="lavender">Lavender</option>
-        <option value="leather">Leather</option>
-        <option value="lime">Lime</option>
-        <option value="midnight">Midnight OLED</option>
-        <option value="mint">Mint Fresh</option>
-        <option value="moon">Moon</option>
-        <option value="moss">Moss</option>
-        <option value="nebula">Nebula</option>
-        <option value="nord">Nordic</option>
-        <option value="obsidian">Obsidian Gold</option>
-        <option value="ocean">Ocean Depths</option>
-        <option value="paper">Paper</option>
-        <option value="rose">Rose</option>
-        <option value="royal">Royal</option>
-        <option value="sakura">Sakura</option>
-        <option value="sandstorm">Sandstorm</option>
-        <option value="sky">Sky</option>
-        <option value="slate">Slate</option>
-        <option value="solar">Solar</option>
-        <option value="spring">Spring</option>
-        <option value="summer">Summer</option>
-        <option value="sun">Sun</option>
-        <option value="swamp">Swamp</option>
-        <option value="terminal">Terminal</option>
-        <option value="tox">Toxic</option>
-        <option value="vaporwave">Vaporwave</option>
-        <option value="void">Void</option>
-        <option value="volcanic">Volcanic</option>
-        <option value="winter">Winter</option>
       </select>
       <a href="admin.html" id="admin-back-btn" class="nav-btn" style="display:none;">← Admin</a>
     </div>
@@ -217,6 +167,22 @@
     const storageSave = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} };
 
     const THEMES = window.BINGO_THEMES;
+
+    const loadCustomThemes = () => {
+      try {
+        const custom = JSON.parse(localStorage.getItem('bingo-custom-themes') || '{}');
+        const sel = $('theme-select');
+        for (const [slug, data] of Object.entries(custom)) {
+          THEMES[slug] = data.vars;
+          if (sel && !sel.querySelector(`option[value="${slug}"]`)) {
+             const opt = document.createElement('option');
+             opt.value = slug;
+             opt.textContent = data.name;
+             sel.appendChild(opt);
+          }
+        }
+      } catch {}
+    };
 
     const applyTheme = (name) => {
       const root = document.documentElement;
@@ -362,11 +328,22 @@
         if (btn) btn.style.display = 'inline-flex';
       }
 
+      loadCustomThemes();
       const savedTheme = storageLoad('bingo-theme', 'osrs');
       applyTheme(savedTheme);
       
       const themeSel = $('theme-select');
       if (themeSel) {
+        // Populate standard themes
+        if (window.BINGO_THEME_METADATA) {
+          window.BINGO_THEME_METADATA.forEach(meta => {
+            const opt = document.createElement('option');
+            opt.value = meta.value;
+            opt.textContent = meta.label;
+            themeSel.appendChild(opt);
+          });
+        }
+
         themeSel.value = savedTheme;
         themeSel.addEventListener('change', () => applyTheme(themeSel.value));
 
