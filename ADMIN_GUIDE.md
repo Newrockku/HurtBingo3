@@ -13,7 +13,7 @@ The Admin Dashboard (`admin.html`) provides a high-level overview of the entire 
 ### 1. Event Settings & Overview
 A collapsible section at the top that displays the current configuration loaded from your CSV or local settings:
 *   **Event Name & Codeword**: Basic event identity.
-*   **Format & Size**: The game mode (e.g., Lockout, Blackout) and grid dimensions (e.g., 5x5, 7x7).
+*   **Format & Size**: The game mode (e.g., Clan vs. Clan, Blackout) and grid dimensions (e.g., 5x5, 7x7).
 *   **Team Count**: Number of active teams.
 *   **Bonuses**: Points awarded for completing Rows, Columns, or Diagonals.
 *   **CSV URL**: The source of all game data.
