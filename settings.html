@@ -458,7 +458,7 @@
   </div>
 
   <footer class="page-footer">
-    <span>v3.338</span>
+    <span>v3.339</span>
     <span>&middot;</span>
     <span>Bingo Board Settings</span>
   </footer>
@@ -468,7 +468,7 @@
   <script src="js/themes.js"></script>
   <script>
 (() => {
-  const APP_VERSION = '3.338';
+  const APP_VERSION = '3.339';
 
   const STORAGE_KEYS = {
     eventConfig: 'bingo-event-config',
@@ -1119,23 +1119,29 @@
   const setupThemeDropdown = () => {
     const sel = DOM.themeSel;
     if (!sel) return;
-
-    // Clear all options
-    sel.innerHTML = '';
-
+ 
+    const optGroup = DOM.customOptgroup;
+ 
+    // Remove only the standard options that might be there from a previous render
+    Array.from(sel.options).forEach(opt => {
+        if (opt.parentElement !== optGroup) {
+            sel.removeChild(opt);
+        }
+    });
+ 
     // Populate standard themes
     if (window.BINGO_THEME_METADATA) {
       window.BINGO_THEME_METADATA.forEach(meta => {
         const opt = document.createElement('option');
         opt.value = meta.value;
         opt.textContent = meta.label;
-        sel.appendChild(opt);
+        // Insert before the optgroup if it exists, otherwise append
+        if (optGroup) {
+            sel.insertBefore(opt, optGroup);
+        } else {
+            sel.appendChild(opt);
+        }
       });
-    }
-
-    // Re-attach custom optgroup
-    if (DOM.customOptgroup) {
-      sel.appendChild(DOM.customOptgroup);
     }
     
     sel.value = storageLoad(STORAGE_KEYS.theme, 'osrs');
