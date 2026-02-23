@@ -4,7 +4,7 @@ This guide is for event organizers and administrators to help manage the Bingo e
 
 ## Accessing the Admin Panel
 
-You can access the admin panel by navigating to `admin.html` in your browser. From the main player dashboard (`index.html`), you can also click the "Settings" gear icon and look for an "Admin" link if enabled, or simply append `admin.html` to your URL.
+You can access the admin panel by navigating to `admin.html` in your browser. From there, you can click the 'Settings' button to configure the event.
 
 ## The Admin Dashboard
 
@@ -40,30 +40,23 @@ A grid of mini-boards for every team.
 
 ## Settings & Configuration
 
-The Settings page (`settings.html`) is where you configure the event parameters.
+The Settings page (`settings.html`) is the primary tool for configuring your event. It reads your existing `config.json` and the linked CSV file, populates the fields, and allows you to make changes and export a new `config.json` file to update your event.
 
-### Event Details
-*   **Event Name**: The title displayed at the top of the page.
-*   **Codeword**: The secret code players can reveal.
-*   **Event Description**: A message shown to players (e.g., rules, discord links).
-*   **Format / Board Size / Team Count**: Structural settings for the bingo grid.
+### Loading Data
+*   When you open `settings.html`, it automatically fetches `config.json` from the root of the website.
+*   It then uses the CSV URL found in the config file (specifically from `teams.Team1.url`) to fetch and parse your bingo data sheet.
+*   All the fields on the page (Event Details, Team Names, etc.) are populated from this data.
 
-### Data Source (Crucial)
-*   **CSV Data URL**: This is the most important setting. It must point to a published Google Sheet (CSV format) or a raw CSV file.
-    *   The app reads this CSV to populate tiles, check progress, and calculate scores.
-    *   All teams usually share the same CSV URL, but the app filters data based on columns.
+### Editing & Exporting
+*   All fields on this page are editable.
+*   You can change the Event Title, Description, Codeword, and even the source CSV URL.
+*   Use the dropdowns to set the Format, Board Size, and Team Count.
+*   You can also update the names for each team.
+*   Once you have made your desired changes, click the **Export Config** button. This will generate and download a new `config.json` file containing all your updated settings.
 
-### Security
-*   **Require Team Passcodes**: If enabled, players must enter a passcode to view a specific team's board.
-*   **Team Passcodes**: You can set individual passcodes for each team here.
-
-### Theme Editor
-*   **Custom Themes**: You can create, edit, and delete custom color themes for the dashboard.
-*   **Import/Export**: Share themes with others by exporting them to JSON.
-
-### Share Settings (config.json)
-*   **Download config.json**: Once you have configured the event (Name, CSV URL, Teams, etc.), click this to download a `config.json` file.
-*   **Deployment**: Upload this `config.json` to the root folder of your website. When players visit the site, it will automatically load these settings, ensuring everyone is looking at the correct event data without needing to manually enter the CSV URL.
+### Deployment
+*   To apply your changes, you must manually upload the newly downloaded `config.json` file to the root directory of your web server, replacing the old one.
+*   Players will see the updated configuration the next time they load the bingo board.
 
 ## Gains Tracker
 
@@ -74,8 +67,9 @@ The Gains page (`gains.html`) allows you to compare two snapshots of player data
 ---
 
 ### Quick Setup Checklist
-1.  Create your Google Sheet with the required layout.
-2.  Publish the sheet to CSV.
-3.  Go to `settings.html` and paste the CSV URL.
-4.  Click "Load Settings from CSV" or manually enter Event Name/Description.
-5.  Download `config.json` and upload it to your web server.
+1.  Create your Google Sheet with the required layout and publish it to CSV.
+2.  Create an initial `config.json` file (you can use a basic template or export one from the settings page). Make sure `teams.Team1.url` points to your CSV. Upload it to your server.
+3.  Navigate to `settings.html`. The page will load your current configuration.
+4.  Modify the settings as needed (Event Name, Team Names, etc.).
+5.  Click **Export Config** to download the updated `config.json`.
+6.  Upload the new `config.json` to your web server, replacing the old file.
