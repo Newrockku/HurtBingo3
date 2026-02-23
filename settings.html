@@ -70,6 +70,12 @@
     .btn:hover { background: var(--bg-tile); border-color: var(--accent); color: var(--accent); }
     .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
     @media (max-width: 768px) { .grid-2 { grid-template-columns: 1fr; } }
+    .page-footer {
+      width: 100%; max-width: 1400px; margin: 40px auto 0 auto;
+      padding: 20px 0; border-top: 1px solid var(--border-main);
+      font-size: 0.7rem; color: var(--border-main);
+      display: flex; justify-content: center; align-items: center; gap: 6px;
+    }
   </style>
 </head>
 <body>
@@ -137,6 +143,12 @@
       </div>
     </div>
   </div>
+
+  <footer class="page-footer">
+    <span>v3.342</span>
+    <span>&middot;</span>
+    <span>Bingo Settings</span>
+  </footer>
 
   <script src="js/themes.js"></script>
   <script src="js/bingo-utils.js"></script>
