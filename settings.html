@@ -37,6 +37,15 @@
       display: inline-flex; align-items: center; gap: 8px;
     }
     .nav-btn:hover { border-color: var(--accent); color: var(--accent); background: var(--bg-tile); }
+    #admin-back-btn {
+      border-color: var(--accent);
+      color: var(--accent);
+      font-weight: bold;
+    }
+    #admin-back-btn:hover {
+      background: var(--accent);
+      color: var(--bg-body);
+    }
     .container { max-width: 1400px; margin: 0 auto; }
     .card {
       background: var(--bg-tile); border: 2px solid var(--border-main);
@@ -71,7 +80,10 @@
     </div>
     <div style="display:flex; gap:10px; align-items:center;">
       <select id="theme-select" class="nav-btn" style="padding:6px;"></select>
-      <a href="admin.html" class="nav-btn">Back to Admin</a>
+      <a href="admin.html" class="nav-btn" id="admin-back-btn">
+        <svg style="width:18px; height:18px; fill:currentColor;" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+        Back to Admin
+      </a>
     </div>
   </header>
 
