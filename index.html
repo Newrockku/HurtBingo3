@@ -760,7 +760,7 @@
   async function loadSharedConfig() {
     let loadedRemote = false;
     try {
-      const res = await fetch('config.json?t=' + Date.now());
+      const res = await fetch(withCacheBust('config.json'));
       if (res.ok) {
         const data = await res.json();
         if (data.teams) TEAM_MAP = data.teams;
@@ -916,6 +916,12 @@
     }
     cols.push(cur.trim());
     return cols;
+  };
+
+  const withCacheBust = (url) => {
+    const u = String(url || '').trim();
+    if (!u) return '';
+    return u + (u.includes('?') ? '&' : '?') + 't=' + Date.now();
   };
 
   const getProgressColor = (pct) => {
@@ -1292,11 +1298,13 @@
         return;
       }
 
-      const res = await fetch(`${team.url}&t=${Date.now()}`, {
+      const res = await fetch(withCacheBust(team.url), {
         headers: { 'pragma': 'no-cache', 'cache-control': 'no-cache' },
         signal: fetchController.signal
       });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const raw = normalizeNL(await res.text());
+      if (fetchController?.signal.aborted) return;
       const h = simpleHash(raw);
 
       if (manual) {

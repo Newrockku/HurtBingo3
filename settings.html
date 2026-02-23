@@ -417,7 +417,6 @@
   const storageSave = (k, v) => {
     try {
       localStorage.setItem(k, JSON.stringify(v));
-      console.log('Saved to localStorage:', k);  // Debug log
     } catch (e) {
       console.error('Failed to save:', k, e);
       showToast('❌ Failed to save! Storage may be full.');
@@ -436,7 +435,14 @@
         icon = '<svg style="width:1.2em; height:1.2em; fill:currentColor; vertical-align: -0.2em; margin-right: 8px;" viewBox="0 0 24 24"><path d="M6 2v6h.01L6 8.01 10 12l-4 4 .01.01H6V22h12v-5.99h-.01L18 16l-4-4 4-3.99-.01-.01H18V2H6zm10 14.5V20H8v-3.5l4-4 4 4zm-4-5l-4-4V4h8v3.5l-4 4z"/></svg>';
     }
 
-    toast.innerHTML = `${icon} ${msg.substring(icon ? 2 : 0)}`;
+    const messageText = msg.substring(icon ? 2 : 0);
+    toast.textContent = messageText;
+    if (icon) {
+      const iconWrap = document.createElement('span');
+      iconWrap.innerHTML = icon;
+      const iconEl = iconWrap.firstElementChild;
+      if (iconEl) toast.prepend(iconEl);
+    }
 
     toast.classList.add('show');
     setTimeout(() => toast.classList.remove('show'), duration);
@@ -499,7 +505,7 @@
   const loadConfig = async () => {
     // 1. Try to load from config.json
     try {
-      const res = await fetch('config.json?t=' + Date.now());
+      const res = await fetch(withCacheBust('config.json'));
       if (res.ok) {
         const data = await res.json();
         if (data.eventConfig) {
@@ -548,16 +554,22 @@
     return cols;
   };
 
+  const withCacheBust = (url) => {
+    const u = String(url || '').trim();
+    if (!u) return '';
+    return u + (u.includes('?') ? '&' : '?') + 't=' + Date.now();
+  };
+
   const importFromCSV = async () => {
     const url = $('csv-url').value.trim();
     if (!url) { showToast('❌ Enter CSV URL first'); return; }
     
     try {
       showToast('⏳ Fetching CSV...');
-      const res = await fetch(url);
+      const res = await fetch(withCacheBust(url));
       if (!res.ok) throw new Error('Fetch failed');
       const text = await res.text();
-      const rows = text.split('\n');
+      const rows = text.replace(/\r/g, '').split('\n');
       if (rows.length < 2) throw new Error('CSV empty or missing data');
       
       // Parse first data row (index 1, assuming index 0 is header)

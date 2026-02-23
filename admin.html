@@ -441,6 +441,12 @@
 
   const $ = id => document.getElementById(id);
 
+  const escapeHTML = (str) => {
+    const d = document.createElement('div');
+    d.appendChild(document.createTextNode(String(str ?? '')));
+    return d.innerHTML;
+  };
+
   const storageLoad = (k, fb) => {
     try {
       const v = localStorage.getItem(k);
@@ -461,6 +467,12 @@
     let h = 0;
     for (let i = 0; i < str.length; i++) { h = ((h << 5) - h) + str.charCodeAt(i); h |= 0; }
     return h;
+  };
+
+  const withCacheBust = (url) => {
+    const u = String(url || '').trim();
+    if (!u) return '';
+    return u + (u.includes('?') ? '&' : '?') + 't=' + Date.now();
   };
 
   const applyTheme = (name) => {
@@ -563,7 +575,7 @@
 
       row.innerHTML = `
         <div class="leaderboard-rank">${medal || idx + 1}</div>
-        <div class="leaderboard-name">${team.name}</div>
+        <div class="leaderboard-name">${escapeHTML(team.name)}</div>
         <div class="leaderboard-points">${team.points}</div>
       `;
 
@@ -620,7 +632,7 @@
 
     const createRow = (t) => `
       <div class="stat-list-item">
-        <span style="color:var(--text-bright);">${t.id}. ${t.title}</span>
+        <span style="color:var(--text-bright);">${t.id}. ${escapeHTML(t.title)}</span>
         <span style="font-weight:bold; color:${t.count > 0 ? 'var(--accent)' : 'var(--text-dim)'};">${t.count}/${totalTeams}</span>
       </div>`;
 
@@ -700,7 +712,7 @@
 
       card.innerHTML = `
         <div class="board-header">
-          <div class="board-name">${team.name || key}</div>
+          <div class="board-name">${escapeHTML(team.name || key)}</div>
           <div class="board-points">${team.points || 0} PTS</div>
         </div>
         <div class="mini-grid-wrapper">${gridHtml}</div>
@@ -728,8 +740,8 @@
     fetchController = new AbortController();
 
     try {
-      const res = await fetch(url + '&t=' + Date.now(), { signal: fetchController.signal });
-      if (!res.ok) return;
+      const res = await fetch(withCacheBust(url), { signal: fetchController.signal });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const text = normalizeNL(await res.text());
 
       if (fetchController.signal.aborted) return;
