@@ -1059,10 +1059,6 @@
     DOM.viewSettings.style.display = 'flex';
     DOM.themeSel.value = storageLoad(STORAGE_KEYS.theme, 'osrs');
     DOM.intervalSel.value = String(syncMs);
-    
-    ThemeEditor.refreshCustomDropdown();
-    ThemeEditor.refreshCustomList();
-    ThemeEditor.updateEditButton();
     showModal(triggerEl, true);
   };
 
