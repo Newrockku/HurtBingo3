@@ -252,6 +252,11 @@
       display: flex; flex-direction: column; gap: 2px;
       animation: fadeIn 0.5s ease;
     }
+    .discord-settings {
+      grid-column: 1 / -1; border-top: 1px solid var(--border-main);
+      margin-top: 10px; padding-top: 15px;
+    }
+    .discord-input { width: 100%; background: var(--bg-body); border: 1px solid var(--border-main); color: var(--text-main); padding: 8px; margin-top: 5px; font-family: inherit; }
     .stat-list-item:last-child { border-bottom: none; }
     .update-item:last-child { border-bottom: none; }
     .update-time { font-size: 0.7rem; color: var(--text-dim); }
@@ -324,6 +329,15 @@
             <span class="stat-label">CSV URL</span>
             <span style="font-size:0.75rem; color:var(--text-dim); word-break:break-all;" id="csv-url-display">Not configured</span>
           </div>
+          <div class="discord-settings">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:5px;">
+              <span class="stat-label" style="font-weight:bold; color:var(--text-bright);">Discord Webhook Integration</span>
+              <label style="font-size:0.8rem; display:flex; align-items:center; gap:5px; cursor:pointer; color:var(--text-dim);">
+                <input type="checkbox" id="discord-enable"> Enable Notifications
+              </label>
+            </div>
+            <input type="password" id="discord-webhook-url" class="discord-input" placeholder="https://discord.com/api/webhooks/...">
+          </div>
         </div>
       </div>
     </div>
@@ -387,7 +401,10 @@
     theme: 'bingo-theme',
     customThemes: 'bingo-custom-themes',
     syncInterval: 'bingo-sync-interval',
-    codewordVisible: 'bingo-codeword-visible'
+    codewordVisible: 'bingo-codeword-visible',
+    webhookUrl: 'bingo-webhook-url',
+    webhookEnabled: 'bingo-webhook-enabled',
+    recentUpdates: 'bingo-recent-updates'
   };
 
   const DEFAULT_TEAMS = {
@@ -644,6 +661,7 @@
     const now = new Date().toLocaleTimeString();
     recentUpdates.unshift({ time: now, team: teamName, tile: tileTitle });
     if (recentUpdates.length > 20) recentUpdates.pop();
+    storageSave(STORAGE_KEYS.recentUpdates, recentUpdates);
     renderRecentUpdates();
   };
 
@@ -846,6 +864,7 @@
               newArr.forEach((isComplete, idx) => {
                  if (isComplete && !oldArr[idx]) {
                     addRecentUpdate(teamsConfig[teamKey].name || teamKey, tileStats[idx].title);
+                    postToDiscord(teamsConfig[teamKey].name || teamKey, tileStats[idx].title);
                  }
               });
            });
@@ -916,13 +935,27 @@
     });
   };
 
+  const setupDiscordSettings = () => {
+    const urlInput = $('discord-webhook-url');
+    const enableCheck = $('discord-enable');
+    if (urlInput && enableCheck) {
+      urlInput.value = localStorage.getItem(STORAGE_KEYS.webhookUrl) || '';
+      enableCheck.checked = localStorage.getItem(STORAGE_KEYS.webhookEnabled) === 'true';
+      urlInput.addEventListener('change', () => localStorage.setItem(STORAGE_KEYS.webhookUrl, urlInput.value.trim()));
+      enableCheck.addEventListener('change', () => localStorage.setItem(STORAGE_KEYS.webhookEnabled, enableCheck.checked));
+    }
+  };
+
   const init = async () => {
     loadCustomThemes();
     setupThemeDropdown();
     await loadConfig();
+    recentUpdates = storageLoad(STORAGE_KEYS.recentUpdates, []);
+    renderRecentUpdates();
     renderEventOverview();
     renderLeaderboard();
 
+    setupDiscordSettings();
     await refresh();
 
     // Auto-refresh every 5 seconds

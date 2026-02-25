@@ -300,7 +300,8 @@
     theme: 'bingo-theme',
     customThemes: 'bingo-custom-themes',
     syncInterval: 'bingo-sync-interval',
-    codewordVisible: 'bingo-codeword-visible'
+    codewordVisible: 'bingo-codeword-visible',
+    recentUpdates: 'bingo-recent-updates'
   };
 
   const DEFAULT_TEAMS = {
@@ -522,6 +523,7 @@
     const now = new Date().toLocaleTimeString();
     recentUpdates.unshift({ time: now, team: teamName, tile: tileTitle });
     if (recentUpdates.length > 20) recentUpdates.pop();
+    storageSave(STORAGE_KEYS.recentUpdates, recentUpdates);
     renderRecentUpdates();
   };
 
@@ -768,6 +770,8 @@
     loadCustomThemes();
     setupThemeDropdown();
     await loadConfig();
+    recentUpdates = storageLoad(STORAGE_KEYS.recentUpdates, []);
+    renderRecentUpdates();
     renderEventOverview();
     renderLeaderboard();
 
