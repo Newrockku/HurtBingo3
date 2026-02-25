@@ -28,10 +28,13 @@ Insights into how the event is progressing:
 *   **Easiest Tiles**: The top 5 most completed tiles across all teams.
 *   **Hardest Tiles**: The top 5 least completed tiles (often those with 0 completions).
 
-### 4. Recent Updates
+### 4. Recent Updates & Discord Notifications
 A live feed showing the latest activity.
-*   Updates automatically when a team completes a tile.
-*   Shows the time, team name, and the specific tile completed.
+*   **Live Feed**: Updates automatically when a team completes a tile.
+*   **Discord Integration**: You can configure a Discord Webhook to send automatic announcements.
+    *   Paste your Webhook URL in the **Event Settings & Overview** section.
+    *   Check **Enable Notifications**.
+    *   *Note: The Admin Dashboard must remain open in a browser tab for notifications to send.*
 
 ### 5. Team Boards
 A grid of mini-boards for every team.
@@ -57,6 +60,19 @@ The Settings page (`settings.html`) is the primary tool for configuring your eve
 ### Deployment
 *   To apply your changes, you must manually upload the newly downloaded `config.json` file to the root directory of your web server, replacing the old one.
 *   Players will see the updated configuration the next time they load the bingo board.
+
+## Additional Tools
+
+### Public Overview
+The Overview page (`overview.html`) is a read-only dashboard suitable for public display or a second monitor. It mirrors the Admin Dashboard's layout but removes all settings and administrative controls.
+
+### Stream Overlay
+The Stream Overlay (`overlay.html`) is a widget designed for OBS/Streamlabs.
+*   **Features**: Transparent background, auto-cycles between Grid and Leaderboard.
+*   **URL Parameters**:
+    *   `?team=Team1`: Select the team to display.
+    *   `?cycle=15`: Set the rotation interval in seconds.
+    *   `?size=32`: Set the tile size in pixels.
 
 ## Gains Tracker
 

@@ -399,7 +399,6 @@
     tiles: 'bingo-tiles-config',
     completion: 'bingo-completion',
     theme: 'bingo-theme',
-    customThemes: 'bingo-custom-themes',
     syncInterval: 'bingo-sync-interval',
     codewordVisible: 'bingo-codeword-visible',
     webhookUrl: 'bingo-webhook-url',
@@ -420,22 +419,6 @@
 
   const THEME_VARS = window.BINGO_THEME_VARS;
   const THEMES = window.BINGO_THEMES;
-
-  const loadCustomThemes = () => {
-    try {
-      const custom = JSON.parse(localStorage.getItem(STORAGE_KEYS.customThemes) || '{}');
-      const sel = $('theme-select');
-      for (const [slug, data] of Object.entries(custom)) {
-        THEMES[slug] = data.vars;
-        if (sel && !sel.querySelector(`option[value="${slug}"]`)) {
-           const opt = document.createElement('option');
-           opt.value = slug;
-           opt.textContent = data.name;
-           sel.appendChild(opt);
-        }
-      }
-    } catch {}
-  };
 
   let eventConfig = {
     name: 'Bingo 2026',
@@ -947,7 +930,6 @@
   };
 
   const init = async () => {
-    loadCustomThemes();
     setupThemeDropdown();
     await loadConfig();
     recentUpdates = storageLoad(STORAGE_KEYS.recentUpdates, []);

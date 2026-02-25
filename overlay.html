@@ -206,16 +206,16 @@
           if (config.eventConfig) {
             eventConfig = { ...eventConfig, ...config.eventConfig };
             $('event-name').textContent = eventConfig.name;
-            updateBoardSize(eventConfig.boardSize);
+            // Defer board size update to avoid flickering if CSV overrides it
           }
 
           // 2. Load CSV
           // Use target team's URL or Team1 as fallback
           const csvUrl = config.teams?.[targetTeamKey]?.url || config.teams?.Team1?.url;
-          if (!csvUrl) throw new Error('No CSV URL');
+          if (!csvUrl) { updateBoardSize(eventConfig.boardSize); throw new Error('No CSV URL'); }
 
           const csvRes = await fetch(withCacheBust(csvUrl));
-          if (!csvRes.ok) throw new Error('CSV load failed');
+          if (!csvRes.ok) { updateBoardSize(eventConfig.boardSize); throw new Error('CSV load failed'); }
           const csvText = normalizeNL(await csvRes.text());
           
           const rows = csvText.split('\n').map(r => r.trim()).filter(r => r);
@@ -223,7 +223,11 @@
 
           // Parse Metadata (Row 1)
           const metaCols = parseCSVRow(rows[1]);
-          if (metaCols[4]) updateBoardSize(metaCols[4]);
+          if (metaCols[4]) {
+            updateBoardSize(metaCols[4]);
+          } else {
+            updateBoardSize(eventConfig.boardSize);
+          }
 
           // Parse Teams
           teamsConfig = {};

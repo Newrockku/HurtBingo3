@@ -1,6 +1,6 @@
 # Bingo Game - Player Guide
 
-Welcome to the Bingo event! This guide explains how to use the dashboard to track your team's progress, view tile requirements, and customize your experience.
+Welcome to Bingo! This guide explains how to use the dashboard to track your team's progress, view tile requirements, and customize your experience.
 
 ## The Dashboard
 
@@ -42,12 +42,6 @@ Click the **Settings (Gear Icon)** in the top right corner to access player opti
 ### Appearance (Themes)
 You can change the look of the board without affecting other players.
 *   **Standard Themes**: Choose from a wide variety of built-in themes like *OSRS*, *Dark Mode*, *Dracula*, *Cyberpunk*, and more.
-*   **Custom Themes**: You can create your own color scheme!
-    1.  Open Settings.
-    2.  Click **+ New Custom Theme**.
-    3.  Use the color pickers to adjust backgrounds, borders, and text colors.
-    4.  Name your theme and click **Save**.
-    5.  Your custom theme is saved to your browser.
 
 ### Data Settings
 *   **Sync Interval**: Adjust how frequently the board checks for new data (e.g., 15 seconds, 1 minute, 5 minutes).
@@ -56,6 +50,13 @@ You can change the look of the board without affecting other players.
 
 *   **"No Team Configured"**: If you see this message, ensure you are using the correct link provided by your event organizer (usually ending in `?team=Team1`).
 *   **Board not updating**: Check your internet connection and try clicking **[Sync Now]** at the bottom of the page.
+
+## For Streamers
+
+If you are streaming your gameplay, you can use the **Stream Overlay** widget (`overlay.html`).
+*   **Setup**: Add `overlay.html?team=YourTeamID` as a **Browser Source** in OBS or Streamlabs.
+*   **Features**: It features a transparent background and automatically cycles between your team's grid and the event leaderboard.
+*   **Customization**: Add `?cycle=20` to change the rotation speed (in seconds).
 
 ---
 *Good luck and happy scaping!*
