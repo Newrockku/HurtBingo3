@@ -515,7 +515,7 @@
           </div>
         </div>
         <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 2px;">
-          <div class="modal-label">Checklist</div>
+          <div id="modal-checklist-label" class="modal-label">Checklist</div>
           <div id="modal-points" class="modal-points-inline">0 PTS</div>
         </div>
         <div id="modal-list" class="modal-checklist" style="max-height: 130px; margin-bottom: 12px;"></div>
@@ -730,6 +730,7 @@
     modalProgressSection: $('modal-progress-section'),
     modalBar: $('modal-bar'),
     modalList: $('modal-list'),
+    modalChecklistLabel: $('modal-checklist-label'),
     modalDesc: $('modal-desc'),
     modalPoints: $('modal-points'),
     mapBack: $('modal-map-back'),
@@ -1032,6 +1033,12 @@
     DOM.modalBar.style.backgroundColor = t.barColor;
     DOM.modalList.innerHTML = t.modalChecklistHtml || '';
     DOM.modalDesc.innerText = t.description || '(No description)';
+
+    if (DOM.modalChecklistLabel) {
+      DOM.modalChecklistLabel.innerText = (t.requiredCount > 0)
+        ? `Checklist (${t.collectedCount}/${t.requiredCount})`
+        : 'Checklist';
+    }
     
     DOM.modalImage.alt = t.title;
     DOM.modalImage.onerror = () => handleImgError(DOM.modalImage);
@@ -1318,7 +1325,7 @@
           return `<div class="check-item${isCollected ? '' : ' uncollected'}"><span class="check-mark"></span> ${escapeHTML(it)}</div>`;
         }).join('');
         
-        tiles[i] = { id, title, img, percent, barColor: getProgressColor(percent), gridChecklistHtml, modalChecklistHtml, description, isCompleted, points: pointsVal, noData: false };
+        tiles[i] = { id, title, img, percent, barColor: getProgressColor(percent), gridChecklistHtml, modalChecklistHtml, description, isCompleted, points: pointsVal, noData: false, collectedCount: collectedItemsSet.size, requiredCount: requiredItems.length };
       }
 
       const bingoStats = calculateBingos(completion, gridCols, gridRows);
