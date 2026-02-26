@@ -586,8 +586,8 @@
       card.href = teamUrl;
 
       const teamNum = team.teamNumber || 1;
-      const currentCol = 13 + ((teamNum - 1) * 3);
-      const goalCol = 14 + ((teamNum - 1) * 3);
+      const currentCol = 14 + ((teamNum - 1) * 3);
+      const goalCol = 15 + ((teamNum - 1) * 3);
       
       let gridHtml = '';
       for(let i=0; i<maxTiles; i++) {
@@ -672,10 +672,11 @@
         eventConfig.teamCount = metaCols[5] || eventConfig.teamCount;
         updateBoardSize(eventConfig.boardSize);
 
+        // Parse Bonuses from new Col 12 (M)
         let rowBonus = 0, colBonus = 0, diagBonus = 0;
-        if (rows[1]) { const c = parseCSVRow(rows[1]); rowBonus = parseInt(c[11]) || 0; }
-        if (rows[2]) { const c = parseCSVRow(rows[2]); colBonus = parseInt(c[11]) || 0; }
-        if (rows[3]) { const c = parseCSVRow(rows[3]); diagBonus = parseInt(c[11]) || 0; }
+        if (rows[1]) { const c = parseCSVRow(rows[1]); rowBonus = parseInt(c[12]) || 0; }
+        if (rows[2]) { const c = parseCSVRow(rows[2]); colBonus = parseInt(c[12]) || 0; }
+        if (rows[3]) { const c = parseCSVRow(rows[3]); diagBonus = parseInt(c[12]) || 0; }
         eventConfig.bonuses = { row: rowBonus, col: colBonus, diag: diagBonus }; // Store bonuses in eventConfig
 
         // Update teamsConfig with names from CSV (vertical column 6)
@@ -710,8 +711,8 @@
 
           Object.entries(teamsConfig).forEach(([key, team]) => {
             const tNum = team.teamNumber;
-            const curCol = 13 + ((tNum - 1) * 3);
-            const goalCol = 14 + ((tNum - 1) * 3);
+            const curCol = 14 + ((tNum - 1) * 3);
+            const goalCol = 15 + ((tNum - 1) * 3);
             const cur = parseInt(cols[curCol], 10) || 0;
             const goal = parseInt(cols[goalCol], 10) || 1;
             if (cur >= goal && teamCompletions[key]) { // Ensure teamCompletions[key] exists before accessing

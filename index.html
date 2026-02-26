@@ -1234,11 +1234,11 @@
       flashSync();
 
       // Parse Metadata from first data row (index 1) BEFORE init arrays
-      // Parse Bonuses from Col 11 in Rows 2, 3, 4 (Indices 1, 2, 3)
+      // Parse Bonuses from new Col 12 (M) in Rows 2, 3, 4 (Indices 1, 2, 3)
       let rowBonus = 0, colBonus = 0, diagBonus = 0;
-      if (lines[1]) { const c = parseCSVRow(lines[1]); rowBonus = parseInt(c[11]) || 0; }
-      if (lines[2]) { const c = parseCSVRow(lines[2]); colBonus = parseInt(c[11]) || 0; }
-      if (lines[3]) { const c = parseCSVRow(lines[3]); diagBonus = parseInt(c[11]) || 0; }
+      if (lines[1]) { const c = parseCSVRow(lines[1]); rowBonus = parseInt(c[12]) || 0; }
+      if (lines[2]) { const c = parseCSVRow(lines[2]); colBonus = parseInt(c[12]) || 0; }
+      if (lines[3]) { const c = parseCSVRow(lines[3]); diagBonus = parseInt(c[12]) || 0; }
       
       completion = Array(maxTiles).fill(false);
       tiles = Array(maxTiles).fill(null);
@@ -1252,10 +1252,10 @@
       const teamNumber = currentTeamObject.teamNumber || 1;
       
       // Calculate which columns belong to this team
-      // New Format: Metadata(0-6) | TileData(7-10) | Bonus(11) | TeamData(12+)
-      const itemsCol = 12 + ((teamNumber - 1) * 3);
-      const currentCol = 13 + ((teamNumber - 1) * 3);
-      const goalCol = 14 + ((teamNumber - 1) * 3);
+      // New Format: Metadata(0-6) | TileData(7-10) | TileItemList(11) | Bonus(12) | TeamData(13+)
+      const itemsCol = 13 + ((teamNumber - 1) * 3); // This is the team's collected items, not used for checklist
+      const currentCol = 14 + ((teamNumber - 1) * 3);
+      const goalCol = 15 + ((teamNumber - 1) * 3);
       const rows = lines.slice(1);
       let count = 0;
       let calculatedPoints = 0;
@@ -1286,8 +1286,8 @@
         const title = cols[8] || `Tile ${id}`;
         const description = cols[9] || '';
         const pointsVal = parseInt(cols[10], 10) || 0;
+        const requiredItems = cols[11] ? cols[11].split(',').map(s => s.trim()).filter(Boolean) : [];
         
-        const items = cols[itemsCol] ? cols[itemsCol].split(',').map(s => s.trim()).filter(Boolean) : [];
         const current = Math.max(0, parseInt(cols[currentCol], 10) || 0);
         const goal = Math.max(1, parseInt(cols[goalCol], 10) || 1);
         const percent = Math.min((current / goal) * 100, 100);
@@ -1297,7 +1297,7 @@
         completion[i] = isCompleted;
         setMinimapComplete(id, isCompleted);
         
-        const checklistHtml = items.map(it =>
+        const checklistHtml = requiredItems.map(it =>
           `<div class="check-item"><span class="check-mark"></span> ${escapeHTML(it)}</div>`
         ).join('');
         
