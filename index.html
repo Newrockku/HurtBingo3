@@ -1272,6 +1272,16 @@
       const rows = lines.slice(1);
       let count = 0;
       let calculatedPoints = 0;
+
+      // Helper to robustly parse comma-separated values from a single CSV cell.
+      // Handles leading/trailing whitespace, and stray commas at the start/end of the list.
+      const parseList = (str) => {
+        if (!str) return [];
+        const cleanedStr = String(str).trim().replace(/^,+/,'').replace(/,+$/,'');
+        if (!cleanedStr) return [];
+        return cleanedStr.split(',').map(s => s.trim()).filter(s => s);
+      };
+
       console.log(`Team: ${currentTeamKey} (Team Number: ${teamNumber}), Columns: Items=${itemsCol}, Current=${currentCol}, Goal=${goalCol}`);
 
       // Update event title and description from eventConfig (already updated from CSV metadata)
