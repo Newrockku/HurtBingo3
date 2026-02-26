@@ -1335,7 +1335,7 @@
           return `<div class="check-item${isCollected ? '' : ' uncollected'}"><span class="check-mark"></span> ${escapeHTML(it)}</div>`;
         }).join('');
         
-        tiles[i] = { id, title, img, percent, barColor: getProgressColor(percent), gridChecklistHtml, modalChecklistHtml, description, isCompleted, points: pointsVal, noData: false, collectedCount: collectedItemsSet.size, requiredCount: requiredItems.length };
+        tiles[i] = { id, title, img, percent, barColor: getProgressColor(percent), gridChecklistHtml, modalChecklistHtml, description, isCompleted, points: pointsVal, noData: false, collectedCount: current, requiredCount: goal };
       }
 
       const bingoStats = calculateBingos(completion, gridCols, gridRows);
