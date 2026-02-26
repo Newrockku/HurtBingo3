@@ -470,19 +470,45 @@
   };
 
   const loadConfig = async () => {
-    // Load from LocalStorage (Populated by index.html or settings.html fetching CSV)
-
+    // 1. Try loading from config.json
     try {
-      const savedEvent = localStorage.getItem(STORAGE_KEYS.eventConfig);
-      if (savedEvent) eventConfig = JSON.parse(savedEvent);
-      const savedTeams = localStorage.getItem(STORAGE_KEYS.teams);
-      teamsConfig = savedTeams ? JSON.parse(savedTeams) : { ...DEFAULT_TEAMS };
+      const res = await fetch(withCacheBust('config.json'));
+      if (res.ok) {
+        const data = await res.json();
+        if (data.eventConfig) eventConfig = { ...eventConfig, ...data.eventConfig };
+        if (data.teams) teamsConfig = data.teams;
+
+        // Fallback for masterCsvUrl
+        if (!eventConfig.masterCsvUrl && data.teams) {
+           if (data.teams.Team1?.url) eventConfig.masterCsvUrl = data.teams.Team1.url;
+           else if (data.teams['Team 1']?.url) eventConfig.masterCsvUrl = data.teams['Team 1'].url;
+        }
+      }
+    } catch {}
+
+    // 2. Load from LocalStorage (Theme, or fallback if config.json failed)
+    try {
       const savedTheme = storageLoad(STORAGE_KEYS.theme, 'osrs');
       applyTheme(savedTheme);
-      
+
+      // If we still don't have a CSV URL, check localStorage
+      if (!eventConfig.masterCsvUrl) {
+        const savedEvent = localStorage.getItem(STORAGE_KEYS.eventConfig);
+        if (savedEvent) {
+          const localConfig = JSON.parse(savedEvent);
+          if (localConfig.masterCsvUrl) eventConfig = { ...eventConfig, ...localConfig };
+        }
+      }
+
+      // If teams are empty (config.json failed or didn't have teams), check localStorage
+      if (Object.keys(teamsConfig).length === 0) {
+        const savedTeams = localStorage.getItem(STORAGE_KEYS.teams);
+        teamsConfig = savedTeams ? JSON.parse(savedTeams) : { ...DEFAULT_TEAMS };
+      }
+
       if (eventConfig.boardSize) updateBoardSize(eventConfig.boardSize);
     } catch {
-      teamsConfig = { ...DEFAULT_TEAMS };
+      if (Object.keys(teamsConfig).length === 0) teamsConfig = { ...DEFAULT_TEAMS };
     }
   };
 
