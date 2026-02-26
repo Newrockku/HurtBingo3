@@ -491,21 +491,6 @@
       const savedTheme = storageLoad(STORAGE_KEYS.theme, 'osrs');
       applyTheme(savedTheme);
 
-      // If we still don't have a CSV URL, check localStorage
-      if (!eventConfig.masterCsvUrl) {
-        const savedEvent = localStorage.getItem(STORAGE_KEYS.eventConfig);
-        if (savedEvent) {
-          const localConfig = JSON.parse(savedEvent);
-          if (localConfig.masterCsvUrl) eventConfig = { ...eventConfig, ...localConfig };
-        }
-      }
-
-      // If teams are empty (config.json failed or didn't have teams), check localStorage
-      if (Object.keys(teamsConfig).length === 0) {
-        const savedTeams = localStorage.getItem(STORAGE_KEYS.teams);
-        teamsConfig = savedTeams ? JSON.parse(savedTeams) : { ...DEFAULT_TEAMS };
-      }
-
       if (eventConfig.boardSize) updateBoardSize(eventConfig.boardSize);
     } catch {
       if (Object.keys(teamsConfig).length === 0) teamsConfig = { ...DEFAULT_TEAMS };
@@ -873,10 +858,6 @@
           teamsConfig[key].points += (stats.rows * rowBonus) + (stats.cols * colBonus) + (stats.diags * diagBonus);
         });
 
-        // Persist updates to storage so loadConfig() doesn't revert them next cycle
-        storageSave(STORAGE_KEYS.eventConfig, eventConfig);
-        storageSave(STORAGE_KEYS.teams, teamsConfig);
-        
         // Update UI components that depend on metadata
         renderEventOverview();
         renderTileStats(tileStats, Object.keys(teamsConfig).length);

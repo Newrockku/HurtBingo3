@@ -652,19 +652,6 @@
       }
     } catch {}
 
-    if (!loadedRemote) {
-      // Fallback to localStorage
-    try {
-      const savedTeams = localStorage.getItem(STORAGE_KEYS.teams);
-      TEAM_MAP = savedTeams ? JSON.parse(savedTeams) : { ...DEFAULT_TEAMS };
-      } catch { TEAM_MAP = { ...DEFAULT_TEAMS }; }
-
-    try {
-      const savedEvent = localStorage.getItem(STORAGE_KEYS.eventConfig);
-        if (savedEvent) eventConfig = { ...eventConfig, ...JSON.parse(savedEvent) };
-      } catch {}
-    }
-
     // Safety: If TEAM_MAP is empty (e.g. bad config or empty local storage), force defaults
     if (Object.keys(TEAM_MAP).length === 0) {
       TEAM_MAP = { ...DEFAULT_TEAMS };
@@ -1213,8 +1200,6 @@
           }
         }
         TEAM_MAP = updatedTeamMap;
-        localStorage.setItem(STORAGE_KEYS.teams, JSON.stringify(TEAM_MAP));
-        localStorage.setItem(STORAGE_KEYS.eventConfig, JSON.stringify(eventConfig)); // Save updated config
       }
 
       if (manual) {
