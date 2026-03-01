@@ -960,9 +960,11 @@
         xpBox.style.justifyContent = 'center';
         xpBox.style.alignItems = 'center';
         xpBox.style.textAlign = 'center';
+        const xpColor = tile.isCompleted ? 'var(--text-completed)' : 'var(--text-bright)';
+        const goalColor = tile.isCompleted ? 'var(--text-completed)' : 'var(--text-dim)';
         xpBox.innerHTML = `
-          <div style="font-size: 8cqw; font-weight: bold; color: var(--text-bright); line-height: 1.1;">${tile.collectedCount.toLocaleString()}</div>
-          <div style="font-size: 5cqw; color: var(--text-dim);">/ ${tile.requiredCount.toLocaleString()} XP</div>
+          <div style="font-size: 8cqw; font-weight: bold; color: ${xpColor}; line-height: 1.1;">${tile.collectedCount.toLocaleString()}</div>
+          <div style="font-size: 5cqw; color: ${goalColor};">/ ${tile.requiredCount.toLocaleString()} XP</div>
         `;
         cell.appendChild(xpBox);
       } else {
