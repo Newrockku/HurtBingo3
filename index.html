@@ -952,7 +952,20 @@
       cell.appendChild(headerBox);
       cell.appendChild(imgContainer);
       cell.appendChild(progressContainer);
-      if (!tile.isXpTile) {
+      if (tile.isXpTile) {
+        const xpBox = document.createElement('div');
+        xpBox.className = 'checklist-box';
+        xpBox.style.display = 'flex';
+        xpBox.style.flexDirection = 'column';
+        xpBox.style.justifyContent = 'center';
+        xpBox.style.alignItems = 'center';
+        xpBox.style.textAlign = 'center';
+        xpBox.innerHTML = `
+          <div style="font-size: 8cqw; font-weight: bold; color: var(--text-bright); line-height: 1.1;">${tile.collectedCount.toLocaleString()}</div>
+          <div style="font-size: 5cqw; color: var(--text-dim);">/ ${tile.requiredCount.toLocaleString()} XP</div>
+        `;
+        cell.appendChild(xpBox);
+      } else {
         cell.appendChild(checklistBox);
       }
       cell.appendChild(pointBadge);
