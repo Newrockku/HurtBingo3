@@ -954,7 +954,7 @@
       cell.appendChild(progressContainer);
       if (tile.isXpTile) {
         const xpBox = document.createElement('div');
-        xpBox.className = 'checklist-box';
+        xpBox.style.flexGrow = '1';
         xpBox.style.display = 'flex';
         xpBox.style.flexDirection = 'column';
         xpBox.style.justifyContent = 'center';
@@ -1048,7 +1048,8 @@
     DOM.modalBar.style.backgroundColor = t.barColor;
 
     DOM.modalList.style.display = t.isXpTile ? 'none' : 'block';
-    DOM.modalChecklistLabel.style.display = t.isXpTile ? 'none' : 'block';
+    DOM.modalChecklistLabel.style.visibility = t.isXpTile ? 'hidden' : 'visible';
+    DOM.modalChecklistLabel.style.display = 'block';
 
     DOM.modalList.innerHTML = t.modalChecklistHtml || '';
     DOM.modalDesc.innerText = t.description || '(No description)';
