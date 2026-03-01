@@ -359,7 +359,7 @@
 
       // Calculate Max Values for highlighting
       const maxVals = {};
-      const numericHeaders = ['Total', 'Total Boss KC', ...SKILL_HEADERS, ...BOSS_HEADERS];
+      const numericHeaders = ['Draft Score', 'Total', 'Total Boss KC', ...SKILL_HEADERS, ...BOSS_HEADERS];
       numericHeaders.forEach(h => {
         maxVals[h] = 0;
         gainsData.forEach(row => {
@@ -370,7 +370,7 @@
 
       // Render Header
       if (!tableHead.innerHTML) {
-        const displayHeaders = ['Player', 'Total', 'Total Boss KC', ...SKILL_HEADERS, ...BOSS_HEADERS];
+        const displayHeaders = ['Player', 'Draft Score', 'Total', 'Total Boss KC', ...SKILL_HEADERS, ...BOSS_HEADERS];
         let headHTML = '<tr>';
         for (const header of displayHeaders) {
           const isSortCol = sortState.column === header;
@@ -385,7 +385,7 @@
       let bodyHTML = '';
       for (const player of gainsData) {
         bodyHTML += '<tr>';
-        const displayHeaders = ['Player', 'Total', 'Total Boss KC', ...SKILL_HEADERS, ...BOSS_HEADERS];
+        const displayHeaders = ['Player', 'Draft Score', 'Total', 'Total Boss KC', ...SKILL_HEADERS, ...BOSS_HEADERS];
         for (const header of displayHeaders) {
           const value = player[header];
           if (header === 'Player') {
