@@ -1048,16 +1048,18 @@
     DOM.modalBar.style.backgroundColor = t.barColor;
 
     DOM.modalList.style.display = t.isXpTile ? 'none' : 'block';
-    DOM.modalChecklistLabel.style.visibility = t.isXpTile ? 'hidden' : 'visible';
+    DOM.modalChecklistLabel.style.visibility = 'visible';
     DOM.modalChecklistLabel.style.display = 'block';
 
     DOM.modalList.innerHTML = t.modalChecklistHtml || '';
     DOM.modalDesc.innerText = t.description || '(No description)';
 
     if (DOM.modalChecklistLabel) {
-      DOM.modalChecklistLabel.innerText = (t.requiredCount > 0)
-        ? `Checklist (${t.collectedCount}/${t.requiredCount})`
-        : 'Checklist';
+      if (t.isXpTile) {
+        DOM.modalChecklistLabel.innerHTML = `<span style="text-transform: none; font-weight: normal;">${t.collectedCount.toLocaleString()} / ${t.requiredCount.toLocaleString()} XP</span>`;
+      } else {
+        DOM.modalChecklistLabel.innerText = (t.requiredCount > 0) ? `Checklist (${t.collectedCount}/${t.requiredCount})` : 'Checklist';
+      }
     }
     
     DOM.modalImage.alt = t.title;
