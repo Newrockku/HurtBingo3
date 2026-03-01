@@ -51,12 +51,5 @@ You can change the look of the board without affecting other players.
 *   **"No Team Configured"**: If you see this message, ensure you are using the correct link provided by your event organizer (usually ending in `?team=Team1`).
 *   **Board not updating**: Check your internet connection and try clicking **[Sync Now]** at the bottom of the page.
 
-## For Streamers
-
-If you are streaming your gameplay, you can use the **Stream Overlay** widget (`overlay.html`).
-*   **Setup**: Add `overlay.html?team=YourTeamID` as a **Browser Source** in OBS or Streamlabs.
-*   **Features**: It features a transparent background and automatically cycles between your team's grid and the event leaderboard.
-*   **Customization**: Add `?cycle=20` to change the rotation speed (in seconds).
-
 ---
 *Good luck and happy scaping!*
