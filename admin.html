@@ -289,6 +289,31 @@
     .stats-table td:nth-child(2) { white-space: normal; }
     .stats-table td:nth-child(3) { width: 120px; text-align: right; font-weight: bold; }
 
+    /* Heatmap Grid */
+    .heatmap-grid {
+      display: grid; grid-template-columns: repeat(var(--grid-cols, 7), 1fr);
+      gap: 4px; margin-top: 10px;
+    }
+    .heatmap-cell {
+      background: var(--bg-well); border: 1px solid var(--border-main);
+      aspect-ratio: 1/1; position: relative;
+      display: flex; flex-direction: column; justify-content: center; align-items: center;
+      cursor: default; overflow: hidden;
+    }
+    .heatmap-bg {
+      position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+      background-color: var(--accent); transition: opacity 0.3s; z-index: 0;
+    }
+    .heatmap-content { z-index: 1; text-align: center; pointer-events: none; }
+    .heatmap-count { font-size: 1.2rem; font-weight: bold; color: var(--text-main); text-shadow: 1px 1px 2px black; }
+    .heatmap-id { font-size: 0.7rem; color: var(--text-bright); text-shadow: 1px 1px 2px black; }
+    .heatmap-tooltip {
+      display: none; position: absolute; bottom: 105%; left: 50%; transform: translateX(-50%);
+      background: var(--bg-body); border: 1px solid var(--border-main); padding: 4px 8px;
+      font-size: 0.8rem; white-space: nowrap; z-index: 10; box-shadow: 0 2px 5px rgba(0,0,0,0.5); color: var(--text-main);
+    }
+    .heatmap-cell:hover .heatmap-tooltip { display: block; }
+
     @media (max-width: 768px) {
       body { padding: 12px; }
       .admin-header { padding: 12px; }
@@ -373,19 +398,8 @@
     <!-- Tile Statistics -->
     <div class="card">
       <h2 class="card-title"><svg style="width:1em; height:1em; fill:currentColor; vertical-align: -0.15em; margin-right: 8px;" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M5 9.2h3V19H5zM10.6 5h3v14h-3zm5.6 8h3v6h-3z"/></svg>Tile Statistics</h2>
-      <div id="tile-stats-table-wrapper" class="stats-table-wrapper">
-        <table class="stats-table">
-          <thead>
-            <tr>
-              <th>#</th>
-              <th>Tile</th>
-              <th>Completions</th>
-            </tr>
-          </thead>
-          <tbody id="tile-stats-tbody">
-            <tr><td colspan="3" style="text-align:center; color:var(--text-dim); padding: 20px;">Loading stats...</td></tr>
-          </tbody>
-        </table>
+      <div id="heatmap-grid" class="heatmap-grid">
+        <div style="grid-column: 1/-1; text-align:center; color:var(--text-dim); padding: 20px;">Loading stats...</div>
       </div>
     </div>
 
@@ -657,29 +671,29 @@
   };
 
   const renderTileStats = (tileStats, totalTeams) => {
-    const tbody = $('tile-stats-tbody');
-    if (!tbody) return;
+    const container = $('heatmap-grid');
+    if (!container) return;
 
-    // Sort by count desc, then by ID asc
-    const sorted = [...tileStats].sort((a, b) => {
-      if (b.count !== a.count) return b.count - a.count;
-      return a.id - b.id;
+    container.innerHTML = '';
+    const maxVal = totalTeams || 1;
+
+    const frag = document.createDocumentFragment();
+    tileStats.forEach(t => {
+      const pct = (t.count / maxVal);
+      const cell = document.createElement('div');
+      cell.className = 'heatmap-cell';
+      
+      cell.innerHTML = `
+        <div class="heatmap-bg" style="opacity: ${pct * 0.85};"></div>
+        <div class="heatmap-content">
+          <div class="heatmap-count">${t.count}</div>
+          <div class="heatmap-id">${t.id}</div>
+        </div>
+        <div class="heatmap-tooltip">${t.id}. ${escapeHTML(t.title)} (${t.count}/${totalTeams})</div>
+      `;
+      frag.appendChild(cell);
     });
-
-    if (sorted.length === 0) {
-      tbody.innerHTML = '<tr><td colspan="3" style="text-align:center; color:var(--text-dim); padding: 20px;">No tile data available</td></tr>';
-      return;
-    }
-
-    const rowsHtml = sorted.map(t => `
-      <tr>
-        <td>${t.id}</td>
-        <td>${escapeHTML(t.title)}</td>
-        <td style="color: ${t.count > 0 ? 'var(--accent)' : 'var(--text-dim)'};">${t.count} / ${totalTeams}</td>
-      </tr>
-    `).join('');
-
-    tbody.innerHTML = rowsHtml;
+    container.appendChild(frag);
   };
 
   const addRecentUpdate = (teamName, tileTitle) => {
