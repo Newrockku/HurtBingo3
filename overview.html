@@ -276,9 +276,29 @@
 
     <!-- Tile Statistics -->
     <div class="card">
-      <h2 class="card-title"><svg style="width:1em; height:1em; fill:currentColor; vertical-align: -0.15em; margin-right: 8px;" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M5 9.2h3V19H5zM10.6 5h3v14h-3zm5.6 8h3v6h-3z"/></svg>Tile Statistics</h2>
-      <div id="heatmap-grid" class="heatmap-grid">
-        <div style="grid-column: 1/-1; text-align:center; color:var(--text-dim); padding: 20px;">Loading stats...</div>
+      <div style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 8px; border-bottom: 2px solid var(--border-main); margin-bottom: 16px;">
+        <h2 class="card-title" style="margin:0; padding:0; border:none;"><svg style="width:1em; height:1em; fill:currentColor; vertical-align: -0.15em; margin-right: 8px;" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M5 9.2h3V19H5zM10.6 5h3v14h-3zm5.6 8h3v6h-3z"/></svg>Tile Statistics</h2>
+        <select id="tile-stats-view-select" class="nav-btn" style="padding: 4px 8px; font-size: 0.8rem; height: auto;">
+          <option value="heatmap">Heatmap</option>
+          <option value="list">List</option>
+        </select>
+      </div>
+      <div id="heatmap-view">
+        <div id="heatmap-grid" class="heatmap-grid">
+          <div style="grid-column: 1/-1; text-align:center; color:var(--text-dim); padding: 20px;">Loading stats...</div>
+        </div>
+      </div>
+      <div id="list-view" style="display: none;">
+        <div class="stats-grid">
+          <div>
+            <h3 style="font-size:1rem; color:var(--text-dim); border-bottom:1px solid var(--border-main); padding-bottom:5px; margin-top:0;">Easiest Tiles (Most Completed)</h3>
+            <div id="stats-most-completed" style="display:flex; flex-direction:column; gap:2px;"></div>
+          </div>
+          <div>
+            <h3 style="font-size:1rem; color:var(--text-dim); border-bottom:1px solid var(--border-main); padding-bottom:5px; margin-top:0;">Hardest Tiles (Least Completed)</h3>
+            <div id="stats-least-completed" style="display:flex; flex-direction:column; gap:2px;"></div>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -321,7 +341,8 @@
     customThemes: 'bingo-custom-themes',
     syncInterval: 'bingo-sync-interval',
     codewordVisible: 'bingo-codeword-visible',
-    recentUpdates: 'bingo-recent-updates'
+    recentUpdates: 'bingo-recent-updates',
+    tileStatsView: 'bingo-tile-stats-view'
   };
 
   const DEFAULT_TEAMS = {
@@ -822,6 +843,13 @@
     renderRecentUpdates();
     renderEventOverview();
     renderLeaderboard();
+
+    const statsViewSelect = $('tile-stats-view-select');
+    if (statsViewSelect) {
+        statsViewSelect.value = storageLoad(STORAGE_KEYS.tileStatsView, 'heatmap');
+        statsViewSelect.addEventListener('change', updateStatsView);
+        updateStatsView(); // Set initial view
+    }
 
     await refresh();
 
